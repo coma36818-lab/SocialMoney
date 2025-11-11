@@ -63,6 +63,8 @@ export default function Home() {
       <div className="px-6">
         <HomeClient />
 
+        <Hero />
+        
         {newsSections.map((section) => (
           <NewsSection key={section.id} {...section} />
         ))}
@@ -73,7 +75,6 @@ export default function Home() {
           articles={curiositaArticles}
         />
 
-        <Hero />
         <div className="py-10">
           <StatsBar />
         </div>
