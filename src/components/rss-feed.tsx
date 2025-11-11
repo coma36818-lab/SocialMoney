@@ -8,14 +8,21 @@ import Image from 'next/image';
 import { AdSlot } from './ad-slot';
 
 // Map feed hostnames to desired names and icons
-const feedSourceDetails: { [key: string]: { name: string; icon: string } } = {
-  'ansa.it': { name: 'ANSA', icon: '📰' },
-  'vogue.it': { name: 'Vogue', icon: '👗' },
-  'giallozafferano.it': { name: 'GialloZafferano', icon: '🍳' },
-  'comingsoon.it': { name: 'ComingSoon', icon: '🎬' },
-  'people.com': { name: 'People', icon: '💋' },
-  'feeds.bbci.co.uk': { name: 'BBC News', icon: '🌍' },
-};
+const feedSources = [
+  { name: 'ANSA', icon: '📰', url: 'https://www.ansa.it/sito/ansait_rss.xml', identifier: 'ansa.it' },
+  { name: 'BBC News', icon: '🌍', url: 'http://feeds.bbci.co.uk/news/rss.xml', identifier: 'bbci.co.uk' },
+  { name: 'Vogue', icon: '👗', url: 'https://www.vogue.it/rss', identifier: 'vogue.it' },
+  { name: 'GialloZafferano', icon: '🍳', url: 'https://www.giallozafferano.it/rss', identifier: 'giallozafferano.it' },
+  { name: 'ComingSoon', icon: '🎬', url: 'https://www.comingsoon.it/rss', identifier: 'comingsoon.it' },
+  { name: 'People', icon: '💋', url: 'https://people.com/feed/', identifier: 'people.com' },
+];
+
+const feedSourceDetails: { [key: string]: { name: string; icon: string } } = 
+  feedSources.reduce((acc, source) => {
+    acc[source.identifier] = { name: source.name, icon: source.icon };
+    return acc;
+  }, {} as { [key: string]: { name: string; icon: string } });
+
 
 interface FeedItem {
   title: string;
@@ -23,14 +30,11 @@ interface FeedItem {
   image: string;
   description: string;
   pubDate: string;
-  source: string; // The hostname, e.g., "vogue.it"
+  source: string; // The identifier, e.g., "vogue.it"
   guid: string;
 }
 
 const AD_INTERVAL = 8; // Show an ad every 8 news items
-
-// The single endpoint for all feeds
-const feedMixerUrl = 'https://feedmix.novacms.xyz/api/v1/aggregate?feeds=https://www.ansa.it/sito/ansait_rss.xml,http://feeds.bbci.co.uk/news/rss.xml,https://www.vogue.it/rss,https://people.com/feed/,https://www.giallozafferano.it/rss,https://www.comingsoon.it/rss';
 
 export function RssFeed() {
   const [allFeedItems, setAllFeedItems] = useState<FeedItem[]>([]);
@@ -41,26 +45,70 @@ export function RssFeed() {
   useEffect(() => {
     async function fetchFeeds() {
       setLoading(true);
-      try {
-        const res = await fetch(feedMixerUrl);
-        if (!res.ok) {
-          throw new Error('Failed to fetch feeds from FeedMixer');
-        }
-        const data = await res.json();
-        
-        // Process items: add a unique guid, normalize source
-        const processedItems = (data.items || []).map((item: any) => ({
-            ...item,
-            guid: item.id || item.link || item.title,
-            pubDate: item.published || new Date().toISOString(),
-            description: (item.summary || item.content || '').replace(/<[^>]*>/g, '').substring(0, 100) + '...',
-            source: new URL(item.link).hostname.replace('www.', ''),
-            image: item.image || `https://picsum.photos/seed/${item.id || item.title}/600/400`,
-        }));
+      
+      const feedPromises = feedSources.map(feed => 
+        fetch(`/api/rss?url=${encodeURIComponent(feed.url)}`)
+          .then(res => {
+            if (!res.ok) {
+              console.warn(`Failed to fetch feed for ${feed.name}, status: ${res.status}`);
+              return null; // Return null for failed feeds
+            }
+            return res.text();
+          })
+          .then(text => {
+            if (!text) return [];
 
-        // Sort by date to get the most recent, then shuffle for variety
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(text, 'application/xml');
+            const items = Array.from(xmlDoc.querySelectorAll('item'));
+            
+            return items.slice(0, 10).map(item => {
+              const title = item.querySelector('title')?.textContent || '';
+              const link = item.querySelector('link')?.textContent || '';
+              const pubDate = item.querySelector('pubDate')?.textContent || new Date().toISOString();
+              const guid = item.querySelector('guid')?.textContent || link || title;
+
+              let description = (item.querySelector('description')?.textContent || '').replace(/<[^>]*>/g, '').substring(0, 100) + '...';
+              
+              let image = '';
+              const enclosure = item.querySelector('enclosure');
+              if (enclosure && enclosure.getAttribute('type')?.startsWith('image')) {
+                image = enclosure.getAttribute('url') || '';
+              }
+              if (!image) {
+                const content = item.querySelector('description')?.textContent || '';
+                const imgMatch = content.match(/<img[^>]+src="([^">]+)"/);
+                if (imgMatch) {
+                    image = imgMatch[1];
+                }
+              }
+               if (!image) {
+                image = `https://picsum.photos/seed/${guid}/600/400`;
+              }
+
+              return {
+                title,
+                link,
+                pubDate,
+                description,
+                image,
+                guid,
+                source: feed.identifier,
+              };
+            });
+          })
+          .catch(error => {
+            console.error(`Error processing feed for ${feed.name}:`, error);
+            return []; // Return empty array on error
+          })
+      );
+
+      try {
+        const results = await Promise.all(feedPromises);
+        const processedItems = results.flat().filter(item => item !== null) as FeedItem[];
+        
         const sortedAndShuffled = processedItems
-            .sort((a: FeedItem, b: FeedItem) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+            .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
             .slice(0, 50) // Take top 50 recent
             .sort(() => Math.random() - 0.5); // Then shuffle them
 
@@ -68,7 +116,7 @@ export function RssFeed() {
         setFilteredItems(sortedAndShuffled);
 
       } catch (error) {
-        console.error("Error fetching aggregated feeds:", error);
+        console.error("Error fetching or processing feeds:", error);
       } finally {
         setLoading(false);
       }
@@ -81,9 +129,10 @@ export function RssFeed() {
     if (currentFilter === 'all') {
       setFilteredItems(allFeedItems);
     } else {
-       // Filter by the desired source name (e.g., 'ANSA')
-      const sourceHostname = Object.keys(feedSourceDetails).find(host => feedSourceDetails[host].name === currentFilter);
-      setFilteredItems(allFeedItems.filter(item => item.source === sourceHostname));
+       const sourceIdentifier = feedSources.find(s => s.name === currentFilter)?.identifier;
+       if (sourceIdentifier) {
+         setFilteredItems(allFeedItems.filter(item => item.source === sourceIdentifier));
+       }
     }
   }, [currentFilter, allFeedItems]);
 
@@ -103,7 +152,7 @@ export function RssFeed() {
         >
             All
         </Button>
-        {Object.values(feedSourceDetails).map(feed => (
+        {feedSources.map(feed => (
           <Button
             key={feed.name}
             variant={currentFilter === feed.name ? 'default' : 'outline'}
