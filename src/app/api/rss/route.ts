@@ -10,15 +10,15 @@ export async function GET(request: NextRequest) {
 
   try {
     const response = await fetch(feedUrl, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
-      // Se il fetch non va a buon fine, restituiamo uno status specifico
-      // che il client può gestire senza interrompere tutto.
+      // If fetching fails, return a specific status that the client can handle
+      // without halting everything. 424 Failed Dependency is a good candidate.
       return NextResponse.json(
         { error: `Impossibile recuperare il feed: ${response.statusText}` },
-        { status: response.status } // Usiamo lo status code originale se disponibile
+        { status: response.status }
       );
     }
 
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error(`Errore nel recuperare il feed ${feedUrl}:`, error);
     const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto';
-    // Restituisce un errore 500 solo per errori di server imprevisti
+    // Return a 500 only for unexpected server errors, otherwise pass the original status
     return NextResponse.json({ error: `Errore del server nel recuperare il feed: ${errorMessage}` }, { status: 500 });
   }
 }
