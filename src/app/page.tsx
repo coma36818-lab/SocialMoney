@@ -1,14 +1,13 @@
 
 import { AffiliatePrograms } from '@/components/affiliate-programs';
 import { ContentSubmission } from '@/components/content-submission';
-import { Hero } from '@/components/hero';
 import { NewsSection } from '@/components/news-section';
-import { PostingTimes } from '@/components/posting-times';
-import { StatsBar } from '@/components/stats-bar';
 import { newsSections, curiositaArticles } from '@/lib/data';
 import { HomeClient } from './home-client';
 import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
-import { RssFeed } from '@/components/rss-feed';
+import { Hero } from '@/components/hero';
+import { StatsBar } from '@/components/stats-bar';
+import { PostingTimes } from '@/components/posting-times';
 
 export default function Home() {
   return (
@@ -64,7 +63,8 @@ export default function Home() {
       </section>
 
       <div className="px-6">
-        <RssFeed />
+        
+        <HomeClient />
 
         {newsSections.map((section) => (
           <NewsSection key={section.id} {...section} />
@@ -75,9 +75,9 @@ export default function Home() {
           title="🤔 Curiosità & Lo Sapevi Che..."
           articles={curiositaArticles}
         />
-
-        <Hero />
+        
         <AiTrendAnalyzer />
+        <Hero />
         
         <div className="py-10">
           <StatsBar />
