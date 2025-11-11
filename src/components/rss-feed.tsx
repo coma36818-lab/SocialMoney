@@ -72,16 +72,16 @@ export function RssFeed() {
       setLoading(true);
       const allItems: FeedItem[] = [];
       const promises = feeds.map(feed =>
-        fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(feed.url)}`)
+        fetch(`/api/rss?url=${encodeURIComponent(feed.url)}`)
           .then(res => {
             if (!res.ok) {
               throw new Error(`Failed to fetch feed for ${feed.name}`);
             }
-            return res.json();
+            return res.text();
           })
-          .then(data => {
-            if (data.contents) {
-              const result = parser.parse(data.contents);
+          .then(xmlText => {
+            if (xmlText) {
+              const result = parser.parse(xmlText);
               const itemsFromFeed = result?.rss?.channel?.item || result?.feed?.entry || [];
               const itemsToAdd = Array.isArray(itemsFromFeed) ? itemsFromFeed : [itemsFromFeed];
               
@@ -97,7 +97,7 @@ export function RssFeed() {
               }));
               allItems.push(...parsedItems);
             } else {
-              console.warn(`No content found in CORS response for ${feed.name}`);
+              console.warn(`No content found in API response for ${feed.name}`);
             }
           })
           .catch(err => console.error(`Failed to load or process RSS feed for ${feed.name}:`, err))
