@@ -5,7 +5,6 @@ import { Button } from './ui/button';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { AdSlot } from './ad-slot';
 
 // Map feed hostnames to desired names and icons
 const feedSources = [
@@ -68,21 +67,27 @@ export function RssFeed() {
 
               let description = (item.querySelector('description')?.textContent || '').replace(/<[^>]*>/g, '').substring(0, 100) + '...';
               
-              let image = '';
-              const enclosure = item.querySelector('enclosure');
-              if (enclosure && enclosure.getAttribute('type')?.startsWith('image')) {
-                image = enclosure.getAttribute('url') || '';
-              }
-              if (!image) {
-                const content = item.querySelector('description')?.textContent || '';
-                const imgMatch = content.match(/<img[^>]+src="([^">]+)"/);
-                if (imgMatch) {
-                    image = imgMatch[1];
+              const extractImage = (item: Element): string => {
+                const mediaContent = item.getElementsByTagName('media:content')[0];
+                if (mediaContent && mediaContent.getAttribute('url')) {
+                    return mediaContent.getAttribute('url')!;
                 }
-              }
-               if (!image) {
-                image = `https://picsum.photos/seed/${guid}/600/400`;
-              }
+
+                const enclosure = item.querySelector('enclosure');
+                if (enclosure && enclosure.getAttribute('type')?.startsWith('image')) {
+                    return enclosure.getAttribute('url') || '';
+                }
+
+                const descriptionContent = item.querySelector('description')?.textContent || '';
+                const imgMatch = descriptionContent.match(/<img[^>]+src="([^">]+)"/);
+                if (imgMatch) {
+                    return imgMatch[1];
+                }
+                
+                return `https://picsum.photos/seed/${guid}/600/400`;
+              };
+
+              const image = extractImage(item);
 
               return {
                 title,
