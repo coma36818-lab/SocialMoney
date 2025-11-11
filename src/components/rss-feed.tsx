@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { XMLParser } from 'fast-xml-parser';
 
 const feeds = [
   { name: 'ANSA', url: 'https://www.ansa.it/sito/ansait_rss.xml', icon: '📰' },
@@ -22,24 +23,35 @@ interface FeedItem {
   pubDate: string;
   source: string;
   icon: string;
+  guid: string;
 }
 
 function extractImageUrl(item: any): string {
-    // 1. Prefer thumbnail if available
+    // 1. Check enclosure (often used for media)
+    if (item.enclosure && item.enclosure['@_url'] && item.enclosure['@_type']?.startsWith('image')) {
+        return item.enclosure['@_url'];
+    }
+    // 2. Check for media:content (a common RSS extension)
+    if (item['media:content'] && item['media:content']['@_url']) {
+        return item['media:content']['@_url'];
+    }
+    // 3. Check for media:thumbnail
+    if (item['media:thumbnail'] && item['media:thumbnail']['@_url']) {
+        return item['media:thumbnail']['@_url'];
+    }
+    // 4. Check for a raw thumbnail field
     if (item.thumbnail && typeof item.thumbnail === 'string' && item.thumbnail.startsWith('http')) {
         return item.thumbnail;
     }
-    // 2. Check enclosure
-    if (item.enclosure && item.enclosure.link && item.enclosure.type && item.enclosure.type.startsWith('image')) {
-        return item.enclosure.link;
+    // 5. Parse description/content for an <img> tag
+    const content = item.description || item['content:encoded'] || '';
+    if(typeof content === 'string') {
+        const imgMatch = content.match(/<img[^>]+src="([^">]+)"/);
+        if (imgMatch && imgMatch[1]) {
+            return imgMatch[1];
+        }
     }
-    // 3. Parse content for an <img> tag
-    const content = item.content || item.description || '';
-    const imgMatch = content.match(/<img[^>]+src="([^">]+)"/);
-    if (imgMatch && imgMatch[1]) {
-        return imgMatch[1];
-    }
-    // 4. Fallback to a generic placeholder
+    // 6. Fallback to a generic placeholder
     return `https://picsum.photos/seed/${item.guid || item.title}/600/400`;
 }
 
@@ -51,11 +63,16 @@ export function RssFeed() {
   const [currentFilter, setCurrentFilter] = useState('all');
 
   useEffect(() => {
+    const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: "@_"
+    });
+
     async function fetchFeeds() {
       setLoading(true);
       const allItems: FeedItem[] = [];
       const promises = feeds.map(feed =>
-        fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`)
+        fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(feed.url)}`)
           .then(res => {
             if (!res.ok) {
               throw new Error(`Failed to fetch feed for ${feed.name}`);
@@ -63,19 +80,24 @@ export function RssFeed() {
             return res.json();
           })
           .then(data => {
-            if (data.status === 'ok' && data.items) {
-              const items: FeedItem[] = data.items.slice(0, 10).map((item: any) => ({
+            if (data.contents) {
+              const result = parser.parse(data.contents);
+              const itemsFromFeed = result?.rss?.channel?.item || result?.feed?.entry || [];
+              const itemsToAdd = Array.isArray(itemsFromFeed) ? itemsFromFeed : [itemsFromFeed];
+              
+              const parsedItems: FeedItem[] = itemsToAdd.slice(0, 10).map((item: any) => ({
                 title: item.title || 'Untitled',
-                link: item.link || '#',
+                link: item.link?.['@_href'] || item.link || '#',
                 thumbnail: extractImageUrl(item),
-                description: item.description ? item.description.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : 'Leggi l\'articolo completo...',
-                pubDate: item.pubDate,
+                description: (item.description || item.summary || '').replace(/<[^>]*>/g, '').substring(0, 150) + '...',
+                pubDate: item.pubDate || item.published || new Date().toISOString(),
                 source: feed.name,
                 icon: feed.icon,
+                guid: item.guid || item.id,
               }));
-              allItems.push(...items);
+              allItems.push(...parsedItems);
             } else {
-              console.warn(`No items found or error in feed for ${feed.name}: ${data.message}`);
+              console.warn(`No content found in CORS response for ${feed.name}`);
             }
           })
           .catch(err => console.error(`Failed to load or process RSS feed for ${feed.name}:`, err))
@@ -137,7 +159,7 @@ export function RssFeed() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredItems.map((item, index) => (
-            <div key={index} className="bg-card/30 border border-border rounded-lg overflow-hidden group transition-all duration-300 hover:border-primary/50 hover:shadow-2xl hover:-translate-y-1">
+            <div key={`${item.guid}-${index}`} className="bg-card/30 border border-border rounded-lg overflow-hidden group transition-all duration-300 hover:border-primary/50 hover:shadow-2xl hover:-translate-y-1">
                 <Link href={item.link} target="_blank" rel="noopener noreferrer">
                     <div className="relative aspect-[3/2] overflow-hidden">
                     <Image
@@ -146,7 +168,7 @@ export function RssFeed() {
                         width={600}
                         height={400}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => { e.currentTarget.src = `https://picsum.photos/seed/${item.title}/600/400`; }}
+                        onError={(e) => { e.currentTarget.src = `https://picsum.photos/seed/${item.guid || item.title}/600/400`; }}
                     />
                     </div>
                 </Link>
