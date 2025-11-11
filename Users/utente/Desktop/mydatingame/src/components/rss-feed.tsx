@@ -79,19 +79,24 @@ export function RssFeed() {
                 if (enclosure && enclosure.getAttribute('type')?.startsWith('image')) {
                     return enclosure.getAttribute('url') || '';
                 }
-
+                
                 // 3. Look for an <img> tag inside the content:encoded tag
                 const contentEncoded = item.getElementsByTagName('content:encoded')[0]?.textContent || '';
-                const encodedImgMatch = contentEncoded.match(/<img[^>]+src="([^">]+)"/);
-                if (encodedImgMatch && encodedImgMatch[1]) {
-                    return encodedImgMatch[1];
+                if(contentEncoded) {
+                    const encodedImgMatch = contentEncoded.match(/<img[^>]+src="([^">]+)"/);
+                    if (encodedImgMatch && encodedImgMatch[1]) {
+                        return encodedImgMatch[1];
+                    }
                 }
+                
 
                 // 4. Look for an <img> tag inside the description tag
                 const descriptionContent = item.querySelector('description')?.textContent || '';
-                const descriptionImgMatch = descriptionContent.match(/<img[^>]+src="([^">]+)"/);
-                if (descriptionImgMatch && descriptionImgMatch[1]) {
-                    return descriptionImgMatch[1];
+                if (descriptionContent) {
+                    const descriptionImgMatch = descriptionContent.match(/<img[^>]+src="([^">]+)"/);
+                    if (descriptionImgMatch && descriptionImgMatch[1]) {
+                        return descriptionImgMatch[1];
+                    }
                 }
 
                 // 5. Check media:thumbnail
@@ -101,7 +106,7 @@ export function RssFeed() {
                 }
                 
                 // Fallback to a consistent placeholder if no image is found
-                return `https://picsum.photos/seed/${guid}/600/400`;
+                return `https://picsum.photos/seed/${guid || title}/600/400`;
               };
 
               const image = extractImage(item);
