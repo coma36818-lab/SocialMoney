@@ -5,7 +5,6 @@ import { z } from 'zod';
 
 // This schema should match the input for the Genkit flow.
 // The flow expects socialMediaPlatform, userInterests, and competitorContent.
-// The previous form only had profile-url, which doesn't match.
 const AnalyzeTrendsInputSchema = z.object({
   socialMediaPlatform: z.enum(['Instagram', 'TikTok', 'YouTube']),
   userInterests: z.string().min(3, 'Please describe your interests.'),
