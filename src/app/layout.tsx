@@ -5,6 +5,7 @@ import { AppFooter } from '@/components/footer';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { CookieBanner } from '@/components/cookie-banner';
+import { ScrollToTop } from '@/components/scroll-to-top';
 
 const siteConfig = {
   name: 'MyDatinGame',
@@ -117,6 +118,7 @@ export default function RootLayout({
         </div>
         <Toaster />
         <CookieBanner />
+        <ScrollToTop />
       </body>
     </html>
   );
