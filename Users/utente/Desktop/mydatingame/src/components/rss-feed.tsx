@@ -97,8 +97,9 @@ export function RssFeed() {
                     return imgMatch[1];
                 }
                 
-                // If no image is found, create a deterministic placeholder based on the title
-                const seed = encodeURIComponent(title.replace(/[^a-zA-Z0-9]/g, '-'));
+                // If no image is found, create a deterministic placeholder based on the guid.
+                // The guid is a much better seed than the full title or link.
+                const seed = encodeURIComponent(guid.replace(/[^a-zA-Z0-9]/g, '-'));
                 return `https://picsum.photos/seed/${seed}/600/400`;
               };
 
@@ -201,7 +202,7 @@ export function RssFeed() {
                           height={400}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           onError={(e) => { 
-                            const seed = encodeURIComponent(item.title.replace(/[^a-zA-Z0-9]/g, '-'));
+                            const seed = encodeURIComponent(item.guid.replace(/[^a-zA-Z0-9]/g, '-'));
                             e.currentTarget.src = `https://picsum.photos/seed/${seed}/600/400`;
                           }}
                       />
