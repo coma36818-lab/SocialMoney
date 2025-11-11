@@ -3,7 +3,6 @@ import { ContentSubmission } from '@/components/content-submission';
 import { Hero } from '@/components/hero';
 import { NewsSection } from '@/components/news-section';
 import { PostingTimes } from '@/components/posting-times';
-import { RssFeed } from '@/components/rss-feed';
 import { StatsBar } from '@/components/stats-bar';
 import { newsSections, curiositaArticles } from '@/lib/data';
 import { HomeClient } from './home-client';
@@ -62,8 +61,8 @@ export default function Home() {
       </section>
 
       <div className="px-6">
-        <RssFeed />
-        
+        <HomeClient />
+
         {newsSections.map((section) => (
           <NewsSection key={section.id} {...section} />
         ))}
@@ -80,8 +79,6 @@ export default function Home() {
         </div>
 
         <AffiliatePrograms />
-
-        <HomeClient />
         
         <PostingTimes />
 
