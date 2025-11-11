@@ -75,7 +75,9 @@ export function RssFeed() {
         fetch(`/api/rss?url=${encodeURIComponent(feed.url)}`)
           .then(res => {
             if (!res.ok) {
-              throw new Error(`Failed to fetch feed for ${feed.name}`);
+              // Non bloccare tutto, logga l'errore e vai avanti.
+              console.warn(`Could not fetch feed for ${feed.name}. Status: ${res.status}`);
+              return null; // Restituisce null per indicare il fallimento
             }
             return res.text();
           })
@@ -96,8 +98,6 @@ export function RssFeed() {
                 guid: item.guid || item.id,
               }));
               allItems.push(...parsedItems);
-            } else {
-              console.warn(`No content found in API response for ${feed.name}`);
             }
           })
           .catch(err => console.error(`Failed to load or process RSS feed for ${feed.name}:`, err))

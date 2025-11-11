@@ -9,13 +9,17 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Revalidiamo la cache ogni 60 minuti (3600 secondi)
     const response = await fetch(feedUrl, {
       next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
-      throw new Error(`Impossibile recuperare il feed: ${response.statusText}`);
+      // Se il fetch non va a buon fine, restituiamo uno status specifico
+      // che il client può gestire senza interrompere tutto.
+      return NextResponse.json(
+        { error: `Impossibile recuperare il feed: ${response.statusText}` },
+        { status: response.status } // Usiamo lo status code originale se disponibile
+      );
     }
 
     const text = await response.text();
@@ -30,6 +34,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error(`Errore nel recuperare il feed ${feedUrl}:`, error);
     const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto';
+    // Restituisce un errore 500 solo per errori di server imprevisti
     return NextResponse.json({ error: `Errore del server nel recuperare il feed: ${errorMessage}` }, { status: 500 });
   }
 }
