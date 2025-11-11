@@ -1,13 +1,7 @@
 'use client';
 
-import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
-import { RssFeed } from '@/components/rss-feed';
-
+// This file is intentionally left empty for now.
+// It can be used for client-side logic in the future if needed.
 export function HomeClient() {
-  return (
-    <>
-      <RssFeed />
-      <AiTrendAnalyzer />
-    </>
-  );
+  return null;
 }
