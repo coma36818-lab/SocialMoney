@@ -33,20 +33,25 @@ export async function GET() {
       }));
       return items;
     } catch (e) {
-      console.error('Errore feed:', feedConfig.url, e);
-      return []; // Restituisce un array vuoto in caso di errore per non bloccare tutto
+      console.warn('Feed fetching error for:', feedConfig.url, e);
+      return []; // Return an empty array on error to not block other feeds
     }
   });
 
-  const results = await Promise.all(feedPromises);
-  allItems = results.flat();
+  try {
+    const results = await Promise.all(feedPromises);
+    allItems = results.flat();
 
-  // mescola per varietà e ordina per data
-  allItems = allItems
-    .sort(() => Math.random() - 0.5)
-    .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+    // Sort by date to get the most recent, then shuffle for variety
+    allItems.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+    // Get top 50 recent items and shuffle them
+    allItems = allItems.slice(0, 50).sort(() => Math.random() - 0.5);
 
-  return NextResponse.json(allItems);
+    return NextResponse.json(allItems);
+  } catch (error) {
+    console.error("Error processing feeds:", error);
+    return NextResponse.json({ error: "Failed to process feeds" }, { status: 500 });
+  }
 }
 
 // Revalidate every hour
