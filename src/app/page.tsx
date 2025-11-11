@@ -2,7 +2,6 @@
 import { AffiliatePrograms } from '@/components/affiliate-programs';
 import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
 import { ContentSubmission } from '@/components/content-submission';
-import { Hero } from '@/components/hero';
 import { NewsSection } from '@/components/news-section';
 import { PostingTimes } from '@/components/posting-times';
 import { RssFeed } from '@/components/rss-feed';
@@ -12,8 +11,7 @@ import { newsSections, curiositaArticles } from '@/lib/data';
 export default function Home() {
   return (
     <>
-      <Hero />
-      <div className="py-10">
+      <div className="py-10 pt-20">
         <StatsBar />
       </div>
 
