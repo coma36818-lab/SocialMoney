@@ -15,12 +15,12 @@ const siteConfig = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: 'MyDatingame – Trends, Gossip, Fashion & Lifestyle Magazine 2025',
   description: siteConfig.description,
   keywords: siteConfig.keywords,
   authors: [{ name: 'MyDatinGame', url: siteConfig.url }],
   creator: 'MyDatinGame',
-  metadataBase: new URL(siteConfig.url),
   openGraph: {
     type: 'website',
     locale: 'it_IT',
@@ -49,6 +49,17 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 

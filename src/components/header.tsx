@@ -8,7 +8,7 @@ import { navLinks } from '@/lib/data';
 const navAction = {
   label: 'Submit Content',
   icon: Upload,
-  href: '/submit',
+  href: '#join-creators',
 };
 
 export function AppHeader() {
