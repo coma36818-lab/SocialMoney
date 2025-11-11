@@ -34,8 +34,6 @@ interface FeedItem {
   guid: string;
 }
 
-const AD_INTERVAL = 8; // Show an ad every 8 news items
-
 export function RssFeed() {
   const [allFeedItems, setAllFeedItems] = useState<FeedItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<FeedItem[]>([]);
@@ -199,11 +197,6 @@ export function RssFeed() {
                       </div>
                   </div>
               </div>
-              {(index + 1) % AD_INTERVAL === 0 && (
-                <div className="md:col-span-2 lg:col-span-3 xl:col-span-4 w-full">
-                  <AdSlot adSlotId="9219349887" />
-                </div>
-              )}
             </Fragment>
           ))}
         </div>
