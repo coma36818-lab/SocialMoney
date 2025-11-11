@@ -1,6 +1,4 @@
-
 import { AffiliatePrograms } from '@/components/affiliate-programs';
-import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
 import { ContentSubmission } from '@/components/content-submission';
 import { Hero } from '@/components/hero';
 import { NewsSection } from '@/components/news-section';
@@ -8,11 +6,12 @@ import { PostingTimes } from '@/components/posting-times';
 import { RssFeed } from '@/components/rss-feed';
 import { StatsBar } from '@/components/stats-bar';
 import { newsSections, curiositaArticles } from '@/lib/data';
+import { HomeClient } from './home-client';
 
 export default function Home() {
   return (
     <>
-      <section id="frankenstein-trailer" className="pb-12 md:pb-16">
+      <section id="frankenstein-trailer" className="pb-12 md:pb-16 lg:pt-12">
         <div className="relative w-full overflow-hidden" style={{ paddingTop: '56.25%' }}>
           <iframe
             className="absolute top-0 left-0 h-full w-full"
@@ -82,7 +81,7 @@ export default function Home() {
 
         <AffiliatePrograms />
 
-        <AiTrendAnalyzer />
+        <HomeClient />
         
         <PostingTimes />
 
