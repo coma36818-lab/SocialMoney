@@ -1,4 +1,4 @@
-import { AdSlot } from '@/components/ad-slot';
+
 import { AffiliatePrograms } from '@/components/affiliate-programs';
 import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
 import { ContentSubmission } from '@/components/content-submission';
@@ -28,8 +28,6 @@ export default function Home() {
         title="🤔 Curiosità & Lo Sapevi Che..."
         articles={curiositaArticles}
       />
-      
-      <AdSlot />
 
       <AffiliatePrograms />
 
