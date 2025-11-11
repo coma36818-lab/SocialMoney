@@ -3,7 +3,7 @@ import { AffiliatePrograms } from '@/components/affiliate-programs';
 import { ContentSubmission } from '@/components/content-submission';
 import { NewsSection } from '@/components/news-section';
 import { newsSections, curiositaArticles } from '@/lib/data';
-import { HomeClient } from './home-client';
+import { RssFeed } from '@/components/rss-feed';
 import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
 import { Hero } from '@/components/hero';
 import { StatsBar } from '@/components/stats-bar';
@@ -64,7 +64,7 @@ export default function Home() {
 
       <div className="px-6">
         
-        <HomeClient />
+        <RssFeed />
 
         <AiTrendAnalyzer />
         <Hero />
