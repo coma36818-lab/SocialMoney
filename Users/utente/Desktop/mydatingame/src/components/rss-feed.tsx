@@ -68,22 +68,39 @@ export function RssFeed() {
               let description = (item.querySelector('description')?.textContent || '').replace(/<[^>]*>/g, '').substring(0, 100) + '...';
               
               const extractImage = (item: Element): string => {
+                // 1. Prioritize media:content which is common for images/videos
                 const mediaContent = item.getElementsByTagName('media:content')[0];
-                if (mediaContent && mediaContent.getAttribute('url')) {
+                if (mediaContent && mediaContent.getAttribute('url') && mediaContent.getAttribute('medium') === 'image') {
                     return mediaContent.getAttribute('url')!;
                 }
 
+                // 2. Check for enclosure tag, common in podcast/news feeds
                 const enclosure = item.querySelector('enclosure');
                 if (enclosure && enclosure.getAttribute('type')?.startsWith('image')) {
                     return enclosure.getAttribute('url') || '';
                 }
 
+                // 3. Look for an <img> tag inside the content:encoded tag
+                const contentEncoded = item.getElementsByTagName('content:encoded')[0]?.textContent || '';
+                const encodedImgMatch = contentEncoded.match(/<img[^>]+src="([^">]+)"/);
+                if (encodedImgMatch && encodedImgMatch[1]) {
+                    return encodedImgMatch[1];
+                }
+
+                // 4. Look for an <img> tag inside the description tag
                 const descriptionContent = item.querySelector('description')?.textContent || '';
-                const imgMatch = descriptionContent.match(/<img[^>]+src="([^">]+)"/);
-                if (imgMatch) {
-                    return imgMatch[1];
+                const descriptionImgMatch = descriptionContent.match(/<img[^>]+src="([^">]+)"/);
+                if (descriptionImgMatch && descriptionImgMatch[1]) {
+                    return descriptionImgMatch[1];
+                }
+
+                // 5. Check media:thumbnail
+                 const mediaThumbnail = item.getElementsByTagName('media:thumbnail')[0];
+                if (mediaThumbnail && mediaThumbnail.getAttribute('url')) {
+                    return mediaThumbnail.getAttribute('url')!;
                 }
                 
+                // Fallback to a consistent placeholder if no image is found
                 return `https://picsum.photos/seed/${guid}/600/400`;
               };
 
