@@ -56,9 +56,14 @@ export function RssFeed() {
       const allItems: FeedItem[] = [];
       const promises = feeds.map(feed =>
         fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`)
-          .then(res => res.json())
+          .then(res => {
+            if (!res.ok) {
+              throw new Error(`Failed to fetch feed for ${feed.name}`);
+            }
+            return res.json();
+          })
           .then(data => {
-            if (data.items) {
+            if (data.status === 'ok' && data.items) {
               const items: FeedItem[] = data.items.slice(0, 10).map((item: any) => ({
                 title: item.title || 'Untitled',
                 link: item.link || '#',
@@ -69,9 +74,11 @@ export function RssFeed() {
                 icon: feed.icon,
               }));
               allItems.push(...items);
+            } else {
+              console.warn(`No items found or error in feed for ${feed.name}: ${data.message}`);
             }
           })
-          .catch(err => console.error(`Failed to load RSS feed for ${feed.name}`, err))
+          .catch(err => console.error(`Failed to load or process RSS feed for ${feed.name}:`, err))
       );
 
       await Promise.all(promises);
