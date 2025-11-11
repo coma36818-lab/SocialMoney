@@ -88,7 +88,6 @@ export function RssFeed() {
                         return encodedImgMatch[1];
                     }
                 }
-                
 
                 // 4. Look for an <img> tag inside the description tag
                 const descriptionContent = item.querySelector('description')?.textContent || '';
