@@ -1,6 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormStatus } from 'react-dom';
+import { useActionState, useEffect, useRef } from 'react';
 import { getTrendAnalysis, FormState } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { CheckCircle, Lightbulb, TrendingUp, Clock, Loader2 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 function SubmitButton() {
@@ -30,7 +30,7 @@ function SubmitButton() {
 
 export function AiTrendAnalyzer() {
   const initialState: FormState = { message: '' };
-  const [state, formAction] = useFormState(getTrendAnalysis, initialState);
+  const [state, formAction] = useActionState(getTrendAnalysis, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
