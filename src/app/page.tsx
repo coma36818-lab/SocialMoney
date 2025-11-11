@@ -17,12 +17,12 @@ export default function Home() {
         <StatsBar />
       </div>
 
-      <section className="py-12 md:py-16">
+      <section id="video-principale" className="py-12 md:py-16">
         <div className="relative w-full overflow-hidden rounded-lg border shadow-lg" style={{ paddingTop: '56.25%' }}>
           <iframe
             className="absolute top-0 left-0 h-full w-full"
             src="https://www.youtube.com/embed/lTyjzLc-gxg?si=_NzJIAjPSQdIbKyi"
-            title="YouTube video player"
+            title="MyDatinGame Official Trailer - Trends, Gossip & Monetize"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
           ></iframe>
