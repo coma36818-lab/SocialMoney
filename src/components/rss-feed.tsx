@@ -7,13 +7,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { AdSlot } from './ad-slot';
 
-const feedSources = [
-  { name: 'ANSA', icon: '📰' },
-  { name: 'Vogue', icon: '👗' },
-  { name: 'GialloZafferano', icon: '🍳' },
-  { name: 'ComingSoon', icon: '🎬' },
-  { name: 'People', icon: '💋' },
-];
+// Map feed hostnames to desired names and icons
+const feedSourceDetails: { [key: string]: { name: string; icon: string } } = {
+  'ansa.it': { name: 'ANSA', icon: '📰' },
+  'vogue.it': { name: 'Vogue', icon: '👗' },
+  'giallozafferano.it': { name: 'GialloZafferano', icon: '🍳' },
+  'comingsoon.it': { name: 'ComingSoon', icon: '🎬' },
+  'people.com': { name: 'People', icon: '💋' },
+  'feeds.bbci.co.uk': { name: 'BBC News', icon: '🌍' },
+};
 
 interface FeedItem {
   title: string;
@@ -21,12 +23,14 @@ interface FeedItem {
   image: string;
   description: string;
   pubDate: string;
-  source: string;
-  icon: string;
+  source: string; // The hostname, e.g., "vogue.it"
   guid: string;
 }
 
 const AD_INTERVAL = 8; // Show an ad every 8 news items
+
+// The single endpoint for all feeds
+const feedMixerUrl = 'https://feedmix.novacms.xyz/api/v1/aggregate?feeds=https://www.ansa.it/sito/ansait_rss.xml,https://www.vogue.it/rss,https://people.com/feed/,https://www.giallozafferano.it/rss,https://www.comingsoon.it/rss';
 
 export function RssFeed() {
   const [allFeedItems, setAllFeedItems] = useState<FeedItem[]>([]);
@@ -38,13 +42,31 @@ export function RssFeed() {
     async function fetchFeeds() {
       setLoading(true);
       try {
-        const res = await fetch('/api/feeds');
+        const res = await fetch(feedMixerUrl);
         if (!res.ok) {
-          throw new Error('Failed to fetch feeds');
+          throw new Error('Failed to fetch feeds from FeedMixer');
         }
-        const items: FeedItem[] = await res.json();
-        setAllFeedItems(items);
-        setFilteredItems(items);
+        const data = await res.json();
+        
+        // Process items: add a unique guid, normalize source
+        const processedItems = (data.items || []).map((item: any) => ({
+            ...item,
+            guid: item.id || item.link || item.title,
+            pubDate: item.published || new Date().toISOString(),
+            description: (item.summary || item.content || '').replace(/<[^>]*>/g, '').substring(0, 100) + '...',
+            source: new URL(item.link).hostname.replace('www.', ''),
+            image: item.image || `https://picsum.photos/seed/${item.id || item.title}/600/400`,
+        }));
+
+        // Sort by date to get the most recent, then shuffle for variety
+        const sortedAndShuffled = processedItems
+            .sort((a: FeedItem, b: FeedItem) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+            .slice(0, 50) // Take top 50 recent
+            .sort(() => Math.random() - 0.5); // Then shuffle them
+
+        setAllFeedItems(sortedAndShuffled);
+        setFilteredItems(sortedAndShuffled);
+
       } catch (error) {
         console.error("Error fetching aggregated feeds:", error);
       } finally {
@@ -59,7 +81,9 @@ export function RssFeed() {
     if (currentFilter === 'all') {
       setFilteredItems(allFeedItems);
     } else {
-      setFilteredItems(allFeedItems.filter(item => item.source === currentFilter));
+       // Filter by the desired source name (e.g., 'ANSA')
+      const sourceHostname = Object.keys(feedSourceDetails).find(host => feedSourceDetails[host].name === currentFilter);
+      setFilteredItems(allFeedItems.filter(item => item.source === sourceHostname));
     }
   }, [currentFilter, allFeedItems]);
 
@@ -79,7 +103,7 @@ export function RssFeed() {
         >
             All
         </Button>
-        {feedSources.map(feed => (
+        {Object.values(feedSourceDetails).map(feed => (
           <Button
             key={feed.name}
             variant={currentFilter === feed.name ? 'default' : 'outline'}
@@ -121,7 +145,7 @@ export function RssFeed() {
                       </h3>
                       <p className="text-muted-foreground text-sm mb-4 line-clamp-3 flex-grow">{item.description}</p>
                       <div className="flex justify-between items-center text-xs text-muted-foreground mt-auto">
-                          <span>{item.icon} {item.source}</span>
+                          <span>{feedSourceDetails[item.source]?.icon} {feedSourceDetails[item.source]?.name}</span>
                           <span>{new Date(item.pubDate).toLocaleDateString('it-IT')}</span>
                       </div>
                   </div>
