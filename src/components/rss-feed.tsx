@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import { Button } from './ui/button';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { AdSlot } from './ad-slot';
 
 const feedSources = [
   { name: 'ANSA', icon: '📰' },
@@ -24,6 +25,8 @@ interface FeedItem {
   icon: string;
   guid: string;
 }
+
+const AD_INTERVAL = 8; // Show an ad every 8 news items
 
 export function RssFeed() {
   const [allFeedItems, setAllFeedItems] = useState<FeedItem[]>([]);
@@ -96,32 +99,39 @@ export function RssFeed() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredItems.map((item, index) => (
-            <div key={`${item.guid}-${index}`} className="bg-card/30 border border-border rounded-lg overflow-hidden group transition-all duration-300 hover:border-primary/50 hover:shadow-2xl hover:-translate-y-1">
-                <Link href={item.link} target="_blank" rel="noopener noreferrer">
-                    <div className="relative aspect-[3/2] overflow-hidden">
-                    <Image
-                        src={item.image}
-                        alt={item.title || 'Feed image'}
-                        width={600}
-                        height={400}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => { e.currentTarget.src = `https://picsum.photos/seed/${item.guid || item.title}/600/400`; }}
-                    />
-                    </div>
-                </Link>
-                <div className="p-4 flex flex-col flex-grow">
-                    <h3 className="font-bold text-base text-foreground mb-2 leading-snug line-clamp-2 h-[48px]">
-                        <Link href={item.link} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                            {item.title}
-                        </Link>
-                    </h3>
-                    <p className="text-muted-foreground text-sm mb-4 line-clamp-3 flex-grow">{item.description}</p>
-                    <div className="flex justify-between items-center text-xs text-muted-foreground mt-auto">
-                        <span>{item.icon} {item.source}</span>
-                        <span>{new Date(item.pubDate).toLocaleDateString('it-IT')}</span>
-                    </div>
+            <Fragment key={`${item.guid}-${index}`}>
+              <div className="bg-card/30 border border-border rounded-lg overflow-hidden group transition-all duration-300 hover:border-primary/50 hover:shadow-2xl hover:-translate-y-1 flex flex-col">
+                  <Link href={item.link} target="_blank" rel="noopener noreferrer">
+                      <div className="relative aspect-[3/2] overflow-hidden">
+                      <Image
+                          src={item.image}
+                          alt={item.title || 'Feed image'}
+                          width={600}
+                          height={400}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          onError={(e) => { e.currentTarget.src = `https://picsum.photos/seed/${item.guid || item.title}/600/400`; }}
+                      />
+                      </div>
+                  </Link>
+                  <div className="p-4 flex flex-col flex-grow">
+                      <h3 className="font-bold text-base text-foreground mb-2 leading-snug line-clamp-2 h-[48px]">
+                          <Link href={item.link} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                              {item.title}
+                          </Link>
+                      </h3>
+                      <p className="text-muted-foreground text-sm mb-4 line-clamp-3 flex-grow">{item.description}</p>
+                      <div className="flex justify-between items-center text-xs text-muted-foreground mt-auto">
+                          <span>{item.icon} {item.source}</span>
+                          <span>{new Date(item.pubDate).toLocaleDateString('it-IT')}</span>
+                      </div>
+                  </div>
+              </div>
+              {(index + 1) % AD_INTERVAL === 0 && (
+                <div className="md:col-span-2 lg:col-span-3 xl:col-span-4 w-full">
+                  <AdSlot adSlotId="9219349887" />
                 </div>
-            </div>
+              )}
+            </Fragment>
           ))}
         </div>
       )}
