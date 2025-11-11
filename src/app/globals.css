@@ -4,28 +4,28 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 341 100% 71%;
-    --primary-foreground: 226 65% 11%;
+    --background: 226 65% 11%; /* #0a0e27 */
+    --foreground: 210 40% 98%; /* #f8fafc */
+    --card: 225 32% 17%; /* #1a1f3a */
+    --card-foreground: 210 40% 98%;
+    --popover: 226 65% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 339 100% 71%; /* #ff6b9d */
+    --primary-foreground: 226 65% 5%;
     --secondary: 225 32% 17%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 225 32% 17%;
-    --muted-foreground: 216 19% 79%;
-    --accent: 347 50% 52%;
+    --muted: 227 41% 16%; /* #151937 */
+    --muted-foreground: 216 19% 79%; /* #b8c5d6 */
+    --accent: 341 65% 52%; /* #c44569 */
     --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 210 40% 98% / 0.08;
     --input: 210 40% 98% / 0.05;
-    --ring: 341 100% 71%;
+    --ring: 339 100% 71%;
     --radius: 1rem;
-    --chart-1: 341 100% 71%;
-    --chart-2: 44 98% 68%;
+    --chart-1: 339 100% 71%;
+    --chart-2: 44 98% 68%; /* accent-gold: #feca57 */
     --chart-3: 173 58% 39%;
     --chart-4: 197 37% 24%;
     --chart-5: 27 87% 67%;
@@ -34,23 +34,24 @@
   .dark {
     --background: 226 65% 11%; /* #0a0e27 */
     --foreground: 210 40% 98%; /* #f8fafc */
-    --card: 227 41% 16%; /* #151937 */
+    --card: 225 32% 17%; /* #1a1f3a */
     --card-foreground: 210 40% 98%;
     --popover: 226 65% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: 341 100% 71%; /* #ff6b9d */
+    --primary: 339 100% 71%; /* #ff6b9d */
     --primary-foreground: 226 65% 5%;
     --secondary: 225 32% 17%; /* #1a1f3a */
     --secondary-foreground: 210 40% 98%;
-    --muted: 225 32% 17%;
+    --muted: 227 41% 16%; /* #151937 */
     --muted-foreground: 216 19% 79%; /* #b8c5d6 */
-    --accent: 347 50% 52%; /* #c44569 */
+    --accent: 341 65% 52%; /* #c44569 */
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 210 40% 98% / 0.08;
     --input: 210 40% 98% / 0.05;
-    --ring: 341 100% 71%;
+    --ring: 339 100% 71%;
+    --chart-2: 44 98% 68%; /* accent-gold: #feca57 */
   }
 }
 
@@ -69,12 +70,12 @@
   }
 
   h2.section-title {
-    @apply font-headline text-3xl md:text-4xl font-bold text-center mb-12 relative pb-4;
+    @apply font-headline text-3xl md:text-4xl font-black text-center mb-12 relative pb-4;
   }
   h2.section-title::after {
     content: '';
     @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-1 rounded-full;
-    background: linear-gradient(90deg, hsl(var(--primary)), hsl(44, 98%, 68%));
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--chart-2)));
   }
 }
 

@@ -7,23 +7,23 @@ import { Toaster } from '@/components/ui/toaster';
 import { CookieBanner } from '@/components/cookie-banner';
 
 const siteConfig = {
-  name: 'MyDatingame',
+  name: 'MyDatinGame',
   url: 'https://mydatingame.com',
-  ogImage: 'https://mydatingame.com/og-image.jpg',
-  description: 'Your daily hub for influencer tips, trends & opportunities — influencer marketing, AI trends, social media growth and digital news 2025.',
-  keywords: "influencer, social media, affiliate marketing, AI trends, creator tools, monetization, digital marketing, 2025 trends"
+  ogImage: 'https://mydatingame.com/preview.jpg',
+  description: 'Trends, Gossip, Lifestyle & Monetize. Your digital magazine for celebrity news, fashion, beauty, gaming, and influencer strategies for 2025.',
+  keywords: "dating, notizie, video, RSS, ANSA, Vogue, GialloZafferano, ComingSoon, People, celebrity gossip, fashion trends 2025, beauty tips, gaming news, TV series, influencer marketing, affiliate programs, lifestyle magazine, trending news, gift ideas"
 };
 
 export const metadata: Metadata = {
-  title: 'MyDatingame – Grow Your Influence & Earn Online',
+  title: 'MyDatingame – Trends, Gossip, Fashion & Lifestyle Magazine 2025',
   description: siteConfig.description,
   keywords: siteConfig.keywords,
-  authors: [{ name: 'MyDatingame', url: siteConfig.url }],
-  creator: 'MyDatingame',
+  authors: [{ name: 'MyDatinGame', url: siteConfig.url }],
+  creator: 'MyDatinGame',
   metadataBase: new URL(siteConfig.url),
   openGraph: {
     type: 'website',
-    locale: 'en_US',
+    locale: 'it_IT',
     url: siteConfig.url,
     title: siteConfig.name,
     description: siteConfig.description,
@@ -42,24 +42,20 @@ export const metadata: Metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     images: [siteConfig.ogImage],
-    creator: '@MyDatingame',
   },
   icons: {
     icon: '/favicon.ico',
+    apple: '/favicon-192.png',
   },
   alternates: {
     canonical: '/',
-    languages: {
-      'en-US': '/',
-      'it-IT': '/it',
-    },
   },
 };
 
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: dark)', color: '#0a0e27' },
-    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
   ],
 }
 
@@ -70,21 +66,33 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" style={{scrollBehavior: 'smooth'}}>
+    <html lang="it" className="dark" style={{scrollBehavior: 'smooth'}}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "NewsMediaOrganization",
+            "@type": "Organization",
             "name": "MyDatingame",
             "url": "https://mydatingame.com",
-            "logo": "https://mydatingame.com/favicon.ico",
+            "logo": "https://mydatingame.com/logo.png",
             "sameAs": [
-              "https://www.instagram.com/yourprofile",
-              "https://www.tiktok.com/@yourprofile"
+              "https://www.facebook.com/mydatingame",
+              "https://www.instagram.com/mydatingame",
+              "https://twitter.com/mydatingame"
             ]
+        })}} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "MyDatingame",
+            "url": "https://mydatingame.com",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://mydatingame.com/search?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
         })}} />
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5195762211359589" crossOrigin="anonymous"></script>
         <meta name="google-adsense-account" content="ca-pub-5195762211359589" />
@@ -93,7 +101,7 @@ export default function RootLayout({
         <div className="bg-animation"></div>
         <div className="relative z-10 flex min-h-screen flex-col">
           <AppHeader />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 max-w-[1400px] w-full mx-auto px-6">{children}</main>
           <AppFooter />
         </div>
         <Toaster />

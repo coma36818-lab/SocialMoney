@@ -16,14 +16,14 @@ const getImage = (id: string): ImagePlaceholder => {
 };
 
 export const navLinks = [
-  { href: '#real-news', label: 'Notizie' },
+  { href: '#real-news', label: 'News' },
   { href: '#gossip', label: 'Gossip' },
   { href: '#influencer', label: 'Influencer' },
-  { href: '#cucina', label: 'Cucina' },
+  { href: '#cucina', label: 'Food' },
   { href: '#cinema', label: 'Cinema' },
   { href: '#games', label: 'Games' },
   { href: '#handmade', label: 'Handmade' },
-  { href: '#join-creators', label: 'Partecipa' },
+  { href: '#join-creators', label: 'Join' },
 ];
 
 export const stats = [
@@ -43,34 +43,34 @@ export const creatorRoles = [
 export const newsSections = [
     {
         id: 'real-news',
-        title: '🔥 Ultime Notizie in Tempo Reale',
+        title: '🔥 Latest Real-Time News',
         articles: [
             {
                 image: getImage('breaking-news'),
                 badge: 'Breaking News',
-                title: 'Le Notizie Più Importanti del Giorno',
-                description: 'Scopri gli eventi più rilevanti che stanno accadendo in questo momento nel mondo.',
-                meta: '⏰ 2 ore fa',
+                title: 'Today\'s Most Important News',
+                description: 'Discover the most relevant events happening right now around the world.',
+                meta: '⏰ 2 hours ago',
                 link: 'https://www.bbc.com/news',
-                linkText: 'Leggi tutto →',
+                linkText: 'Read more →',
             },
             {
                 image: getImage('tech-news'),
-                badge: 'Tecnologia',
-                title: 'Nuove Innovazioni Tecnologiche 2025',
-                description: 'Le ultime novità dal mondo tech: AI, smartphone, gadget e molto altro.',
-                meta: '⏰ 4 ore fa',
+                badge: 'Technology',
+                title: 'New Tech Innovations 2025',
+                description: 'Latest news from the tech world: AI, smartphones, gadgets and much more.',
+                meta: '⏰ 4 hours ago',
                 link: 'https://techcrunch.com/',
-                linkText: 'Scopri →',
+                linkText: 'Discover →',
             },
             {
                 image: getImage('business-news'),
                 badge: 'Business',
-                title: 'Tendenze del Mercato Globale',
-                description: 'Analisi economiche e opportunità di investimento per il 2025.',
-                meta: '⏰ 5 ore fa',
+                title: 'Global Market Trends',
+                description: 'Economic analysis and investment opportunities for 2025.',
+                meta: '⏰ 5 hours ago',
                 link: 'https://www.bloomberg.com/',
-                linkText: 'Approfondisci →',
+                linkText: 'Learn more →',
             },
         ],
     },
@@ -303,6 +303,33 @@ export const newsSections = [
                 link: 'https://www.shopify.com/blog/affiliate-marketing',
                 linkText: 'Impara →',
             },
+            {
+                image: getImage('creator-economy'),
+                badge: 'Creator Tips',
+                title: 'Diventare Creator Professionista',
+                description: 'I segreti dei top creator per costruire un brand personale e vivere di contenuti digitali.',
+                meta: '⏰ 4 ore fa',
+                link: 'https://creatoreconomy.so/',
+                linkText: 'Leggi →'
+            },
+            {
+                image: getImage('tiktok-money'),
+                badge: 'TikTok',
+                title: 'TikTok Creator Fund e Sponsorizzazioni',
+                description: 'Come accedere al Creator Fund di TikTok e ottenere brand deal con le aziende.',
+                meta: '⏰ 5 ore fa',
+                link: 'https://www.tiktok.com/creators/',
+                linkText: 'Inizia →'
+            },
+            {
+                image: getImage('digital-products'),
+                badge: 'Prodotti Digitali',
+                title: 'Vendere Prodotti Digitali Online',
+                description: 'Crea e vendi corsi online, ebook, preset e template per generare reddito passivo.',
+                meta: '⏰ 6 ore fa',
+                link: 'https://gumroad.com/',
+                linkText: 'Vendi →'
+            }
         ],
     },
     {
@@ -327,9 +354,67 @@ export const newsSections = [
                 title: '#️⃣ Smart Hashtag Strategy',
                 description: 'Use 3 niche hashtags + 1 trending tag. Rotate weekly to avoid shadowban. Research what your audience actually searches for.',
             },
+             {
+                image: getImage('timing'),
+                badge: 'Timing',
+                title: '⏰ Timing Is Everything',
+                description: 'Post when your audience is most active. Instagram: 6-8PM weekdays. TikTok: 7-10PM. Test and track your best times.'
+            },
+            {
+                image: getImage('behind-the-scenes'),
+                badge: 'Content',
+                title: '💡 Behind-The-Scenes Content',
+                description: 'Show your process, failures, and real moments. Authenticity builds deeper connections and higher engagement rates.'
+            },
+            {
+                image: getImage('analytics'),
+                badge: 'Analytics',
+                title: '📊 Data-Driven Decisions',
+                description: 'Analyze your top 10 posts monthly. Double down on what works. Cut what doesn\'t. Let data guide your content strategy.'
+            }
         ]
     }
 ];
+
+export const curiositaArticles = [
+  {
+    image: getImage('miele'),
+    badge: 'Food Facts',
+    title: '🧠 Fatto Curioso del Giorno',
+    description: "Lo sapevi che il miele è l'unico alimento che non scade mai? Gli archeologi hanno trovato vasetti di miele nelle tombe egizie ancora perfettamente commestibili dopo 3000 anni!",
+  },
+  {
+    image: getImage('africa'),
+    badge: 'Geografia',
+    title: '🌍 Geografia Sorprendente',
+    description: "L'Africa è l'unico continente che si estende in tutti e quattro gli emisferi: nord, sud, est e ovest. Incredibile vero?",
+  },
+  {
+    image: getImage('cinema-trivia'),
+    badge: 'Cinema',
+    title: '🎬 Cinema Trivia',
+    description: 'Il film "Avatar" di James Cameron ha impiegato 4 anni per essere completato e ha utilizzato tecnologie mai viste prima nel cinema.',
+  },
+  {
+    image: getImage('minecraft'),
+    badge: 'Gaming',
+    title: '🎮 Gaming Facts',
+    description: 'Il videogioco più venduto di tutti i tempi è Minecraft con oltre 300 milioni di copie vendute in tutto il mondo!',
+  },
+  {
+    image: getImage('pizza-trivia'),
+    badge: 'Food',
+    title: '🍕 Food Trivia',
+    description: 'La pizza Margherita prende il nome dalla Regina Margherita di Savoia e i suoi colori rappresentano la bandiera italiana: rosso (pomodoro), bianco (mozzarella), verde (basilico).',
+  },
+  {
+    image: getImage('iphone-trivia'),
+    badge: 'Tech',
+    title: '📱 Tech Curiosity',
+    description: "Il primo iPhone è stato lanciato nel 2007 e non aveva nemmeno l'App Store! Le app sono arrivate solo un anno dopo.",
+  },
+];
+
 
 export const affiliatePrograms = [
     { name: 'Amazon Associates', category: 'E-commerce Giant', description: 'Promote millions of products. Earn up to 10% commission on qualifying purchases.', link: 'https://affiliate-program.amazon.com/', logo: 'Amazon' },

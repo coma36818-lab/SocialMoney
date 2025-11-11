@@ -5,11 +5,11 @@ import Link from 'next/link';
 
 export function AffiliatePrograms() {
   return (
-    <section id="affiliates" className="container py-12 md:py-20">
+    <section id="affiliates" className="py-12 md:py-20">
       <h2 className="section-title">Top Affiliate Programs for Creators</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {affiliatePrograms.map((program, index) => (
-          <Card key={index} className="bg-card/50 border-border flex flex-col transition-all duration-300 hover:bg-card hover:-translate-y-1 hover:shadow-2xl hover:border-primary/50">
+          <Card key={index} className="bg-card/30 border-border flex flex-col transition-all duration-300 hover:bg-card hover:-translate-y-1 hover:shadow-2xl hover:border-primary/50">
             <CardHeader className="flex-row gap-4 items-center">
                 <div className="w-16 h-16 bg-white/90 rounded-lg flex items-center justify-center p-2 shrink-0">
                     <span className="font-bold text-center text-sm text-black">{program.logo}</span>

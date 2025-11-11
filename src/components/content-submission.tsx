@@ -9,14 +9,14 @@ export function ContentSubmission() {
     const bgImage = PlaceHolderImages.find(p => p.id === 'creator-participation-bg');
 
   return (
-    <section id="join-creators" className="container py-20 md:py-28">
-      <div className="relative rounded-2xl border-2 border-primary p-8 md:p-16 text-center overflow-hidden">
+    <section id="join-creators" className="py-20 md:py-28">
+      <div className="relative rounded-2xl border-2 border-primary p-8 md:p-16 text-center overflow-hidden bg-card/30">
         {bgImage && (
             <Image
                 src={bgImage.imageUrl}
                 alt={bgImage.description}
                 fill
-                className="object-cover object-center"
+                className="object-cover object-center opacity-20"
                 data-ai-hint={bgImage.imageHint}
             />
         )}

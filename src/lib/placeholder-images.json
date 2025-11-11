@@ -151,6 +151,24 @@
       "imageHint": "business chart"
     },
     {
+      "id": "creator-economy",
+      "description": "Creator economy tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1556155092-490a1ba16284?w=600&q=80",
+      "imageHint": "person working"
+    },
+    {
+      "id": "tiktok-money",
+      "description": "TikTok monetization tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&q=80",
+      "imageHint": "social media"
+    },
+    {
+      "id": "digital-products",
+      "description": "Digital products selling tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+      "imageHint": "analytics chart"
+    },
+    {
       "id": "micro-vlogs",
       "description": "Micro vlogs tips image",
       "imageUrl": "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80",
@@ -167,6 +185,60 @@
       "description": "Hashtags strategy tips image",
       "imageUrl": "https://images.unsplash.com/photo-1611926653458-09294b3142bf?w=600&q=80",
       "imageHint": "social media"
+    },
+    {
+      "id": "timing",
+      "description": "Post timing tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1501139083538-0139583c060f?w=600&q=80",
+      "imageHint": "clock time"
+    },
+    {
+      "id": "behind-the-scenes",
+      "description": "Behind the scenes content tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80",
+      "imageHint": "team working"
+    },
+    {
+      "id": "analytics",
+      "description": "Data analytics tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+      "imageHint": "data chart"
+    },
+    {
+      "id": "miele",
+      "description": "Honey jar for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1587049352846-4a222e784210?w=600&q=80",
+      "imageHint": "honey jar"
+    },
+    {
+      "id": "africa",
+      "description": "Map of Africa for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=600&q=80",
+      "imageHint": "africa map"
+    },
+    {
+      "id": "cinema-trivia",
+      "description": "Cinema for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=600&q=80",
+      "imageHint": "cinema screen"
+    },
+    {
+      "id": "minecraft",
+      "description": "Minecraft game for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&q=80",
+      "imageHint": "video game"
+    },
+    {
+      "id": "pizza-trivia",
+      "description": "Pizza for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&q=80",
+      "imageHint": "pizza slice"
+    },
+    {
+      "id": "iphone-trivia",
+      "description": "iPhone for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=600&q=80",
+      "imageHint": "iphone screen"
     },
     {
       "id": "posting-times-bg",
