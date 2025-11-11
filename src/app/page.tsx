@@ -66,6 +66,13 @@ export default function Home() {
         
         <HomeClient />
 
+        <AiTrendAnalyzer />
+        <Hero />
+        
+        <div className="py-10">
+          <StatsBar />
+        </div>
+
         {newsSections.map((section) => (
           <NewsSection key={section.id} {...section} />
         ))}
@@ -76,13 +83,6 @@ export default function Home() {
           articles={curiositaArticles}
         />
         
-        <AiTrendAnalyzer />
-        <Hero />
-        
-        <div className="py-10">
-          <StatsBar />
-        </div>
-
         <AffiliatePrograms />
         
         <PostingTimes />
