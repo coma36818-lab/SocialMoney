@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <>
       <section id="video-principale" className="py-12 md:py-16">
-        <div className="relative w-full overflow-hidden rounded-lg border shadow-lg" style={{ paddingTop: '56.25%' }}>
+        <div className="relative w-full overflow-hidden md:rounded-lg border-y md:border shadow-lg" style={{ paddingTop: '56.25%' }}>
           <iframe
             className="absolute top-0 left-0 h-full w-full"
             src="https://www.youtube.com/embed/lTyjzLc-gxg?si=_NzJIAjPSQdIbKyi"
@@ -24,31 +24,33 @@ export default function Home() {
         </div>
       </section>
 
-      <RssFeed />
-      
-      {newsSections.map((section) => (
-        <NewsSection key={section.id} {...section} />
-      ))}
+      <div className="px-6">
+        <RssFeed />
+        
+        {newsSections.map((section) => (
+          <NewsSection key={section.id} {...section} />
+        ))}
 
-      <NewsSection
-        id="curiosita"
-        title="🤔 Curiosità & Lo Sapevi Che..."
-        articles={curiositaArticles}
-      />
+        <NewsSection
+          id="curiosita"
+          title="🤔 Curiosità & Lo Sapevi Che..."
+          articles={curiositaArticles}
+        />
 
-      <Hero />
+        <Hero />
 
-      <div className="py-10">
-        <StatsBar />
+        <div className="py-10">
+          <StatsBar />
+        </div>
+
+        <AffiliatePrograms />
+
+        <AiTrendAnalyzer />
+        
+        <PostingTimes />
+
+        <ContentSubmission />
       </div>
-
-      <AffiliatePrograms />
-
-      <AiTrendAnalyzer />
-      
-      <PostingTimes />
-
-      <ContentSubmission />
     </>
   );
 }
