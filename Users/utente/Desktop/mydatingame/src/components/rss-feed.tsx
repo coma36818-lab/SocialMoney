@@ -70,7 +70,7 @@ export function RssFeed() {
               const extractImage = (item: Element): string => {
                 // 1. Prioritize media:content which is common for images/videos
                 const mediaContent = item.getElementsByTagName('media:content')[0];
-                if (mediaContent && mediaContent.getAttribute('url') && mediaContent.getAttribute('medium') === 'image') {
+                if (mediaContent && mediaContent.getAttribute('url')) {
                     return mediaContent.getAttribute('url')!;
                 }
 
@@ -80,28 +80,13 @@ export function RssFeed() {
                     return enclosure.getAttribute('url') || '';
                 }
                 
-                // 3. Look for an <img> tag inside the content:encoded tag
-                const contentEncoded = item.getElementsByTagName('content:encoded')[0]?.textContent || '';
-                if(contentEncoded) {
-                    const encodedImgMatch = contentEncoded.match(/<img[^>]+src="([^">]+)"/);
-                    if (encodedImgMatch && encodedImgMatch[1]) {
-                        return encodedImgMatch[1];
-                    }
-                }
-
-                // 4. Look for an <img> tag inside the description tag
+                // 3. Look for an <img> tag inside the description tag
                 const descriptionContent = item.querySelector('description')?.textContent || '';
                 if (descriptionContent) {
                     const descriptionImgMatch = descriptionContent.match(/<img[^>]+src="([^">]+)"/);
                     if (descriptionImgMatch && descriptionImgMatch[1]) {
                         return descriptionImgMatch[1];
                     }
-                }
-
-                // 5. Check media:thumbnail
-                 const mediaThumbnail = item.getElementsByTagName('media:thumbnail')[0];
-                if (mediaThumbnail && mediaThumbnail.getAttribute('url')) {
-                    return mediaThumbnail.getAttribute('url')!;
                 }
                 
                 // Fallback to a consistent placeholder if no image is found
