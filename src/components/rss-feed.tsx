@@ -24,6 +24,26 @@ interface FeedItem {
   icon: string;
 }
 
+function extractImageUrl(item: any): string {
+    // 1. Prefer thumbnail if available
+    if (item.thumbnail && typeof item.thumbnail === 'string' && item.thumbnail.startsWith('http')) {
+        return item.thumbnail;
+    }
+    // 2. Check enclosure
+    if (item.enclosure && item.enclosure.link && item.enclosure.type && item.enclosure.type.startsWith('image')) {
+        return item.enclosure.link;
+    }
+    // 3. Parse content for an <img> tag
+    const content = item.content || item.description || '';
+    const imgMatch = content.match(/<img[^>]+src="([^">]+)"/);
+    if (imgMatch && imgMatch[1]) {
+        return imgMatch[1];
+    }
+    // 4. Fallback to a generic placeholder
+    return `https://picsum.photos/seed/${item.guid || item.title}/600/400`;
+}
+
+
 export function RssFeed() {
   const [allFeedItems, setAllFeedItems] = useState<FeedItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<FeedItem[]>([]);
@@ -42,7 +62,7 @@ export function RssFeed() {
               const items: FeedItem[] = data.items.slice(0, 10).map((item: any) => ({
                 title: item.title || 'Untitled',
                 link: item.link || '#',
-                thumbnail: item.thumbnail || (item.enclosure && item.enclosure.link) || 'https://picsum.photos/seed/rss-fallback/600/400',
+                thumbnail: extractImageUrl(item),
                 description: item.description ? item.description.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : 'Leggi l\'articolo completo...',
                 pubDate: item.pubDate,
                 source: feed.name,
@@ -119,7 +139,7 @@ export function RssFeed() {
                         width={600}
                         height={400}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => { e.currentTarget.src = 'https://picsum.photos/seed/rss-fallback/600/400'; }}
+                        onError={(e) => { e.currentTarget.src = `https://picsum.photos/seed/${item.title}/600/400`; }}
                     />
                     </div>
                 </Link>
