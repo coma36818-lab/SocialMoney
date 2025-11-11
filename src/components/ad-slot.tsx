@@ -8,12 +8,16 @@ export function AdSlot() {
 
     useEffect(() => {
         if (consent === 'accepted') {
-            try {
-                // @ts-ignore
-                (window.adsbygoogle = window.adsbygoogle || []).push({});
-            } catch (e) {
-                console.error("AdSense push error:", e);
-            }
+            const timeoutId = setTimeout(() => {
+                try {
+                    // @ts-ignore
+                    (window.adsbygoogle = window.adsbygoogle || []).push({});
+                } catch (e) {
+                    console.error("AdSense push error:", e);
+                }
+            }, 100); // Small delay to ensure the container is rendered
+
+            return () => clearTimeout(timeoutId);
         }
     }, [consent]);
 
@@ -37,8 +41,6 @@ export function AdSlot() {
                 data-ad-slot="6986146564" // Example slot, replace if needed
                 data-ad-format="auto"
                 data-full-width-responsive="true"></ins>
-            
-            <p className="text-muted-foreground">Advertisement</p>
         </div>
     </div>
   );
