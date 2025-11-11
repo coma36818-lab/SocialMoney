@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, Fragment } from 'react';
@@ -94,7 +95,7 @@ export function RssFeed() {
                           height={400}
                           data-ai-hint={item.image.imageHint}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          onError={(e) => { e.currentTarget.src = `https://picsum.photos/seed/${item.title}/600/400`; }}
+                          onError={(e) => { e.currentTarget.src = `https://picsum.photos/seed/${encodeURIComponent(item.title)}/600/400`; }}
                       />
                       </div>
                   </Link>
