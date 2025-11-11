@@ -12,7 +12,7 @@ import { newsSections, curiositaArticles } from '@/lib/data';
 export default function Home() {
   return (
     <>
-      <section id="video-principale" className="py-12 md:py-16 pt-20">
+      <section id="video-principale" className="py-12 md:py-16">
         <div className="relative w-full overflow-hidden rounded-lg border shadow-lg" style={{ paddingTop: '56.25%' }}>
           <iframe
             className="absolute top-0 left-0 h-full w-full"
