@@ -1,14 +1,15 @@
 
 import { AffiliatePrograms } from '@/components/affiliate-programs';
 import { ContentSubmission } from '@/components/content-submission';
-import { NewsSection } from '@/components/news-section';
-import { newsSections, curiositaArticles } from '@/lib/data';
 import { RssFeed } from '@/components/rss-feed';
 import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
 import { Hero } from '@/components/hero';
 import { StatsBar } from '@/components/stats-bar';
 import { PostingTimes } from '@/components/posting-times';
 import { AdSlot } from '@/components/ad-slot';
+import { NewsSection } from '@/components/news-section';
+import { newsSections, curiositaArticles } from '@/lib/data';
+
 
 export default function Home() {
   return (
@@ -76,7 +77,8 @@ export default function Home() {
         
         <AdSlot />
 
-        {newsSections.map((section) => (
+        {/* These sections are now displayed inside RssFeed, so we can remove them from here to avoid duplication */}
+        {/* {newsSections.map((section) => (
           <NewsSection key={section.id} {...section} />
         ))}
 
@@ -84,7 +86,7 @@ export default function Home() {
           id="curiosita"
           title="🤔 Curiosità & Lo Sapevi Che..."
           articles={curiositaArticles}
-        />
+        /> */}
         
         <AffiliatePrograms />
         
