@@ -8,6 +8,7 @@ import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
 import { Hero } from '@/components/hero';
 import { StatsBar } from '@/components/stats-bar';
 import { PostingTimes } from '@/components/posting-times';
+import { AdSlot } from '@/components/ad-slot';
 
 export default function Home() {
   return (
@@ -37,7 +38,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="video-principale" className="pb-12 md:pb-16">
+      <section id="miumiu-ss26" className="pb-12 md:pb-16">
         <div className="relative w-full overflow-hidden" style={{ paddingTop: '56.25%' }}>
           <iframe
             className="absolute top-0 left-0 h-full w-full"
@@ -72,6 +73,8 @@ export default function Home() {
         <div className="py-10">
           <StatsBar />
         </div>
+        
+        <AdSlot />
 
         {newsSections.map((section) => (
           <NewsSection key={section.id} {...section} />
@@ -85,6 +88,8 @@ export default function Home() {
         
         <AffiliatePrograms />
         
+        <AdSlot adSlotId="1451730459" />
+
         <PostingTimes />
 
         <ContentSubmission />
