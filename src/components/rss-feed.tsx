@@ -5,56 +5,25 @@ import { Button } from './ui/button';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { XMLParser } from 'fast-xml-parser';
 
-const feeds = [
-  { name: 'ANSA', url: 'https://www.ansa.it/sito/ansait_rss.xml', icon: '📰' },
-  { name: 'Vogue', url: 'https://www.vogue.it/rss', icon: '👗' },
-  { name: 'GialloZafferano', url: 'https://www.giallozafferano.it/rss', icon: '🍳' },
-  { name: 'ComingSoon', url: 'https://www.comingsoon.it/rss', icon: '🎬' },
-  { name: 'People', url: 'https://people.com/feed/', icon: '💋' },
+const feedSources = [
+  { name: 'ANSA', icon: '📰' },
+  { name: 'Vogue', icon: '👗' },
+  { name: 'GialloZafferano', icon: '🍳' },
+  { name: 'ComingSoon', icon: '🎬' },
+  { name: 'People', icon: '💋' },
 ];
 
 interface FeedItem {
   title: string;
   link: string;
-  thumbnail: string;
+  image: string;
   description: string;
   pubDate: string;
   source: string;
   icon: string;
   guid: string;
 }
-
-function extractImageUrl(item: any): string {
-    // 1. Check enclosure (often used for media)
-    if (item.enclosure && item.enclosure['@_url'] && item.enclosure['@_type']?.startsWith('image')) {
-        return item.enclosure['@_url'];
-    }
-    // 2. Check for media:content (a common RSS extension)
-    if (item['media:content'] && item['media:content']['@_url']) {
-        return item['media:content']['@_url'];
-    }
-    // 3. Check for media:thumbnail
-    if (item['media:thumbnail'] && item['media:thumbnail']['@_url']) {
-        return item['media:thumbnail']['@_url'];
-    }
-    // 4. Check for a raw thumbnail field
-    if (item.thumbnail && typeof item.thumbnail === 'string' && item.thumbnail.startsWith('http')) {
-        return item.thumbnail;
-    }
-    // 5. Parse description/content for an <img> tag
-    const content = item.description || item['content:encoded'] || '';
-    if(typeof content === 'string') {
-        const imgMatch = content.match(/<img[^>]+src="([^">]+)"/);
-        if (imgMatch && imgMatch[1]) {
-            return imgMatch[1];
-        }
-    }
-    // 6. Fallback to a generic placeholder
-    return `https://picsum.photos/seed/${item.guid || item.title}/600/400`;
-}
-
 
 export function RssFeed() {
   const [allFeedItems, setAllFeedItems] = useState<FeedItem[]>([]);
@@ -63,53 +32,21 @@ export function RssFeed() {
   const [currentFilter, setCurrentFilter] = useState('all');
 
   useEffect(() => {
-    const parser = new XMLParser({
-        ignoreAttributes: false,
-        attributeNamePrefix: "@_"
-    });
-
     async function fetchFeeds() {
       setLoading(true);
-      const allItems: FeedItem[] = [];
-      const promises = feeds.map(feed =>
-        fetch(`/api/rss?url=${encodeURIComponent(feed.url)}`)
-          .then(res => {
-            if (!res.ok) {
-              // Non bloccare tutto, logga l'errore e vai avanti.
-              console.warn(`Could not fetch feed for ${feed.name}. Status: ${res.status}`);
-              return null; // Restituisce null per indicare il fallimento
-            }
-            return res.text();
-          })
-          .then(xmlText => {
-            if (xmlText) {
-              const result = parser.parse(xmlText);
-              const itemsFromFeed = result?.rss?.channel?.item || result?.feed?.entry || [];
-              const itemsToAdd = Array.isArray(itemsFromFeed) ? itemsFromFeed : [itemsFromFeed];
-              
-              const parsedItems: FeedItem[] = itemsToAdd.slice(0, 10).map((item: any) => ({
-                title: item.title || 'Untitled',
-                link: item.link?.['@_href'] || item.link || '#',
-                thumbnail: extractImageUrl(item),
-                description: (item.description || item.summary || '').replace(/<[^>]*>/g, '').substring(0, 150) + '...',
-                pubDate: item.pubDate || item.published || new Date().toISOString(),
-                source: feed.name,
-                icon: feed.icon,
-                guid: item.guid || item.id,
-              }));
-              allItems.push(...parsedItems);
-            }
-          })
-          .catch(err => console.error(`Failed to load or process RSS feed for ${feed.name}:`, err))
-      );
-
-      await Promise.all(promises);
-
-      allItems.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-      
-      setAllFeedItems(allItems);
-      setFilteredItems(allItems);
-      setLoading(false);
+      try {
+        const res = await fetch('/api/feeds');
+        if (!res.ok) {
+          throw new Error('Failed to fetch feeds');
+        }
+        const items: FeedItem[] = await res.json();
+        setAllFeedItems(items);
+        setFilteredItems(items);
+      } catch (error) {
+        console.error("Error fetching aggregated feeds:", error);
+      } finally {
+        setLoading(false);
+      }
     }
 
     fetchFeeds();
@@ -126,9 +63,9 @@ export function RssFeed() {
 
   return (
     <section id="rss-feeds" className="py-12 md:py-16">
-      <h2 className="section-title">📰 Latest News from Top Portals</h2>
+      <h2 className="section-title">📰 Trending News & Celebrity Buzz</h2>
       <p className="text-center text-muted-foreground -mt-8 mb-8 max-w-2xl mx-auto">
-        Real-time news from ANSA, Vogue, GialloZafferano, ComingSoon and People - 10 articles per source
+        Real-time updates from ANSA, Vogue, GialloZafferano, ComingSoon, and People.
       </p>
 
       <div className="flex justify-center flex-wrap gap-3 mb-8">
@@ -139,7 +76,7 @@ export function RssFeed() {
         >
             All
         </Button>
-        {feeds.map(feed => (
+        {feedSources.map(feed => (
           <Button
             key={feed.name}
             variant={currentFilter === feed.name ? 'default' : 'outline'}
@@ -163,8 +100,8 @@ export function RssFeed() {
                 <Link href={item.link} target="_blank" rel="noopener noreferrer">
                     <div className="relative aspect-[3/2] overflow-hidden">
                     <Image
-                        src={item.thumbnail}
-                        alt={item.title}
+                        src={item.image}
+                        alt={item.title || 'Feed image'}
                         width={600}
                         height={400}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -172,14 +109,14 @@ export function RssFeed() {
                     />
                     </div>
                 </Link>
-                <div className="p-4">
+                <div className="p-4 flex flex-col flex-grow">
                     <h3 className="font-bold text-base text-foreground mb-2 leading-snug line-clamp-2 h-[48px]">
                         <Link href={item.link} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                             {item.title}
                         </Link>
                     </h3>
-                    <p className="text-muted-foreground text-sm mb-4 line-clamp-3 h-[60px]">{item.description}</p>
-                    <div className="flex justify-between items-center text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-sm mb-4 line-clamp-3 flex-grow">{item.description}</p>
+                    <div className="flex justify-between items-center text-xs text-muted-foreground mt-auto">
                         <span>{item.icon} {item.source}</span>
                         <span>{new Date(item.pubDate).toLocaleDateString('it-IT')}</span>
                     </div>
