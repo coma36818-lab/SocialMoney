@@ -7,17 +7,8 @@ import { useCookieConsent } from '@/hooks/use-cookie-consent';
 export function CookieBanner() {
     const { consent, showBanner, accept, decline } = useCookieConsent();
 
-    useEffect(() => {
-        if (consent === 'accepted') {
-            try {
-                // @ts-ignore
-                (window.adsbygoogle = window.adsbygoogle || []).push({});
-            } catch (e) {
-                console.error('AdSense initialization failed', e);
-            }
-        }
-    }, [consent]);
-
+    // The ad initialization logic has been moved to AdSlot.tsx
+    // to ensure ads are only pushed when the slot is rendered.
 
   if (!showBanner) {
     return null;

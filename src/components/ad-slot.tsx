@@ -1,12 +1,21 @@
-// This component is a placeholder for AdSense ads.
-// The actual ad loading is handled by the script in the layout and cookie consent.
-
 'use client';
 
 import { useCookieConsent } from '@/hooks/use-cookie-consent';
+import { useEffect } from 'react';
 
 export function AdSlot() {
     const { consent } = useCookieConsent();
+
+    useEffect(() => {
+        if (consent === 'accepted') {
+            try {
+                // @ts-ignore
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (e) {
+                console.error("AdSense push error:", e);
+            }
+        }
+    }, [consent]);
 
     if (consent !== 'accepted') {
         return (
@@ -28,9 +37,7 @@ export function AdSlot() {
                 data-ad-slot="6986146564" // Example slot, replace if needed
                 data-ad-format="auto"
                 data-full-width-responsive="true"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
+            
             <p className="text-muted-foreground">Advertisement</p>
         </div>
     </div>
