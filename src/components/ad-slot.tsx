@@ -19,34 +19,25 @@ export function AdSlot({ adSlotId = "6986146564" }: AdSlotProps) {
             return;
         }
 
-        const adElement = adRef.current;
-        if (adElement.childElementCount > 0 && adElement.querySelector('iframe')) {
-            // Ad might be already loaded or in progress
-            return;
-        }
-
-        const observer = new ResizeObserver(entries => {
-            const entry = entries[0];
-            if (entry && entry.contentRect.width > 0) {
-                 // Now that the container has a width, we can push the ad.
-                try {
-                    // @ts-ignore
-                    (window.adsbygoogle = window.adsbygoogle || []).push({});
-                } catch (e) {
-                    console.error("AdSense push error:", e);
-                }
-                // Once the ad is pushed, we don't need to observe anymore.
-                observer.disconnect();
+        const pushAd = () => {
+            try {
+                // @ts-ignore
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (e) {
+                console.error("AdSense push error:", e);
             }
-        });
-        
-        observer.observe(adElement);
-
-        return () => {
-            observer.disconnect();
         };
 
-    }, [consent]); // Re-run if consent changes
+        // Check if the ad container already has a size
+        if (adRef.current.offsetWidth > 0) {
+            pushAd();
+        } else {
+            // If not, wait for a bit and try again. This handles cases where CSS isn't fully applied yet.
+            const timeoutId = setTimeout(pushAd, 200);
+            return () => clearTimeout(timeoutId);
+        }
+
+    }, [consent, adSlotId]); // Rerun if consent or slotId changes
 
     if (consent !== 'accepted') {
         return (
