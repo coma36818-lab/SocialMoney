@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://mydatingame.com/sitemap.xml

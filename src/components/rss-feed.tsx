@@ -30,7 +30,7 @@ interface FeedItem {
 const AD_INTERVAL = 8; // Show an ad every 8 news items
 
 // The single endpoint for all feeds
-const feedMixerUrl = 'https://feedmix.novacms.xyz/api/v1/aggregate?feeds=https://www.ansa.it/sito/ansait_rss.xml,https://www.vogue.it/rss,https://people.com/feed/,https://www.giallozafferano.it/rss,https://www.comingsoon.it/rss';
+const feedMixerUrl = 'https://feedmix.novacms.xyz/api/v1/aggregate?feeds=https://www.ansa.it/sito/ansait_rss.xml,http://feeds.bbci.co.uk/news/rss.xml,https://www.vogue.it/rss,https://people.com/feed/,https://www.giallozafferano.it/rss,https://www.comingsoon.it/rss';
 
 export function RssFeed() {
   const [allFeedItems, setAllFeedItems] = useState<FeedItem[]>([]);
@@ -92,7 +92,7 @@ export function RssFeed() {
     <section id="rss-feeds" className="py-12 md:py-16">
       <h2 className="section-title">📰 Trending News & Celebrity Buzz</h2>
       <p className="text-center text-muted-foreground -mt-8 mb-8 max-w-2xl mx-auto">
-        Real-time updates from ANSA, Vogue, GialloZafferano, ComingSoon, and People.
+        Scopri le tendenze più calde della settimana nel mondo delle celebrità e della moda internazionale, con notizie in tempo reale dalle fonti più autorevoli.
       </p>
 
       <div className="flex justify-center flex-wrap gap-3 mb-8">
