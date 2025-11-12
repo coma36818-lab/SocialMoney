@@ -2,18 +2,20 @@
 
 import AdBanner from '@/components/ad-banner';
 
-const games = Array.from({ length: 4 }, (_, i) => ({
-  id: i + 2, // Start id from 2 since Asteroids is 1
-  name: `Gioco ${i + 2}`,
-  imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i+1}`,
-  gameUrl: `https://embed.crazygames.com/game${i + 2}`,
-}));
-
-const asteroidsGame = {
-  id: 1,
-  name: 'Asteroids.X',
-  gameUrl: 'https://idev.games/embed/asteroids-x',
-};
+const allGames = [
+  {
+    id: 1,
+    name: 'Asteroids.X',
+    imageUrl: 'https://images.unsplash.com/photo-1612036782180-6f0b6cd84627?w=400&h=300&fit=crop&q=80',
+    gameUrl: 'https://idev.games/embed/asteroids-x',
+  },
+  ...Array.from({ length: 4 }, (_, i) => ({
+    id: i + 2,
+    name: `Gioco ${i + 2}`,
+    imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i+1}`,
+    gameUrl: `https://embed.crazygames.com/game${i + 2}`,
+  }))
+];
 
 // Il codice del tuo annuncio Adsterra è stato inserito qui.
 const adCode = `
@@ -52,17 +54,7 @@ export default function GameLibraryPage() {
       <section id="game-library" className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12 place-items-center">
           
-          {/* Card 1 for Asteroids - Directly playable */}
-          <div className="w-full max-w-[300px] flex flex-col">
-            <div className="relative w-full h-[220px] rounded-xl shadow-xl bg-black/80 flex flex-col items-center justify-center text-center overflow-hidden">
-               <iframe id="embededGame" src={asteroidsGame.gameUrl} scrolling="no" seamless={true} frameBorder="0" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>Browser not compatible.</iframe>
-            </div>
-             <div className="p-4 text-center">
-                <h2 className="text-xl font-bold">{asteroidsGame.name}</h2>
-              </div>
-          </div>
-          
-          {games.map((game) => (
+          {allGames.map((game) => (
             <div
               key={game.id}
               className="group [perspective:1000px] w-full max-w-[300px]"
