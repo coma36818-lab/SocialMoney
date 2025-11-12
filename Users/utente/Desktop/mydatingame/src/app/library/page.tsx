@@ -36,7 +36,7 @@ export default function GameLibraryPage() {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [showAsteroids, setShowAsteroids] = useState(false);
 
-  const allGames = games.slice(1);
+  const allGames = games.slice(1, 5);
 
   return (
     <div
