@@ -34,8 +34,9 @@ const adCode = `
 
 export default function GameLibraryPage() {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
+  const [showAsteroids, setShowAsteroids] = useState(false);
 
-  const allGames = [asteroidsGame, ...games.slice(1)];
+  const allGames = games.slice(1);
 
   return (
     <div
@@ -67,6 +68,19 @@ export default function GameLibraryPage() {
 
       <section id="game-library" className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12 place-items-center">
+          {/* Card 1 for Asteroids */}
+          <div className="w-full max-w-[300px]">
+            <div className="relative h-[220px] rounded-xl shadow-xl bg-black/80 flex flex-col items-center justify-center text-center">
+              {showAsteroids ? (
+                <iframe src={asteroidsGame.gameUrl} className="w-full h-full" frameBorder="0" allowFullScreen></iframe>
+              ) : (
+                <button onClick={() => setShowAsteroids(true)} className="text-2xl font-bold font-headline text-primary mb-3 hover:text-primary/80 transition-colors">
+                  {asteroidsGame.name}
+                </button>
+              )}
+            </div>
+          </div>
+          
           {allGames.map((game) => (
             <div
               key={game.id}
