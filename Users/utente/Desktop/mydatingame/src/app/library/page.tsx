@@ -3,17 +3,11 @@
 import AdBanner from '@/components/ad-banner';
 
 const allGames = [
-  {
-    id: 1,
-    name: 'Asteroids.X',
-    imageUrl: 'https://images.unsplash.com/photo-1612036782180-6f0b6cd84627?w=400&h=300&fit=crop&q=80',
-    gameUrl: 'https://idev.games/embed/asteroids-x',
-  },
-  ...Array.from({ length: 4 }, (_, i) => ({
-    id: i + 2,
-    name: `Gioco ${i + 2}`,
+  ...Array.from({ length: 5 }, (_, i) => ({
+    id: i + 1,
+    name: `Gioco ${i + 1}`,
     imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i+1}`,
-    gameUrl: `https://embed.crazygames.com/game${i + 2}`,
+    gameUrl: `https://embed.crazygames.com/game${i + 1}`,
   }))
 ];
 
