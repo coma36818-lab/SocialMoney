@@ -2,14 +2,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Upload } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { navLinks } from '@/lib/data';
-
-const navAction = {
-  label: 'Submit Content',
-  icon: Upload,
-  href: '#join-creators',
-};
 
 export function AppHeader() {
   return (
@@ -39,12 +33,6 @@ export function AppHeader() {
               </Button>
             ))}
           </nav>
-           <Button asChild className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-primary/30">
-              <Link href={navAction.href}>
-                <Upload className="md:mr-2" />
-                <span className="hidden md:inline">{navAction.label}</span>
-              </Link>
-            </Button>
         </div>
 
 
@@ -58,7 +46,7 @@ export function AppHeader() {
             </SheetTrigger>
             <SheetContent side="right">
               <nav className="flex flex-col gap-4 mt-8">
-                {[...navLinks, navAction].map((link) => (
+                {navLinks.map((link) => (
                   <Button variant="ghost" asChild key={link.href} className="justify-start text-lg">
                     <Link href={link.href}>{link.label}</Link>
                   </Button>

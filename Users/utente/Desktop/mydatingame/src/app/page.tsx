@@ -1,12 +1,14 @@
 
 import { AffiliatePrograms } from '@/components/affiliate-programs';
 import { ContentSubmission } from '@/components/content-submission';
-import { RssFeed } from '@/components/rss-feed';
+import { NewsSection } from '@/components/news-section';
+import { newsSections, curiositaArticles } from '@/lib/data';
 import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
 import { Hero } from '@/components/hero';
 import { StatsBar } from '@/components/stats-bar';
 import { PostingTimes } from '@/components/posting-times';
-import { AdSlot } from '@/components/ad-slot';
+import { RssFeed } from '@/components/rss-feed';
+
 
 export default function Home() {
   return (
@@ -62,22 +64,18 @@ export default function Home() {
       </section>
 
       <div className="px-6">
-        
         <RssFeed />
-        
+
         <AiTrendAnalyzer />
+
         <Hero />
         
         <div className="py-10">
           <StatsBar />
         </div>
         
-        <AdSlot />
-        
         <AffiliatePrograms />
         
-        <AdSlot adSlotId="1451730459" />
-
         <PostingTimes />
 
         <ContentSubmission />
