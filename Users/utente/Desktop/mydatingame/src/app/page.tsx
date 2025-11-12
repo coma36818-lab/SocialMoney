@@ -62,7 +62,9 @@ export default function Home() {
         </div>
       </section>
 
-      <GameHubBanner />
+      <div className="px-6">
+        <GameHubBanner />
+      </div>
 
       <div className="px-6">
         {newsSections.map((section) => (
