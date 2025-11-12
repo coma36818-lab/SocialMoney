@@ -1,13 +1,12 @@
 
 import { AffiliatePrograms } from '@/components/affiliate-programs';
 import { ContentSubmission } from '@/components/content-submission';
-import { NewsSection } from '@/components/news-section';
-import { newsSections, curiositaArticles } from '@/lib/data';
 import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
 import { Hero } from '@/components/hero';
 import { StatsBar } from '@/components/stats-bar';
 import { PostingTimes } from '@/components/posting-times';
 import { RssFeed } from '@/components/rss-feed';
+import { GameHubPreview } from '@/components/game-hub-preview';
 
 
 export default function Home() {
@@ -62,6 +61,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <GameHubPreview />
 
       <div className="px-6">
         <RssFeed />
