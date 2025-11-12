@@ -10,8 +10,8 @@ export function GameHubPreview() {
         <div className="w-[340px] h-[340px] md:w-[600px] md:h-[600px] lg:w-[900px] lg:h-[900px] bg-card rounded-2xl shadow-2xl shadow-primary/10 text-center cursor-pointer group overflow-hidden transition-all duration-300 hover:shadow-primary/30 hover:-translate-y-2">
           <div className="relative w-full h-2/3">
             <img
-              src="https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=2070&auto=format&fit=crop"
-              alt="Game Hub Preview"
+              src="https://images.unsplash.com/photo-1542773998-9325f0a098d7?q=80&w=2232&auto=format&fit=crop"
+              alt="Girl playing video games"
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
