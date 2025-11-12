@@ -1,22 +1,19 @@
 'use client';
 
 import AdBanner from '@/components/ad-banner';
-import { useState } from 'react';
 
-const games = Array.from({ length: 5 }, (_, i) => ({
-  id: i + 1,
-  name: `Gioco ${i + 1}`,
-  imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i}`,
-  gameUrl: `https://embed.crazygames.com/game${i + 1}`,
+const games = Array.from({ length: 4 }, (_, i) => ({
+  id: i + 2, // Start id from 2 since Asteroids is 1
+  name: `Gioco ${i + 2}`,
+  imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i+1}`,
+  gameUrl: `https://embed.crazygames.com/game${i + 2}`,
 }));
 
 const asteroidsGame = {
-  id: 0,
+  id: 1,
   name: 'Asteroids.X',
-  imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop',
   gameUrl: 'https://idev.games/embed/asteroids-x',
 };
-
 
 // Il codice del tuo annuncio Adsterra è stato inserito qui.
 const adCode = `
@@ -33,10 +30,10 @@ const adCode = `
 `;
 
 export default function GameLibraryPage() {
-  const [selectedGame, setSelectedGame] = useState<string | null>(null);
-  const [showAsteroids, setShowAsteroids] = useState(false);
 
-  const allGames = games.slice(1, 5);
+  const openGameInNewTab = (url: string) => {
+    window.open(url, '_blank');
+  };
 
   return (
     <div
@@ -52,36 +49,20 @@ export default function GameLibraryPage() {
         </h1>
       </header>
 
-      {selectedGame && (
-        <section className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden">
-            <button
-              onClick={() => setSelectedGame(null)}
-              className="absolute top-2 right-2 z-10 bg-white/20 text-white rounded-full p-1 leading-none"
-            >
-              &#x2715;
-            </button>
-            <iframe src={selectedGame} className="w-full h-full" frameBorder="0" allowFullScreen></iframe>
-          </div>
-        </section>
-      )}
-
       <section id="game-library" className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12 place-items-center">
-          {/* Card 1 for Asteroids */}
-          <div className="w-full max-w-[300px]">
-            <div className="relative h-[220px] rounded-xl shadow-xl bg-black/80 flex flex-col items-center justify-center text-center">
-              {showAsteroids ? (
-                <iframe src={asteroidsGame.gameUrl} className="w-full h-full" frameBorder="0" allowFullScreen></iframe>
-              ) : (
-                <button onClick={() => setShowAsteroids(true)} className="text-2xl font-bold font-headline text-primary mb-3 hover:text-primary/80 transition-colors">
-                  {asteroidsGame.name}
-                </button>
-              )}
+          
+          {/* Card 1 for Asteroids - Directly playable */}
+          <div className="w-full max-w-[300px] flex flex-col">
+            <div className="relative w-full h-[220px] rounded-xl shadow-xl bg-black/80 flex flex-col items-center justify-center text-center overflow-hidden">
+               <iframe id="embededGame" src={asteroidsGame.gameUrl} scrolling="no" seamless={true} frameBorder="0" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>Browser not compatible.</iframe>
             </div>
+             <div className="p-4 text-center">
+                <h2 className="text-xl font-bold">{asteroidsGame.name}</h2>
+              </div>
           </div>
           
-          {allGames.map((game) => (
+          {games.map((game) => (
             <div
               key={game.id}
               className="group [perspective:1000px] w-full max-w-[300px]"
@@ -100,7 +81,7 @@ export default function GameLibraryPage() {
                   <div className="flex min-h-full flex-col items-center justify-center">
                     <h3 className="text-2xl font-bold font-headline text-primary mb-3">{game.name}</h3>
                     <button
-                      onClick={() => setSelectedGame(game.gameUrl)}
+                      onClick={() => openGameInNewTab(game.gameUrl)}
                       className="mt-4 rounded-md bg-primary/90 py-2 px-6 text-lg font-semibold text-white hover:bg-primary transition-colors duration-300 shadow-lg"
                     >
                       Gioca
