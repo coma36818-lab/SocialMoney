@@ -7,6 +7,7 @@ import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
 import { Hero } from '@/components/hero';
 import { StatsBar } from '@/components/stats-bar';
 import { PostingTimes } from '@/components/posting-times';
+import { GameHubBanner } from '@/components/game-hub-banner';
 
 export default function Home() {
   return (
@@ -62,6 +63,7 @@ export default function Home() {
       </section>
 
       <div className="px-6">
+        <GameHubBanner />
         {newsSections.map((section) => (
           <NewsSection key={section.id} {...section} />
         ))}
