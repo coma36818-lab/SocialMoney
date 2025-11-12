@@ -1,9 +1,8 @@
-
 'use client';
 
 import AdBanner from '@/components/ad-banner';
 
-const games = Array.from({ length: 50 }, (_, i) => ({
+const games = Array.from({ length: 5 }, (_, i) => ({
   id: i + 1,
   name: `Gioco ${i + 1}`,
   imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i}`,
