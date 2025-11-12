@@ -1,3 +1,4 @@
+
 import type { ImagePlaceholder } from './placeholder-images';
 import { PlaceHolderImages } from './placeholder-images';
 
@@ -24,6 +25,7 @@ export const navLinks = [
   { href: '#games', label: 'Games' },
   { href: '#handmade', label: 'Handmade' },
   { href: '#join-creators', label: 'Join' },
+  { href: '/library', label: 'Explore Games' },
 ];
 
 export const stats = [
@@ -435,3 +437,5 @@ export const postingTimes = [
     { platform: '🐦 Twitter/X', times: 'Weekdays: 8:00 AM - 10:00 AM\nLunch: 12:00 PM - 1:00 PM', details: 'Morning commute and lunch break engagement.' },
     { platform: '💼 LinkedIn', times: 'Weekdays: 7:00 AM - 9:00 AM\nLunch: 12:00 PM - 1:00 PM', details: 'Professional browsing before and during work.' },
 ];
+
+    
