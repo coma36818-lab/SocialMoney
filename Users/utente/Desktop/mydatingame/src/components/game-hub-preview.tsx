@@ -11,14 +11,14 @@ export function GameHubPreview() {
           <div className="relative w-full h-2/3">
             <img
               src="https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=2070&auto=format&fit=crop"
-              alt="Anteprima Game Hub"
+              alt="Game Hub Preview"
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
           </div>
           <div className="p-6 h-1/3 flex flex-col justify-center">
-            <h2 className="text-3xl md:text-5xl lg:text-7xl font-bold font-headline text-primary group-hover:text-yellow-300 transition-colors">Scopri tutti i giochi!</h2>
-            <p className="text-muted-foreground mt-2 md:mt-4 text-base md:text-lg">Entra nella nostra libreria di giochi</p>
+            <h2 className="text-3xl md:text-5xl lg:text-7xl font-bold font-headline text-primary group-hover:text-yellow-300 transition-colors">Discover all the games!</h2>
+            <p className="text-muted-foreground mt-2 md:mt-4 text-base md:text-lg">Enter our game library</p>
           </div>
         </div>
       </Link>
