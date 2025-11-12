@@ -3,12 +3,36 @@
 import AdBanner from '@/components/ad-banner';
 
 const allGames = [
-  ...Array.from({ length: 5 }, (_, i) => ({
-    id: i + 1,
-    name: `Gioco ${i + 1}`,
-    imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i+1}`,
-    gameUrl: `https://embed.crazygames.com/game${i + 1}`,
-  }))
+    {
+    id: 1,
+    name: `Gioco 1`,
+    imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=1`,
+    gameUrl: `https://embed.crazygames.com/game1`,
+  },
+  {
+    id: 2,
+    name: `Gioco 2`,
+    imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=2`,
+    gameUrl: `https://embed.crazygames.com/game2`,
+  },
+  {
+    id: 3,
+    name: `Gioco 3`,
+    imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=3`,
+    gameUrl: `https://embed.crazygames.com/game3`,
+  },
+  {
+    id: 4,
+    name: `Gioco 4`,
+    imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=4`,
+    gameUrl: `https://embed.crazygames.com/game4`,
+  },
+  {
+    id: 5,
+    name: `Gioco 5`,
+    imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=5`,
+    gameUrl: `https://embed.crazygames.com/game5`,
+  },
 ];
 
 // Il codice del tuo annuncio Adsterra è stato inserito qui.
