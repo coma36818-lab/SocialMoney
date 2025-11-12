@@ -7,7 +7,7 @@ export function GameHubPreview() {
   return (
     <section className="flex justify-center items-center py-16 md:py-20">
       <Link href="/library">
-        <div className="w-[340px] h-[340px] md:w-[600px] md:h-[600px] bg-card rounded-2xl shadow-2xl shadow-primary/10 text-center cursor-pointer group overflow-hidden transition-all duration-300 hover:shadow-primary/30 hover:-translate-y-2">
+        <div className="w-[340px] h-[340px] md:w-[600px] md:h-[600px] lg:w-[900px] lg:h-[900px] bg-card rounded-2xl shadow-2xl shadow-primary/10 text-center cursor-pointer group overflow-hidden transition-all duration-300 hover:shadow-primary/30 hover:-translate-y-2">
           <div className="relative w-full h-2/3">
             <img
               src="https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=2070&auto=format&fit=crop"
@@ -17,12 +17,11 @@ export function GameHubPreview() {
              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
           </div>
           <div className="p-6 h-1/3 flex flex-col justify-center">
-            <h2 className="text-3xl md:text-4xl font-bold font-headline text-primary group-hover:text-yellow-300 transition-colors">Scopri tutti i giochi!</h2>
-            <p className="text-muted-foreground mt-2">Entra nella nostra libreria di giochi</p>
+            <h2 className="text-3xl md:text-5xl lg:text-7xl font-bold font-headline text-primary group-hover:text-yellow-300 transition-colors">Scopri tutti i giochi!</h2>
+            <p className="text-muted-foreground mt-2 md:mt-4 text-base md:text-lg">Entra nella nostra libreria di giochi</p>
           </div>
         </div>
       </Link>
     </section>
   );
 }
-
