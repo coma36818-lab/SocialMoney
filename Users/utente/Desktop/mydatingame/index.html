@@ -2330,7 +2330,7 @@
             document.body.appendChild(toast);
             setTimeout(() => {
               toast.style.animation = 'slideDown 0.3s ease';
-              setTimeout(() => toast.remove(), 300);
+              setTimeout(() => toast.remove(), 2000);
             }, 2000);
           }).catch(err => {
             console.error('Failed to copy:', err);
