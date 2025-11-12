@@ -64,6 +64,9 @@ export default function Home() {
 
       <div className="px-6">
         <GameHubBanner />
+      </div>
+
+      <div className="px-6">
         {newsSections.map((section) => (
           <NewsSection key={section.id} {...section} />
         ))}
