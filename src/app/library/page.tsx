@@ -1,6 +1,7 @@
 'use client';
 
 import AdBanner from '@/components/ad-banner';
+import { useState } from 'react';
 
 const games = Array.from({ length: 5 }, (_, i) => ({
   id: i + 1,
@@ -24,9 +25,17 @@ const adCode = `
 `;
 
 export default function GameLibraryPage() {
+  const [selectedGame, setSelectedGame] = useState<string | null>(null);
+
   const openGame = (url: string) => {
     window.open(url, '_blank');
   };
+
+  const asteroidsEmbed = (
+    <div style={{ position: 'relative', height: 0, overflow: 'hidden', paddingBottom: '56.25%' }}>
+      <iframe id="embededGame" src="https://idev.games/embed/asteroids-x" scrolling="no" seamless={true} frameBorder="0" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>Browser not compatible.</iframe>
+    </div>
+  );
 
   return (
     <div
@@ -42,9 +51,37 @@ export default function GameLibraryPage() {
         </h1>
       </header>
 
+      {selectedGame && (
+        <section className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden">
+            <button
+              onClick={() => setSelectedGame(null)}
+              className="absolute top-2 right-2 z-10 bg-white/20 text-white rounded-full p-1"
+            >
+              &#x2715;
+            </button>
+            <iframe src={selectedGame} className="w-full h-full" frameBorder="0" allowFullScreen></iframe>
+          </div>
+        </section>
+      )}
+
       <section id="game-library" className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12 place-items-center">
-          {games.map((game) => (
+          {/* Card 1 for Asteroids */}
+          <div className="group [perspective:1000px] w-full max-w-[300px]">
+            <div className="relative h-[220px] rounded-xl shadow-xl transition-all duration-500 [transform-style:preserve-3d]">
+              <div className="absolute inset-0">
+                <div style={{ position: 'relative', height: '100%', width: '100%', overflow: 'hidden', borderRadius: '0.75rem' }}>
+                    <iframe id="embededGame" src="https://idev.games/embed/asteroids-x" scrolling="no" seamless={true} frameBorder="0" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>Browser not compatible.</iframe>
+                </div>
+              </div>
+            </div>
+             <div className="p-4 text-center">
+                <h2 className="text-xl font-bold">Asteroids.X</h2>
+              </div>
+          </div>
+
+          {games.slice(1).map((game) => (
             <div
               key={game.id}
               className="group [perspective:1000px] w-full max-w-[300px]"
