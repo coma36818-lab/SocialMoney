@@ -1,6 +1,5 @@
 'use client';
 
-import AdBanner from '@/components/ad-banner';
 import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Maximize, Minimize } from 'lucide-react';
@@ -27,22 +26,11 @@ const games = [
     }))
 ];
 
-const adCode = `
-  <script type="text/javascript">
-    atOptions = {
-      'key' : '3ac2480b2d4d52fb741795a5509e37a1',
-      'format' : 'iframe',
-      'height' : 90,
-      'width' : 728,
-      'params' : {}
-    };
-  </script>
-  <script type="text/javascript" src="//www.highperformanceformat.com/3ac2480b2d4d52fb741795a5509e37a1/invoke.js"></script>
-`;
-
 export default function GameLibraryPage() {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [isPageFullScreen, setIsPageFullScreen] = useState(false);
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+
 
   const openGameInModal = (url: string) => {
     setSelectedGame(url);
@@ -58,18 +46,19 @@ export default function GameLibraryPage() {
   }
 
   const toggleFullScreen = () => {
-    const gameContainer = document.getElementById('game-container');
+    const gameContainer = gameContainerRef.current;
     if (!gameContainer) return;
 
     if (!document.fullscreenElement) {
         gameContainer.requestFullscreen().catch(err => {
             alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
         });
+        setIsPageFullScreen(true);
     } else {
         document.exitFullscreen();
+        setIsPageFullScreen(false);
     }
   };
-
 
   return (
     <div
@@ -88,6 +77,7 @@ export default function GameLibraryPage() {
       {selectedGame && (
         <section className={cn("fixed inset-0 z-50 bg-black/80 flex items-center justify-center", isPageFullScreen ? "p-0" : "p-4")}>
           <div 
+            ref={gameContainerRef}
             id="game-container" 
             className={cn(
               "relative bg-black rounded-lg overflow-hidden transition-all duration-300", 
@@ -152,10 +142,6 @@ export default function GameLibraryPage() {
       </section>
 
       <div className="container mx-auto px-6 py-12 text-center">
-        <div className="my-10 flex justify-center">
-          <AdBanner adHtml={adCode} />
-        </div>
-
         <div className="my-10">
           <div className="bg-black bg-opacity-40 backdrop-filter backdrop-blur-lg rounded-xl p-8 shadow-2xl">
             <h3 className="text-3xl font-bold mb-4 text-white shadow-md">Supporta il Progetto</h3>
