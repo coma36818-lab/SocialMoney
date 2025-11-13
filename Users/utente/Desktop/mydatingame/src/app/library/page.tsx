@@ -4,7 +4,7 @@ import AdBanner from '@/components/ad-banner';
 import { useState, useRef } from 'react';
 
 const allGames = [
-    {
+  {
     id: 1,
     name: 'Asteroids.X',
     imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80',
