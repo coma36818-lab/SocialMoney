@@ -3,14 +3,21 @@
 import AdBanner from '@/components/ad-banner';
 import { useState } from 'react';
 
-const games = Array.from({ length: 5 }, (_, i) => ({
-  id: i + 1,
-  name: `Gioco ${i + 1}`,
-  imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i}`,
-  gameUrl: `https://embed.crazygames.com/game${i + 1}`,
-}));
+const games = [
+  {
+    id: 1,
+    name: 'Asteroids.X',
+    imageUrl: 'https://img.itch.zone/aW1hZ2UvMjI5MTAwLzEwODQwNTkucG5n/original/B4voos.png',
+    gameUrl: 'https://idev.games/embed/asteroids-x',
+  },
+  ...Array.from({ length: 4 }, (_, i) => ({
+    id: i + 2,
+    name: `Gioco ${i + 2}`,
+    imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i}`,
+    gameUrl: `https://embed.crazygames.com/game${i + 2}`,
+  })),
+];
 
-// Il codice del tuo annuncio Adsterra è stato inserito qui.
 const adCode = `
   <script type="text/javascript">
     atOptions = {
@@ -27,15 +34,9 @@ const adCode = `
 export default function GameLibraryPage() {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
 
-  const openGame = (url: string) => {
-    window.open(url, '_blank');
+  const openGameInModal = (url: string) => {
+    setSelectedGame(url);
   };
-
-  const asteroidsEmbed = (
-    <div style={{ position: 'relative', height: 0, overflow: 'hidden', paddingBottom: '56.25%' }}>
-      <iframe id="embededGame" src="https://idev.games/embed/asteroids-x" scrolling="no" seamless={true} frameBorder="0" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>Browser not compatible.</iframe>
-    </div>
-  );
 
   return (
     <div
@@ -67,21 +68,7 @@ export default function GameLibraryPage() {
 
       <section id="game-library" className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12 place-items-center">
-          {/* Card 1 for Asteroids */}
-          <div className="group [perspective:1000px] w-full max-w-[300px]">
-            <div className="relative h-[220px] rounded-xl shadow-xl transition-all duration-500 [transform-style:preserve-3d]">
-              <div className="absolute inset-0">
-                <div style={{ position: 'relative', height: '100%', width: '100%', overflow: 'hidden', borderRadius: '0.75rem' }}>
-                    <iframe id="embededGame" src="https://idev.games/embed/asteroids-x" scrolling="no" seamless={true} frameBorder="0" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>Browser not compatible.</iframe>
-                </div>
-              </div>
-            </div>
-             <div className="p-4 text-center">
-                <h2 className="text-xl font-bold">Asteroids.X</h2>
-              </div>
-          </div>
-
-          {games.slice(1).map((game) => (
+          {games.map((game) => (
             <div
               key={game.id}
               className="group [perspective:1000px] w-full max-w-[300px]"
@@ -100,7 +87,7 @@ export default function GameLibraryPage() {
                   <div className="flex min-h-full flex-col items-center justify-center">
                     <h3 className="text-2xl font-bold font-headline text-primary mb-3">{game.name}</h3>
                     <button
-                      onClick={() => openGame(game.gameUrl)}
+                      onClick={() => openGameInModal(game.gameUrl)}
                       className="mt-4 rounded-md bg-primary/90 py-2 px-6 text-lg font-semibold text-white hover:bg-primary transition-colors duration-300 shadow-lg"
                     >
                       Gioca
