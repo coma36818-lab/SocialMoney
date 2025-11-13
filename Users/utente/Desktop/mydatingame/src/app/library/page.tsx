@@ -7,7 +7,7 @@ const games = [
   {
     id: 1,
     name: 'Asteroids.X',
-    imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1614728263952-84ea256ec677?w=600&q=80',
     gameUrl: 'https://idev.games/embed/asteroids-x',
   },
   {
