@@ -7,6 +7,7 @@ import { AiTrendAnalyzer } from '@/components/ai-trend-analyzer';
 import { Hero } from '@/components/hero';
 import { StatsBar } from '@/components/stats-bar';
 import { PostingTimes } from '@/components/posting-times';
+import { AdSlot } from '@/components/ad-slot';
 
 export default function Home() {
   return (
@@ -62,6 +63,8 @@ export default function Home() {
       </section>
 
       <div className="px-6">
+        <AdSlot />
+
         {newsSections.map((section) => (
           <NewsSection key={section.id} {...section} />
         ))}
@@ -81,6 +84,8 @@ export default function Home() {
         </div>
         
         <AffiliatePrograms />
+        
+        <AdSlot adSlotId="9876543210" />
         
         <PostingTimes />
 
