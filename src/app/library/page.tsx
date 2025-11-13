@@ -10,7 +10,7 @@ const games = [
     {
         id: 1,
         name: 'Asteroids.X',
-        imageUrl: 'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=600&q=80',
+        imageUrl: 'https://images.unsplash.com/photo-1614728263952-84ea256ec677?w=600&q=80',
         gameUrl: 'https://idev.games/embed/asteroids-x',
     },
     {
@@ -51,12 +51,25 @@ export default function GameLibraryPage() {
 
   const closeModal = () => {
     setSelectedGame(null);
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    }
     setIsPageFullScreen(false);
   }
 
-  const togglePageFullScreen = () => {
-    setIsPageFullScreen(prev => !prev);
+  const toggleFullScreen = () => {
+    const gameContainer = document.getElementById('game-container');
+    if (!gameContainer) return;
+
+    if (!document.fullscreenElement) {
+        gameContainer.requestFullscreen().catch(err => {
+            alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
   };
+
 
   return (
     <div
@@ -82,7 +95,7 @@ export default function GameLibraryPage() {
             )}>
             <div className="absolute top-2 right-2 z-10 flex space-x-2">
               <button
-                onClick={togglePageFullScreen}
+                onClick={toggleFullScreen}
                 className="bg-white/20 text-white rounded-full p-1.5"
                 aria-label="Toggle Fullscreen"
               >
