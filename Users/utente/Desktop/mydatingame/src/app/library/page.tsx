@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef } from 'react';
@@ -39,25 +40,13 @@ export default function GameLibraryPage() {
 
   const closeModal = () => {
     setSelectedGame(null);
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
+    if (isPageFullScreen) {
+      setIsPageFullScreen(false);
     }
-    setIsPageFullScreen(false);
   }
 
   const toggleFullScreen = () => {
-    const gameContainer = gameContainerRef.current;
-    if (!gameContainer) return;
-
-    if (!document.fullscreenElement) {
-        gameContainer.requestFullscreen().catch(err => {
-            alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-        });
-        setIsPageFullScreen(true);
-    } else {
-        document.exitFullscreen();
-        setIsPageFullScreen(false);
-    }
+    setIsPageFullScreen(!isPageFullScreen);
   };
 
   return (
