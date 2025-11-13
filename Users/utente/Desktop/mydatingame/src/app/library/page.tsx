@@ -1,16 +1,29 @@
 'use client';
 
 import AdBanner from '@/components/ad-banner';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
-const games = Array.from({ length: 5 }, (_, i) => ({
-  id: i + 1,
-  name: `Gioco ${i + 1}`,
-  imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i}`,
-  gameUrl: `https://embed.crazygames.com/game${i + 1}`,
-}));
+const games = [
+  {
+    id: 1,
+    name: 'Asteroids.X',
+    imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80',
+    gameUrl: 'https://idev.games/embed/asteroids-x',
+  },
+  {
+    id: 2,
+    name: 'Power of Ball',
+    imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&q=80',
+    gameUrl: 'https://idev.games/embed/power-of-ball',
+  },
+  ...Array.from({ length: 3 }, (_, i) => ({
+    id: i + 3,
+    name: `Gioco ${i + 3}`,
+    imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i+1}`,
+    gameUrl: `https://embed.crazygames.com/game${i + 3}`,
+  }))
+];
 
-// Il codice del tuo annuncio Adsterra è stato inserito qui.
 const adCode = `
   <script type="text/javascript">
     atOptions = {
@@ -26,16 +39,24 @@ const adCode = `
 
 export default function GameLibraryPage() {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const openGame = (url: string) => {
-    window.open(url, '_blank');
+  const openGameInModal = (url: string) => {
+    setSelectedGame(url);
   };
 
-  const asteroidsEmbed = (
-    <div style={{ position: 'relative', height: 0, overflow: 'hidden', paddingBottom: '56.25%' }}>
-      <iframe id="embededGame" src="https://idev.games/embed/asteroids-x" scrolling="no" seamless={true} frameBorder="0" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>Browser not compatible.</iframe>
-    </div>
-  );
+  const toggleFullScreen = () => {
+    const gameContainer = document.getElementById('game-container');
+    if (!gameContainer) return;
+
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+        gameContainer.requestFullscreen().catch(err => {
+        alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+      });
+    }
+  };
 
   return (
     <div
@@ -53,41 +74,44 @@ export default function GameLibraryPage() {
 
       {selectedGame && (
         <section className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden">
-            <button
-              onClick={() => setSelectedGame(null)}
-              className="absolute top-2 right-2 z-10 bg-white/20 text-white rounded-full p-1"
-            >
-              &#x2715;
-            </button>
-            <iframe src={selectedGame} className="w-full h-full" frameBorder="0" allowFullScreen></iframe>
+          <div id="game-container" className="relative w-full max-w-7xl aspect-video bg-black rounded-lg overflow-hidden">
+            <div className="absolute top-2 right-2 z-10 flex space-x-2">
+              <button
+                onClick={toggleFullScreen}
+                className="bg-white/20 text-white rounded-full p-1"
+                aria-label="Toggle Fullscreen"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m0 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5h-4m0 0v-4m0 4l-5-5" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setSelectedGame(null)}
+                className="bg-white/20 text-white rounded-full p-1"
+                aria-label="Close"
+              >
+                &#x2715;
+              </button>
+            </div>
+            <iframe
+              ref={iframeRef}
+              src={selectedGame}
+              className="w-full h-full"
+              frameBorder="0"
+              allowFullScreen
+            ></iframe>
           </div>
         </section>
       )}
 
       <section id="game-library" className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12 place-items-center">
-          {/* Card 1 for Asteroids */}
-          <div className="group [perspective:1000px] w-full max-w-[300px]">
-            <div className="relative h-[220px] rounded-xl shadow-xl transition-all duration-500 [transform-style:preserve-3d]">
-              <div className="absolute inset-0">
-                <div style={{ position: 'relative', height: '100%', width: '100%', overflow: 'hidden', borderRadius: '0.75rem' }}>
-                    <iframe id="embededGame" src="https://idev.games/embed/asteroids-x" scrolling="no" seamless={true} frameBorder="0" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>Browser not compatible.</iframe>
-                </div>
-              </div>
-            </div>
-             <div className="p-4 text-center">
-                <h2 className="text-xl font-bold">Asteroids.X</h2>
-              </div>
-          </div>
-
-          {games.slice(1).map((game) => (
+          {games.map((game) => (
             <div
               key={game.id}
               className="group [perspective:1000px] w-full max-w-[300px]"
             >
               <div className="relative h-[220px] rounded-xl shadow-xl transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
-                {/* Front side */}
                 <div className="absolute inset-0">
                   <img
                     className="h-full w-full rounded-xl object-cover shadow-xl shadow-black/40"
@@ -95,12 +119,11 @@ export default function GameLibraryPage() {
                     alt={game.name}
                   />
                 </div>
-                {/* Back side */}
                 <div className="absolute inset-0 h-full w-full rounded-xl bg-black/80 px-6 py-4 text-center text-slate-200 [transform:rotateY(180deg)] [backface-visibility:hidden]">
                   <div className="flex min-h-full flex-col items-center justify-center">
                     <h3 className="text-2xl font-bold font-headline text-primary mb-3">{game.name}</h3>
                     <button
-                      onClick={() => openGame(game.gameUrl)}
+                      onClick={() => openGameInModal(game.gameUrl)}
                       className="mt-4 rounded-md bg-primary/90 py-2 px-6 text-lg font-semibold text-white hover:bg-primary transition-colors duration-300 shadow-lg"
                     >
                       Gioca
@@ -114,12 +137,10 @@ export default function GameLibraryPage() {
       </section>
 
       <div className="container mx-auto px-6 py-12 text-center">
-        {/* Sezione Pubblicità (pannello rimosso) */}
         <div className="my-10 flex justify-center">
           <AdBanner adHtml={adCode} />
         </div>
 
-        {/* Sezione Donazione */}
         <div className="my-10">
           <div className="bg-black bg-opacity-40 backdrop-filter backdrop-blur-lg rounded-xl p-8 shadow-2xl">
             <h3 className="text-3xl font-bold mb-4 text-white shadow-md">Supporta il Progetto</h3>
