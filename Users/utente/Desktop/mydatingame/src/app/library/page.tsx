@@ -1,60 +1,62 @@
 'use client';
 
-import AdBanner from '@/components/ad-banner';
 import { useState, useRef } from 'react';
+import { cn } from '@/lib/utils';
+import { Maximize, Minimize } from 'lucide-react';
+
 
 const games = [
-  {
-    id: 1,
-    name: 'Asteroids.X',
-    imageUrl: 'https://images.unsplash.com/photo-1614728263952-84ea256ec677?w=600&q=80',
-    gameUrl: 'https://idev.games/embed/asteroids-x',
-  },
-  {
-    id: 2,
-    name: 'Power of Ball',
-    imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&q=80',
-    gameUrl: 'https://idev.games/embed/power-of-ball',
-  },
-  ...Array.from({ length: 3 }, (_, i) => ({
-    id: i + 3,
-    name: `Gioco ${i + 3}`,
-    imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i+1}`,
-    gameUrl: `https://embed.crazygames.com/game${i + 3}`,
-  }))
+    {
+        id: 1,
+        name: 'Asteroids.X',
+        imageUrl: 'https://images.unsplash.com/photo-1614728263952-84ea256ec677?w=600&q=80',
+        gameUrl: 'https://idev.games/embed/asteroids-x',
+    },
+    {
+        id: 2,
+        name: 'Power of Ball',
+        imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&q=80',
+        gameUrl: 'https://idev.games/embed/power-of-ball',
+    },
+    ...Array.from({ length: 3 }, (_, i) => ({
+        id: i + 3,
+        name: `Gioco ${i + 3}`,
+        imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i+1}`,
+        gameUrl: `https://embed.crazygames.com/game${i + 3}`,
+    }))
 ];
-
-const adCode = `
-  <script type="text/javascript">
-    atOptions = {
-      'key' : '3ac2480b2d4d52fb741795a5509e37a1',
-      'format' : 'iframe',
-      'height' : 90,
-      'width' : 728,
-      'params' : {}
-    };
-  </script>
-  <script type="text/javascript" src="//www.highperformanceformat.com/3ac2480b2d4d52fb741795a5509e37a1/invoke.js"></script>
-`;
 
 export default function GameLibraryPage() {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isPageFullScreen, setIsPageFullScreen] = useState(false);
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+
 
   const openGameInModal = (url: string) => {
     setSelectedGame(url);
+    setIsPageFullScreen(false); // Reset on new game
   };
 
-  const toggleFullScreen = () => {
-    const gameContainer = document.getElementById('game-container');
-    if (!gameContainer) return;
-
+  const closeModal = () => {
+    setSelectedGame(null);
     if (document.fullscreenElement) {
       document.exitFullscreen();
-    } else {
+    }
+    setIsPageFullScreen(false);
+  }
+
+  const toggleFullScreen = () => {
+    const gameContainer = gameContainerRef.current;
+    if (!gameContainer) return;
+
+    if (!document.fullscreenElement) {
         gameContainer.requestFullscreen().catch(err => {
-        alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-      });
+            alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+        setIsPageFullScreen(true);
+    } else {
+        document.exitFullscreen();
+        setIsPageFullScreen(false);
     }
   };
 
@@ -73,28 +75,31 @@ export default function GameLibraryPage() {
       </header>
 
       {selectedGame && (
-        <section className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div id="game-container" className="relative w-full max-w-7xl aspect-video bg-black rounded-lg overflow-hidden">
+        <section className={cn("fixed inset-0 z-50 bg-black/80 flex items-center justify-center", isPageFullScreen ? "p-0" : "p-4")}>
+          <div 
+            ref={gameContainerRef}
+            id="game-container" 
+            className={cn(
+              "relative bg-black rounded-lg overflow-hidden transition-all duration-300", 
+              isPageFullScreen ? "w-full h-full aspect-auto rounded-none" : "w-full max-w-7xl aspect-video"
+            )}>
             <div className="absolute top-2 right-2 z-10 flex space-x-2">
               <button
                 onClick={toggleFullScreen}
-                className="bg-white/20 text-white rounded-full p-1"
+                className="bg-white/20 text-white rounded-full p-1.5"
                 aria-label="Toggle Fullscreen"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m0 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5h-4m0 0v-4m0 4l-5-5" />
-                </svg>
+                {isPageFullScreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
               </button>
               <button
-                onClick={() => setSelectedGame(null)}
-                className="bg-white/20 text-white rounded-full p-1"
+                onClick={closeModal}
+                className="bg-white/20 text-white rounded-full p-1.5 leading-none"
                 aria-label="Close"
               >
                 &#x2715;
               </button>
             </div>
             <iframe
-              ref={iframeRef}
               src={selectedGame}
               className="w-full h-full"
               frameBorder="0"
@@ -137,10 +142,6 @@ export default function GameLibraryPage() {
       </section>
 
       <div className="container mx-auto px-6 py-12 text-center">
-        <div className="my-10 flex justify-center">
-          <AdBanner adHtml={adCode} />
-        </div>
-
         <div className="my-10">
           <div className="bg-black bg-opacity-40 backdrop-filter backdrop-blur-lg rounded-xl p-8 shadow-2xl">
             <h3 className="text-3xl font-bold mb-4 text-white shadow-md">Supporta il Progetto</h3>
