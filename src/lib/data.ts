@@ -17,14 +17,14 @@ const getImage = (id: string): ImagePlaceholder => {
 };
 
 export const navLinks = [
-  { href: '#real-news', label: 'News' },
-  { href: '#gossip', label: 'Gossip' },
-  { href: '#influencer', label: 'Influencer' },
-  { href: '#cucina', label: 'Food' },
-  { href: '#cinema', label: 'Cinema' },
-  { href: '#games', label: 'Games' },
-  { href: '#handmade', label: 'Handmade' },
-  { href: '#join-creators', label: 'Join' },
+  { href: '/#real-news', label: 'News' },
+  { href: '/#gossip', label: 'Gossip' },
+  { href: '/#influencer', label: 'Influencer' },
+  { href: '/#cucina', label: 'Food' },
+  { href: '/#cinema', label: 'Cinema' },
+  { href: '/#games', label: 'Games' },
+  { href: '/#handmade', label: 'Handmade' },
+  { href: '/#join-creators', label: 'Join' },
   { href: '/library', label: 'Explore Games' },
 ];
 
