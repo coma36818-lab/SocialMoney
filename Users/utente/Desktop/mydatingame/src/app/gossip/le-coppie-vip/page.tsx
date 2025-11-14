@@ -18,6 +18,20 @@
                 data-ai-hint="celebrity couple"
               />
             </div>
+            <div className="max-w-2xl mx-auto text-left mt-8">
+              <p className="text-slate-300 mb-4">
+                Cardi B just dropped her latest release -- her first child with NFL star Stefon Diggs is here ... TMZ has learned.
+              </p>
+              <p className="text-slate-300 mb-4">
+                Sources connected to the Diamond-selling rapper tell us Cardi gave birth to the baby boy last week.
+              </p>
+              <p className="text-slate-300 mb-4">
+                We're told Stefon, the New England Patriots star receiver, was with Cardi when their baby boy arrived. Cardi announced the birth Thursday in a social media post.
+              </p>
+              <p className="text-slate-300">
+                Cardi says ... "My life has always been a combination of different chapters and different seasons. My last chapter was the beginning of a new season. Starting over is never easy but it’s been so worth it! I brought new music and a new album to the world! A new baby into my world, and one more reason to be the best version of me, one more reason to love me more than anything else or anyone else so I can continue giving my babies the love and life they deserve."
+              </p>
+            </div>
           </div>
         );
       }

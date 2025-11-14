@@ -10,7 +10,7 @@
             </p>
             <div className="flex justify-center">
               <Image
-                src="https://picsum.photos/seed/vip/800/600"
+                src="/Schermata  13.14.35.png"
                 alt="Immagine coppie VIP"
                 width={800}
                 height={600}
