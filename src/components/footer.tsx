@@ -1,32 +1,11 @@
 
 import Link from 'next/link';
+import { footerSectionsData } from '@/lib/data';
 
 const footerSections = {
   about: {
     title: 'About MyDatinGame',
     description: 'Your ultimate digital magazine for trends, gossip, fashion, entertainment, and creator monetization strategies.',
-  },
-  categories: {
-    title: 'Categories',
-    links: [
-      { href: '/#real-news', label: 'Notizie' },
-      { href: '/#gossip', label: 'Gossip & VIP' },
-      { href: '/#influencer', label: 'Influencer' },
-      { href: '/#cucina', label: 'Cucina' },
-      { href: '/#cinema', label: 'Cinema & Serie TV' },
-      { href: '/#games', label: 'Gaming' },
-      { href: '/#handmade', label: 'Handmade' },
-    ],
-  },
-  resources: {
-    title: 'Resources',
-    links: [
-      { href: '/#affiliates', label: 'Affiliate Programs' },
-      { href: '/#tips', label: 'Creator Tips' },
-      { href: '/#ai-analyzer', label: 'AI Trend Analyzer' },
-      { href: '/#guadagnare-social', label: 'Guadagnare sui Social' },
-      { href: '/#join-creators', label: 'Partecipa' },
-    ],
   },
   legal: {
     title: 'Legal',
@@ -49,9 +28,9 @@ export function AppFooter() {
             <p className="text-muted-foreground text-sm">{footerSections.about.description}</p>
           </div>
           <div className="footer-section">
-            <h4 className="text-lg font-bold mb-4">{footerSections.categories.title}</h4>
+            <h4 className="text-lg font-bold mb-4">{footerSectionsData.categories.title}</h4>
             <ul className="space-y-2">
-              {footerSections.categories.links.map((link) => (
+              {footerSectionsData.categories.links.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
                     {link.label}
@@ -61,9 +40,9 @@ export function AppFooter() {
             </ul>
           </div>
           <div className="footer-section">
-            <h4 className="text-lg font-bold mb-4">{footerSections.resources.title}</h4>
+            <h4 className="text-lg font-bold mb-4">{footerSectionsData.resources.title}</h4>
             <ul className="space-y-2">
-              {footerSections.resources.links.map((link) => (
+              {footerSectionsData.resources.links.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
                     {link.label}

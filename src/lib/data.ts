@@ -417,6 +417,31 @@ export const curiositaArticles = [
   },
 ];
 
+export const footerSectionsData = {
+    categories: {
+        title: 'Categories',
+        links: [
+            { href: '/#real-news', label: 'Notizie' },
+            { href: '/#gossip', label: 'Gossip & VIP' },
+            { href: '/#influencer', label: 'Influencer' },
+            { href: '/#cucina', label: 'Cucina' },
+            { href: '/#cinema', label: 'Cinema & Serie TV' },
+            { href: '/#games', label: 'Gaming' },
+            { href: '/#handmade', label: 'Handmade' },
+        ],
+    },
+    resources: {
+        title: 'Resources',
+        links: [
+            { href: '/#affiliates', label: 'Affiliate Programs' },
+            { href: '/#tips', label: 'Creator Tips' },
+            { href: '/#ai-analyzer', label: 'AI Trend Analyzer' },
+            { href: '/#guadagnare-social', label: 'Guadagnare sui Social' },
+            { href: '/#join-creators', label: 'Partecipa' },
+        ],
+    },
+};
+
 
 export const affiliatePrograms = [
     { name: 'Amazon Associates', category: 'E-commerce Giant', description: 'Promote millions of products. Earn up to 10% commission on qualifying purchases.', link: 'https://affiliate-program.amazon.com/', logo: 'Amazon' },
