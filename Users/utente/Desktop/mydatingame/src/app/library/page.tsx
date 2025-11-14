@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef } from 'react';
@@ -16,7 +15,7 @@ const games = [
     {
         id: 2,
         name: 'Power of Ball',
-        imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&q=80',
+        imageUrl: 'capsule_616x353.jpg',
         gameUrl: 'https://idev.games/embed/power-of-ball',
     },
     ...Array.from({ length: 3 }, (_, i) => ({
@@ -40,13 +39,25 @@ export default function GameLibraryPage() {
 
   const closeModal = () => {
     setSelectedGame(null);
-    if (isPageFullScreen) {
-      setIsPageFullScreen(false);
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
     }
+    setIsPageFullScreen(false);
   }
 
   const toggleFullScreen = () => {
-    setIsPageFullScreen(!isPageFullScreen);
+    const gameContainer = gameContainerRef.current;
+    if (!gameContainer) return;
+
+    if (!document.fullscreenElement) {
+        gameContainer.requestFullscreen().catch(err => {
+            alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+        setIsPageFullScreen(true);
+    } else {
+        document.exitFullscreen();
+        setIsPageFullScreen(false);
+    }
   };
 
   return (
