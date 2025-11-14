@@ -7,13 +7,13 @@ const games = [
   {
     id: 1,
     name: 'Asteroids.X',
-    imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80',
+    imageUrl: '/meteorite-4955128_1280.jpg',
     gameUrl: 'https://idev.games/embed/asteroids-x',
   },
   {
     id: 2,
     name: 'Power of Ball',
-    imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&q=80',
+    imageUrl: '/capsule_616x353.jpg',
     gameUrl: 'https://idev.games/embed/power-of-ball',
   },
   ...Array.from({ length: 3 }, (_, i) => ({

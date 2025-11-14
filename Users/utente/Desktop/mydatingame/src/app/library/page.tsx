@@ -10,7 +10,7 @@ const games = [
     {
         id: 1,
         name: 'Asteroids.X',
-        imageUrl: 'https://images.unsplash.com/photo-1614728263952-84ea256ec677?w=600&q=80',
+        imageUrl: '/meteorite-4955128_1280.jpg',
         gameUrl: 'https://idev.games/embed/asteroids-x',
         isExternalGame: true,
     },
@@ -20,14 +20,7 @@ const games = [
         imageUrl: '/capsule_616x353.jpg',
         gameUrl: '/register',
         isExternalGame: false,
-    },
-    ...Array.from({ length: 3 }, (_, i) => ({
-        id: i + 3,
-        name: `Gioco ${i + 3}`,
-        imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i+1}`,
-        gameUrl: `https://embed.crazygames.com/game${i + 3}`,
-        isExternalGame: true,
-    }))
+    }
 ];
 
 export default function GameLibraryPage() {
