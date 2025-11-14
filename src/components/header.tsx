@@ -1,4 +1,3 @@
-
 'use client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -6,13 +5,16 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 import { navLinks } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 export function AppHeader() {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-sm">
       <div className="container flex h-20 items-center justify-between max-w-[1400px] mx-auto">
         <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-4" onClick={() => setIsSheetOpen(false)}>
             <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center font-black text-2xl md:text-3xl text-primary-foreground shadow-lg animate-[pulse_3s_ease-in-out_infinite]">
               CG
             </div>
@@ -49,7 +51,7 @@ export function AppHeader() {
 
 
         <div className="md:hidden">
-          <Sheet>
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Menu className="h-6 w-6" />
@@ -60,7 +62,7 @@ export function AppHeader() {
               <nav className="flex flex-col gap-4 mt-8">
                 {navLinks.map((link) => (
                   <Button variant="ghost" asChild key={link.href} className="justify-start text-lg">
-                    <Link href={link.href}>{link.label}</Link>
+                    <Link href={link.href} onClick={() => setIsSheetOpen(false)}>{link.label}</Link>
                   </Button>
                 ))}
               </nav>
