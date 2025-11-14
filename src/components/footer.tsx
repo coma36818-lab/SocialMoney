@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 
 const footerSections = {
@@ -8,31 +9,31 @@ const footerSections = {
   categories: {
     title: 'Categories',
     links: [
-      { href: '#real-news', label: 'Notizie' },
-      { href: '#gossip', label: 'Gossip & VIP' },
-      { href: '#influencer', label: 'Influencer' },
-      { href: '#cucina', label: 'Cucina' },
-      { href: '#cinema', label: 'Cinema & Serie TV' },
-      { href: '#games', label: 'Gaming' },
-      { href: '#handmade', label: 'Handmade' },
+      { href: '/#real-news', label: 'Notizie' },
+      { href: '/#gossip', label: 'Gossip & VIP' },
+      { href: '/#influencer', label: 'Influencer' },
+      { href: '/#cucina', label: 'Cucina' },
+      { href: '/#cinema', label: 'Cinema & Serie TV' },
+      { href: '/#games', label: 'Gaming' },
+      { href: '/#handmade', label: 'Handmade' },
     ],
   },
   resources: {
     title: 'Resources',
     links: [
-      { href: '#affiliates', label: 'Affiliate Programs' },
-      { href: '#tips', label: 'Creator Tips' },
-      { href: '#ai-analyzer', label: 'AI Trend Analyzer' },
-      { href: '#guadagnare-social', label: 'Guadagnare sui Social' },
-      { href: '#join-creators', label: 'Partecipa' },
+      { href: '/#affiliates', label: 'Affiliate Programs' },
+      { href: '/#tips', label: 'Creator Tips' },
+      { href: '/#ai-analyzer', label: 'AI Trend Analyzer' },
+      { href: '/#guadagnare-social', label: 'Guadagnare sui Social' },
+      { href: '/#join-creators', label: 'Partecipa' },
     ],
   },
   legal: {
     title: 'Legal',
     links: [
-      { href: '#privacy', label: 'Privacy Policy' },
-      { href: '#terms', label: 'Terms of Service' },
-      { href: '#cookies', label: 'Cookie Policy' },
+      { href: '/#privacy', label: 'Privacy Policy' },
+      { href: '/#terms', label: 'Terms of Service' },
+      { href: '/#cookies', label: 'Cookie Policy' },
       { href: 'mailto:mydatingame@gmail.com', label: 'Contact Us' },
     ],
   },
