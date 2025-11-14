@@ -31,7 +31,13 @@
               <p className="text-slate-300">
                 Cardi says ... "My life has always been a combination of different chapters and different seasons. My last chapter was the beginning of a new season. Starting over is never easy but it’s been so worth it! I brought new music and a new album to the world! A new baby into my world, and one more reason to be the best version of me, one more reason to love me more than anything else or anyone else so I can continue giving my babies the love and life they deserve."
               </p>
+              <div className="mt-6 text-sm">
+                <a href="https://www.tmz.com/2025/11/13/cardi-b-gives-birth-fourth-child-stefon-diggs/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  Fonte: TMZ
+                </a>
+              </div>
             </div>
           </div>
         );
       }
+
