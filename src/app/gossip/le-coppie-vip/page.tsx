@@ -10,7 +10,7 @@ export default function LeCoppieVipPage() {
       </p>
       <div className="flex justify-center">
         <Image
-          src="https://picsum.photos/seed/coppievip/800/600"
+          src="/Schermata13.14.35.png"
           alt="Immagine coppie VIP"
           width={800}
           height={600}
