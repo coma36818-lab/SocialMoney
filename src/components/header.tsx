@@ -1,7 +1,8 @@
+
 'use client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 import { navLinks } from '@/lib/data';
 import { cn } from '@/lib/utils';
@@ -59,6 +60,7 @@ export function AppHeader() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
+              <SheetTitle className="sr-only">Menu</SheetTitle>
               <nav className="flex flex-col gap-4 mt-8">
                 {navLinks.map((link) => (
                   <Button variant="ghost" asChild key={link.href} className="justify-start text-lg">
