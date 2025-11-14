@@ -3,26 +3,30 @@
 import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Maximize, Minimize } from 'lucide-react';
+import Link from 'next/link';
 
 
 const games = [
     {
         id: 1,
         name: 'Asteroids.X',
-        imageUrl: 'https://images.unsplash.com/photo-1614728263952-84ea256ec677?w=600&q=80',
+        imageUrl: 'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=600&q=80',
         gameUrl: 'https://idev.games/embed/asteroids-x',
+        isExternalGame: true,
     },
     {
         id: 2,
         name: 'Power of Ball',
-        imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&q=80',
-        gameUrl: 'https://idev.games/embed/power-of-ball',
+        imageUrl: '/capsule_616x353.jpg',
+        gameUrl: '/register',
+        isExternalGame: false,
     },
     ...Array.from({ length: 3 }, (_, i) => ({
         id: i + 3,
         name: `Gioco ${i + 3}`,
         imageUrl: `https://images.unsplash.com/photo-1611996575749-79a3a2503948?w=400&h=300&fit=crop&q=80&sig=${i+1}`,
         gameUrl: `https://embed.crazygames.com/game${i + 3}`,
+        isExternalGame: true,
     }))
 ];
 
@@ -127,12 +131,18 @@ export default function GameLibraryPage() {
                 <div className="absolute inset-0 h-full w-full rounded-xl bg-black/80 px-6 py-4 text-center text-slate-200 [transform:rotateY(180deg)] [backface-visibility:hidden]">
                   <div className="flex min-h-full flex-col items-center justify-center">
                     <h3 className="text-2xl font-bold font-headline text-primary mb-3">{game.name}</h3>
-                    <button
-                      onClick={() => openGameInModal(game.gameUrl)}
-                      className="mt-4 rounded-md bg-primary/90 py-2 px-6 text-lg font-semibold text-white hover:bg-primary transition-colors duration-300 shadow-lg"
-                    >
-                      Gioca
-                    </button>
+                    {game.isExternalGame ? (
+                      <button
+                        onClick={() => openGameInModal(game.gameUrl)}
+                        className="mt-4 rounded-md bg-primary/90 py-2 px-6 text-lg font-semibold text-white hover:bg-primary transition-colors duration-300 shadow-lg"
+                      >
+                        Gioca
+                      </button>
+                    ) : (
+                      <Link href={game.gameUrl} className="mt-4 rounded-md bg-primary/90 py-2 px-6 text-lg font-semibold text-white hover:bg-primary transition-colors duration-300 shadow-lg">
+                        Registrati
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
