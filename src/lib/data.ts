@@ -87,7 +87,9 @@ export const newsSections = [
                 description: 'Amori, rotture e riconciliazioni delle star più amate del 2025.',
                 meta: '⏰ 1 ora fa',
                 link: 'https://www.tmz.com/',
-                linkText: 'Leggi su DatinGame / Leggi il gossip →',
+                linkText: 'Leggi il gossip →',
+                internalLink: '/gossip/le-coppie-vip',
+                internalLinkText: 'Leggi su DatinGame',
             },
             {
                 image: getImage('red-carpet'),
