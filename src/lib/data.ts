@@ -86,8 +86,8 @@ export const newsSections = [
                 title: 'Le Coppie VIP del Momento',
                 description: 'Amori, rotture e riconciliazioni delle star più amate del 2025.',
                 meta: '⏰ 1 ora fa',
-                link: '/gossip/le-coppie-vip-del-momento',
-                linkText: 'Leggi su DatinGame',
+                link: 'https://www.tmz.com/',
+                linkText: 'Leggi su DatinGame / Leggi il gossip →',
             },
             {
                 image: getImage('red-carpet'),
