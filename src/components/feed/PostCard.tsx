@@ -195,7 +195,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
               <AvatarFallback className="bg-muted-foreground">{getInitials(owner?.full_name || post.created_by.split('@')[0])}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-semibold text-white hover:text-[#FF0055] transition-colors">
+            <p className="font-semibold text-white hover:text-primary transition-colors">
               {owner?.full_name || post.created_by?.split('@')[0]}
             </p>
             <p className="text-xs text-gray-500">
@@ -228,6 +228,17 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
       </div>
 
       {/* Media or Text Content */}
+      {post.media_type === "text" ? (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="px-4 sm:px-6 py-8"
+        >
+          <p className="text-white text-base sm:text-lg whitespace-pre-wrap leading-relaxed">
+            {post.description}
+          </p>
+        </motion.div>
+      ) : (
         <>
           <motion.div 
             whileHover={{ scale: 1.01 }}
@@ -256,6 +267,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
             </div>
           )}
         </>
+      )}
 
       {/* Actions */}
       <div className="p-4 sm:p-6 space-y-4">
@@ -321,7 +333,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 onClick={handleLike}
-                className="bg-gradient-to-r from-[#FF0055] to-[#ff3366] hover:opacity-90 text-white neon-glow text-sm sm:text-base"
+                className="bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-white neon-glow text-sm sm:text-base"
               >
                 <Heart className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Invia Like (-1)</span>

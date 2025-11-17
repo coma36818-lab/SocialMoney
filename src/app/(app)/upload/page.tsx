@@ -1,187 +1,365 @@
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Upload, Image as ImageIcon, Video, X, Loader2, Type } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { createPageUrl } from "@/lib/utils";
+import { base44 } from "@/lib/api";
+import Image from "next/image";
+import type { User } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { base44 } from '@/lib/api';
-import { Loader2, Image as ImageIcon, Video, Type, Sparkles } from 'lucide-react';
-import Image from 'next/image';
-import { suggestPostCaption } from '@/ai/flows/suggest-post-caption';
-import EmojiPicker from '@/components/EmojiPicker';
-
-const postSchema = z.object({
-  description: z.string().max(1000).optional(),
-  media_type: z.enum(['image', 'video']),
-  media_file: z.any(),
-}).refine(data => data.media_file, {
-    message: "File multimediale richiesto",
-    path: ['media_file'],
-});
-
-type PostFormValues = z.infer<typeof postSchema>;
 
 export default function UploadPage() {
   const router = useRouter();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('image');
+  const [user, setUser] = useState<User | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [isSuggesting, setIsSuggesting] = useState(false);
+  const [description, setDescription] = useState("");
+  const [textContent, setTextContent] = useState("");
+  const [dragActive, setDragActive] = useState(false);
+  const [postType, setPostType] = useState("media");
 
-  const form = useForm<PostFormValues>({
-    resolver: zodResolver(postSchema),
-    defaultValues: {
-      description: '',
-      media_type: 'image',
-    },
-  });
+  useEffect(() => {
+    loadUser();
+  }, []);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      form.setValue('media_file', file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const loadUser = async () => {
+    try {
+      const userData = await base44.auth.me();
+      setUser(userData);
+    } catch (error) {
+      router.push(createPageUrl("Upload"));
     }
   };
 
-  const createPostMutation = useMutation({
-    mutationFn: async (data: PostFormValues) => {
-      const user = await base44.auth.me();
-      if (!preview) throw new Error("Anteprima media non disponibile");
-      return base44.entities.Post.create({
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleFile = (selectedFile: File) => {
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'video/mp4', 'video/quicktime'];
+    
+    if (!validTypes.includes(selectedFile.type)) {
+      toast({ variant: 'destructive', title: "Formato non supportato", description: "Usa JPG, PNG o MP4" });
+      return;
+    }
+
+    setFile(selectedFile);
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(selectedFile);
+  };
+
+  const uploadMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error("Utente non autenticato");
+
+      if (postType === "text") {
+        if (!textContent.trim()) {
+          throw new Error("Inserisci un testo");
+        }
+        
+        await base44.entities.Post.create({
+          created_by: user.email,
+          description: textContent,
+          media_url: "",
+          media_type: "text",
+          created_date: new Date().toISOString()
+        });
+      } else {
+        if (!file || !preview) throw new Error("File non selezionato");
+        const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
+        
+        await base44.entities.Post.create({
+          created_by: user.email,
+          description,
+          media_url: preview,
+          media_type: mediaType,
+          created_date: new Date().toISOString()
+        });
+      }
+
+      await base44.entities.Notification.create({
         created_by: user.email,
-        description: data.description,
-        media_type: data.media_type,
-        media_url: preview, // In a real app, this would be the URL from blob storage
-        created_date: new Date().toISOString(),
+        type: "system",
+        message: "Post pubblicato con successo!"
       });
     },
     onSuccess: () => {
-      toast({ title: 'Successo!', description: 'Il tuo post è stato pubblicato.' });
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      router.push('/feed');
+      toast({ title: "Successo!", description: "Post pubblicato con successo!"});
+      queryClient.invalidateQueries({ queryKey: ['posts']});
+      router.push(createPageUrl("Feed"));
     },
     onError: (error: Error) => {
-      toast({ variant: 'destructive', title: 'Errore', description: error.message });
-    },
+        toast({ variant: 'destructive', title: "Errore", description: error.message });
+    }
   });
 
-  const onSubmit = (data: PostFormValues) => {
-    createPostMutation.mutate(data);
+  const handleSubmit = () => {
+    if (postType === "media" && !file) {
+      toast({ variant: 'destructive', title: "Errore", description: "Seleziona un file da caricare" });
+      return;
+    }
+    if (postType === "text" && !textContent.trim()) {
+       toast({ variant: 'destructive', title: "Errore", description: "Scrivi qualcosa da pubblicare" });
+      return;
+    }
+    uploadMutation.mutate();
   };
-  
-  const handleSuggestCaption = async () => {
-    if (activeTab !== 'image' || !preview) {
-        toast({variant: 'destructive', title: 'Nessuna immagine selezionata'});
-        return;
-    }
-    setIsSuggesting(true);
-    try {
-        const result = await suggestPostCaption({ mediaDataUri: preview });
-        if (result.caption) {
-            form.setValue('description', result.caption);
-            toast({title: 'Didascalia suggerita!', description: 'La didascalia è stata inserita.'});
-        }
-    } catch (e) {
-        toast({variant: 'destructive', title: 'Errore AI', description: 'Impossibile suggerire una didascalia.'});
-    } finally {
-        setIsSuggesting(false);
-    }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#111111] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="animate-spin h-12 w-12 text-primary mx-auto mb-4" />
+          <p className="text-gray-400">Caricamento...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="glass-card w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Crea un Nuovo Post</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <Tabs
-                defaultValue="image"
-                className="w-full"
-                onValueChange={(value) => {
-                  setActiveTab(value);
-                  form.setValue('media_type', value as 'image' | 'video');
-                  setPreview(null);
-                  form.setValue('media_file', null);
-                }}
-              >
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="image"><ImageIcon className="w-4 h-4 mr-2"/>Immagine</TabsTrigger>
-                  <TabsTrigger value="video"><Video className="w-4 h-4 mr-2"/>Video</TabsTrigger>
-                </TabsList>
-                <TabsContent value="image" className="mt-6">
-                  <FormField name="media_file" control={form.control} render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>File Immagine</FormLabel>
-                      <FormControl><Input type="file" accept="image/*" onChange={handleFileChange} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                   {preview && <Image src={preview} alt="Preview" width={500} height={300} className="mt-4 rounded-lg object-cover w-full" />}
-                </TabsContent>
-                <TabsContent value="video" className="mt-6">
-                  <FormField name="media_file" control={form.control} render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>File Video</FormLabel>
-                      <FormControl><Input type="file" accept="video/*" onChange={handleFileChange} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  {preview && <video src={preview} controls className="mt-4 rounded-lg w-full" />}
-                </TabsContent>
-              </Tabs>
+    <div className="min-h-screen bg-[#111111] p-4 flex items-center justify-center">
+      <div className="w-full max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Pubblica <span className="text-primary">Contenuto</span>
+          </h1>
+          <p className="text-gray-400">Carica foto, video o testo e inizia a guadagnare</p>
+        </div>
 
-              <div className="relative">
-                <FormField name="description" control={form.control} render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Descrizione</FormLabel>
-                        <FormControl><Textarea placeholder="Scrivi qualcosa di interessante..." {...field} rows={5} /></FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )} />
-                <div className="absolute bottom-1 right-1 flex items-center">
-                    {activeTab === 'image' && preview && (
-                        <Button 
-                            type="button" 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={handleSuggestCaption} 
-                            disabled={isSuggesting}
-                            className="flex items-center gap-1 text-xs text-primary hover:text-primary/80"
-                        >
-                            {isSuggesting ? <Loader2 className="h-3 w-3 animate-spin"/> : <Sparkles className="h-3 w-3" />}
-                            Suggerisci
-                        </Button>
-                    )}
-                    <EmojiPicker onEmojiSelect={(emoji) => form.setValue('description', form.getValues('description') + emoji)} />
+        <Tabs value={postType} onValueChange={setPostType} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 bg-white/5">
+            <TabsTrigger value="media" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+              <ImageIcon className="w-4 h-4 mr-2" />
+              Media
+            </TabsTrigger>
+            <TabsTrigger value="text" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+              <Type className="w-4 h-4 mr-2" />
+              Solo Testo
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Media Upload */}
+          <TabsContent value="media">
+            <Card className="glass-card border-white/5">
+              <CardContent className="p-8">
+                {!preview ? (
+                  <div
+                    onDragEnter={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDragOver={handleDrag}
+                    onDrop={handleDrop}
+                    className={`relative border-2 border-dashed rounded-2xl p-12 transition-all ${
+                      dragActive
+                        ? "border-primary bg-primary/5"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    <input
+                      type="file"
+                      onChange={handleFileInput}
+                      accept="image/*,video/*"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    
+                    <div className="text-center">
+                      <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-primary to-[#ff3366] rounded-2xl flex items-center justify-center neon-glow">
+                        <Upload className="w-10 h-10 text-white" />
+                      </div>
+                      
+                      <h3 className="text-2xl font-bold text-white mb-2">
+                        Carica Media
+                      </h3>
+                      <p className="text-gray-400 mb-6">
+                        Trascina qui il file o clicca per selezionare
+                      </p>
+                      
+                      <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-2">
+                          <ImageIcon className="w-4 h-4" />
+                          <span>JPG, PNG</span>
+                        </div>
+                        <div className="w-1 h-1 bg-gray-600 rounded-full" />
+                        <div className="flex items-center gap-2">
+                          <Video className="w-4 h-4" />
+                          <span>MP4</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Preview */}
+                    <div className="relative aspect-video bg-black rounded-2xl overflow-hidden">
+                      {file?.type.startsWith('image/') ? (
+                        <Image
+                          src={preview}
+                          alt="Preview"
+                          fill
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <video
+                          src={preview}
+                          controls
+                          className="w-full h-full object-contain"
+                        />
+                      )}
+                      
+                      <Button
+                        onClick={() => {
+                          setFile(null);
+                          setPreview(null);
+                        }}
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-4 right-4 bg-black/50 hover:bg-black/70"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                      <label className="block text-white font-semibold mb-2">
+                        Descrizione (opzionale)
+                      </label>
+                      <Textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Scrivi una descrizione per il tuo post..."
+                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 min-h-[120px]"
+                      />
+                    </div>
+
+                    {/* Submit Button */}
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={uploadMutation.isPending}
+                      className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-white text-lg py-6 neon-glow"
+                      size="lg"
+                    >
+                      {uploadMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                          Pubblicazione...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-5 h-5 mr-2" />
+                          Pubblica Post
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Text Post */}
+          <TabsContent value="text">
+            <Card className="glass-card border-white/5">
+              <CardContent className="p-8 space-y-6">
+                <div>
+                  <label className="block text-white font-semibold mb-2">
+                    Cosa vuoi condividere?
+                  </label>
+                  <Textarea
+                    value={textContent}
+                    onChange={(e) => setTextContent(e.target.value)}
+                    placeholder="Scrivi i tuoi pensieri, una citazione, un annuncio..."
+                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 min-h-[300px] text-lg"
+                  />
+                  <p className="text-sm text-gray-500 mt-2">
+                    {textContent.length} caratteri
+                  </p>
                 </div>
-              </div>
 
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 neon-glow" disabled={createPostMutation.isPending}>
-                {createPostMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Pubblica Post
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={uploadMutation.isPending || !textContent.trim()}
+                  className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-white text-lg py-6 neon-glow"
+                  size="lg"
+                >
+                  {uploadMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Pubblicazione...
+                    </>
+                  ) : (
+                    <>
+                      <Type className="w-5 h-5 mr-2" />
+                      Pubblica Post
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Info Cards */}
+        <div className="grid md:grid-cols-3 gap-4 mt-6">
+          <div className="glass-card rounded-xl p-4 text-center">
+            <div className="w-12 h-12 mx-auto mb-3 bg-accent/10 rounded-xl flex items-center justify-center">
+              <span className="text-2xl">💰</span>
+            </div>
+            <h4 className="font-bold text-white mb-1 text-sm">Guadagna</h4>
+            <p className="text-xs text-gray-400">€0.01 per ogni like</p>
+          </div>
+          
+          <div className="glass-card rounded-xl p-4 text-center">
+            <div className="w-12 h-12 mx-auto mb-3 bg-primary/10 rounded-xl flex items-center justify-center">
+              <span className="text-2xl">🚀</span>
+            </div>
+            <h4 className="font-bold text-white mb-1 text-sm">Viralità</h4>
+            <p className="text-xs text-gray-400">Raggiungi migliaia di utenti</p>
+          </div>
+          
+          <div className="glass-card rounded-xl p-4 text-center">
+            <div className="w-12 h-12 mx-auto mb-3 bg-[#3D9DF7]/10 rounded-xl flex items-center justify-center">
+              <span className="text-2xl">⚡</span>
+            </div>
+            <h4 className="font-bold text-white mb-1 text-sm">Istantaneo</h4>
+            <p className="text-xs text-gray-400">Pubblica in pochi secondi</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

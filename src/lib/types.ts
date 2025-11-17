@@ -27,7 +27,7 @@ export type Post = {
   created_date: string;
   description?: string;
   media_url: string;
-  media_type: 'image' | 'video';
+  media_type: 'image' | 'video' | 'text';
   likes_count: number;
   earnings: number;
 };
