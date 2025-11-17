@@ -81,3 +81,9 @@ export type CommentReply = {
   user_email: string;
   user_name?: string;
 };
+
+export type CommentLike = {
+  comment_id: string;
+  user_email: string;
+  user_name?: string;
+};
