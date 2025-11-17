@@ -3,9 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { base44 } from '@/lib/api';
-import { AppSidebar } from '@/components/layout/AppSidebar';
 import { Loader2 } from 'lucide-react';
 import type { User } from '@/lib/types';
+import { AppHeader } from '@/components/layout/AppHeader';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -37,9 +37,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen">
-      <AppSidebar user={user} />
-      <main className="flex-1 pl-0 md:pl-64">
+    <div className="min-h-screen bg-[#111111]">
+      <AppHeader user={user} />
+      <main className="pt-16 md:pt-20 min-h-screen">
         {children}
       </main>
     </div>
