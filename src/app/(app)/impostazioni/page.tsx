@@ -31,6 +31,7 @@ export default function Impostazioni() {
     region: "",
     country: "",
     gender: "non specificato",
+    relationship_status: "",
     avatar: "",
   });
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -64,6 +65,7 @@ export default function Impostazioni() {
         region: userData.region || "",
         country: userData.country || "",
         gender: userData.gender || "non specificato",
+        relationship_status: userData.relationship_status || "",
         avatar: userData.avatar || "",
       });
       if (userData.avatar) {
@@ -97,6 +99,7 @@ export default function Impostazioni() {
         region: data.region,
         country: data.country,
         gender: data.gender as UserType['gender'],
+        relationship_status: data.relationship_status,
         avatar: data.avatar,
       });
       const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
@@ -236,6 +239,25 @@ export default function Impostazioni() {
                     </div>
                   </div>
                   
+                  <div>
+                    <Label htmlFor="relationship_status" className="text-gray-300">Stato Sentimentale</Label>
+                    <Select
+                      value={formData.relationship_status}
+                      onValueChange={(value) => setFormData({ ...formData, relationship_status: value })}
+                    >
+                      <SelectTrigger className="bg-white/5 border-white/10 text-white mt-2">
+                        <SelectValue placeholder="Seleziona" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="single">Single</SelectItem>
+                        <SelectItem value="in_relationship">Impegnato/a</SelectItem>
+                        <SelectItem value="married">Sposato/a</SelectItem>
+                        <SelectItem value="complicated">È complicato</SelectItem>
+                        <SelectItem value="prefer_not_to_say">Preferisco non dirlo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="city" className="text-gray-300">Città</Label>
@@ -303,6 +325,12 @@ export default function Impostazioni() {
                   <Label className="text-gray-400 text-sm">Email</Label>
                   <p className="text-white font-medium mt-1">{user.email}</p>
                 </div>
+                 {user.role && (
+                  <div>
+                    <Label className="text-gray-400 text-sm">Ruolo</Label>
+                    <p className="text-white font-medium mt-1 capitalize">{user.role}</p>
+                  </div>
+                 )}
                 <div>
                   <Label className="text-gray-400 text-sm">Membro da</Label>
                   <p className="text-white font-medium mt-1">
