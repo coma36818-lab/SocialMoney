@@ -1,26 +1,31 @@
+
 export type User = {
-  id: string;
-  nickname: string;
+  id: string; // Firestore document ID
+  username: string;
   email: string;
-  password?: string;
-  age: number;
-  gender: 'uomo' | 'donna' | 'altro' | 'non specificato';
-  city: string;
-  country: string;
-  region: string;
-  full_name: string;
+  walletBalance: number;
+  likeBalance: number;
+  totalLikesReceived: number;
+  totalLikesSent: number;
+  createdAt: string; // ISO timestamp
+  referralCode: string;
+  referredBy: string | null;
+  accountStatus: 'active' | 'banned' | 'suspended';
+  paypalEmail?: string;
+
+  // Campi del profilo aggiuntivi (mantenuti dal design precedente)
   bio?: string;
   avatar?: string;
-  likes_available: number;
-  likes_received: number;
-  likes_sent: number;
-  balance: number;
-  total_earnings: number;
-  role?: string;
+  city?: string;
+  country?: string;
+  region?: string;
+  gender?: 'uomo' | 'donna' | 'altro' | 'non specificato';
+  age?: number;
   relationship_status?: string;
-  created_date?: string;
-  referral_code?: string;
-  referred_by?: string;
+
+  // Mantenuto per retrocompatibilità con la logica esistente, da mappare
+  password?: string; // Solo per la creazione, non memorizzato
+  full_name?: string; // Derivato da username
 };
 
 export type Post = {
