@@ -38,25 +38,23 @@ export function AppSidebar({ user }: { user: User }) {
         </Link>
       </div>
       <nav className="flex-1 space-y-2 p-4">
-        <Link href="/upload" legacyBehavior>
-          <a className="block mb-4">
-            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 neon-glow">
-              <PlusSquare className="mr-2 h-5 w-5" />
-              Pubblica Contenuto
-            </Button>
-          </a>
-        </Link>
+        <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 neon-glow mb-4">
+          <Link href="/upload">
+            <PlusSquare className="mr-2 h-5 w-5" />
+            Pubblica Contenuto
+          </Link>
+        </Button>
         {navItems.map((item) => (
-          <Link href={item.href} key={item.href} legacyBehavior>
-            <a
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-4 py-3 text-muted-foreground transition-all hover:bg-white/10 hover:text-white',
-                pathname === item.href && 'bg-primary/20 text-primary hover:bg-primary/30 hover:text-primary'
-              )}
-            >
-              <item.icon className="h-5 w-5" />
-              <span>{item.label}</span>
-            </a>
+          <Link
+            href={item.href}
+            key={item.href}
+            className={cn(
+              'flex items-center gap-3 rounded-lg px-4 py-3 text-muted-foreground transition-all hover:bg-white/10 hover:text-white',
+              pathname === item.href && 'bg-primary/20 text-primary hover:bg-primary/30 hover:text-primary'
+            )}
+          >
+            <item.icon className="h-5 w-5" />
+            <span>{item.label}</span>
           </Link>
         ))}
       </nav>
