@@ -1,4 +1,5 @@
 
+
 export type User = {
   id: string; // Firestore document ID
   username: string;
@@ -29,15 +30,12 @@ export type User = {
 };
 
 export type Post = {
-  id: string;
-  created_by: string; // user email
-  owner_id: string;
-  created_date: string;
-  description?: string;
-  media_url: string;
-  media_type: 'image' | 'video' | 'text';
-  likes_count: number;
-  earnings: number;
+  id: string; // Firestore document ID
+  userId: string; // ID dell'utente che ha creato il post
+  imageUrl: string;
+  description: string;
+  createdAt: string; // ISO timestamp
+  likes: number;
 };
 
 export type Like = {
@@ -102,3 +100,4 @@ export type CommentLike = {
   user_name?: string;
   created_date: string;
 };
+
