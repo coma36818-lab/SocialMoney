@@ -160,7 +160,7 @@ export default function Impostazioni() {
                     <Switch
                         checked={darkMode}
                         onCheckedChange={setDarkMode}
-                        className="data-[state=checked]:bg-[#FF0055]"
+                        className="data-[state=checked]:bg-primary"
                     />
                     </div>
                 </CardContent>
@@ -399,3 +399,5 @@ export default function Impostazioni() {
     </div>
   );
 }
+
+    

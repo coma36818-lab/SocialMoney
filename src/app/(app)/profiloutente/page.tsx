@@ -107,21 +107,21 @@ export default function ProfiloUtentePage() {
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4 mt-6">
                   <div className="glass-card rounded-xl p-4 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-[#FF0055] to-[#ff3366] mb-3">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-primary to-[#ff3366] mb-3">
                       <Heart className="w-6 h-6 text-white" />
                     </div>
                     <p className="text-xs text-gray-500 mb-1">Like Ricevuti</p>
-                    <p className="text-2xl font-bold text-[#FF0055]">
+                    <p className="text-2xl font-bold text-primary">
                       {targetUser.likes_received || 0}
                     </p>
                   </div>
 
                   <div className="glass-card rounded-xl p-4 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA500] mb-3">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-accent to-[#FFA500] mb-3">
                       <TrendingUp className="w-6 h-6 text-white" />
                     </div>
                     <p className="text-xs text-gray-500 mb-1">Post</p>
-                    <p className="text-2xl font-bold text-[#FFD700]">
+                    <p className="text-2xl font-bold text-accent">
                       {userPosts.length}
                     </p>
                   </div>
@@ -211,3 +211,5 @@ export default function ProfiloUtentePage() {
     </div>
   );
 }
+
+    

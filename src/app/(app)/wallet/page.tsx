@@ -31,7 +31,7 @@ export default function WalletPage() {
 
     const { data: transactions, isLoading } = useQuery({
         queryKey: ['transactions', user?.email],
-        queryFn: () => base44.entities.Transaction.list('-created_date', 50),
+        queryFn: () => user ? base44.entities.Transaction.list('-created_date', 50) : Promise.resolve([]),
         enabled: !!user,
     });
 
@@ -47,9 +47,14 @@ export default function WalletPage() {
 
     const getTransactionColor = (type: Transaction['type']) => {
         switch (type) {
-            case "like_received": case "conversion": return "text-green-400";
-            case "like_purchase": case "payout": return "text-red-400";
-            default: return "text-gray-400";
+            case "like_received":
+            case "conversion":
+                return "text-green-400";
+            case "like_purchase":
+            case "payout":
+                return "text-red-400";
+            default:
+                return "text-gray-400";
         }
     };
 
@@ -62,10 +67,10 @@ export default function WalletPage() {
     }
     
     const legalLinks = [
-        { title: "Termini di Servizio", icon: FileText, description: "Condizioni d'uso della piattaforma", url: createPageUrl("Legal") + "?tab=terms" },
-        { title: "Informativa Pagamenti", icon: CreditCard, description: "Come funzionano i pagamenti", url: createPageUrl("Legal") + "?tab=payment" },
-        { title: "Privacy GDPR", icon: Shield, description: "Protezione dei dati personali", url: createPageUrl("Legal") + "?tab=privacy" },
-        { title: "Regole Creator", icon: Info, description: "Linee guida per i contenuti", url: createPageUrl("Legal") + "?tab=rules" }
+        { title: "Termini di Servizio", icon: FileText, description: "Condizioni d'uso della piattaforma", url: createPageUrl("legal") + "?tab=terms" },
+        { title: "Informativa Pagamenti", icon: CreditCard, description: "Come funzionano i pagamenti", url: createPageUrl("legal") + "?tab=payment" },
+        { title: "Privacy GDPR", icon: Shield, description: "Protezione dei dati personali", url: createPageUrl("legal") + "?tab=privacy" },
+        { title: "Regole Creator", icon: Info, description: "Linee guida per i contenuti", url: createPageUrl("legal") + "?tab=rules" }
     ];
 
     return (

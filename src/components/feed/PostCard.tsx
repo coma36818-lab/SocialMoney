@@ -496,3 +496,5 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
     </motion.div>
   );
 }
+
+    
