@@ -70,20 +70,24 @@ export type Comment = {
   id: string;
   post_id: string;
   user_email: string;
-  user_name: string;
+  user_name?: string;
   comment_text: string;
   created_date: string;
 };
 
 export type CommentReply = {
+  id: string;
   comment_id: string;
   reply_text: string;
   user_email: string;
   user_name?: string;
+  created_date: string;
 };
 
 export type CommentLike = {
+  id: string;
   comment_id: string;
   user_email: string;
   user_name?: string;
+  created_date: string;
 };
