@@ -1,6 +1,6 @@
+
 'use client';
 import React, { useState, useEffect, useRef } from "react";
-import { base44 } from "@/lib/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,111 +12,106 @@ import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import type { User as UserType, Message } from "@/lib/types";
 import EmojiPicker from "@/components/EmojiPicker";
+import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase";
+import { collection, query, where, orderBy, doc } from "firebase/firestore";
 
 export default function Messaggi() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [user, setUser] = useState<UserType | null>(null);
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const { user: authUser, isUserLoading } = useUser();
+  const firestore = useFirestore();
+
+  const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    loadUser();
-  }, []);
 
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [selectedUser, ]);
+  }, [selectedUserEmail]);
 
-  const loadUser = async () => {
-    try {
-      const userData = await base44.auth.me();
-      setUser(userData);
-    } catch (error) {
-      router.push(createPageUrl("Feed"));
-    }
-  };
+  const allUsersQuery = useMemoFirebase(() => {
+    return collection(firestore, 'users');
+  }, [firestore]);
+  const { data: allUsers } = useCollection<UserType>(allUsersQuery);
 
-  const { data: allMessages } = useQuery({
-    queryKey: ['messages'],
-    queryFn: () => base44.entities.Message.list('-created_date'),
-    enabled: !!user,
-    initialData: [],
-    refetchInterval: 3000,
-  });
+  const messagesQuery = useMemoFirebase(() => {
+    if (!authUser) return null;
+    return query(
+        collection(firestore, 'messages'), 
+        where('participants', 'array-contains', authUser.uid),
+        orderBy('created_date', 'desc')
+    );
+  }, [firestore, authUser]);
 
-  const { data: allUsers } = useQuery({
-    queryKey: ['allUsers'],
-    queryFn: () => base44.entities.User.list(),
-    initialData: [],
-  });
+  const { data: allMessages } = useCollection<Message>(messagesQuery, { refetchInterval: 3000 });
+
 
   const sendMessageMutation = useMutation({
-    mutationFn: async ({ to, message }: {to: string, message: string}) => {
-        if (!user) return;
-      await base44.entities.Message.create({
-        to_user_email: to,
-        from_user_email: user.email,
-        message,
-        read: false
-      });
+    mutationFn: async ({ to, message }: { to: string, message: string }) => {
+        if (!authUser || !allUsers) return;
 
-      await base44.entities.Notification.create({
-        created_by: to,
-        type: "system",
-        message: `Nuovo messaggio da ${user.full_name}`,
-        related_id: to
-      });
+        const toUser = allUsers.find(u => u.email === to);
+        if (!toUser) throw new Error("Recipient not found");
 
+        const messageColl = collection(firestore, 'messages');
+        addDocumentNonBlocking(messageColl, {
+            participants: [authUser.uid, toUser.uid],
+            fromUserId: authUser.uid,
+            toUserId: toUser.uid,
+            message,
+            read: false,
+            created_date: new Date().toISOString(),
+        });
+        
+        const notificationColl = collection(firestore, `users/${toUser.uid}/notifications`);
+        addDocumentNonBlocking(notificationColl, {
+            userId: toUser.uid,
+            message: `Nuovo messaggio da ${authUser.displayName || authUser.email}`,
+            type: "system",
+            read: false,
+            created_date: new Date().toISOString()
+        });
+    },
+    onSuccess: () => {
+      setMessageText("");
       const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
       audio.volume = 0.3;
       audio.play();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey:['messages']});
-      setMessageText("");
     }
   });
 
-  const markAsReadMutation = useMutation({
-    mutationFn: async (messageIds: string[]) => {
-      for (const id of messageIds) {
-        await base44.entities.Message.update(id, { read: true });
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['messages']});
-    }
-  });
 
   const getConversations = () => {
-    if (!user || !allMessages) return [];
+    if (!authUser || !allMessages || !allUsers) return [];
     
-    const conversations: {[key: string]: {email: string; messages: Message[], unreadCount: number, lastMessage: Message}} = {};
+    const conversations: {[key: string]: {user: UserType, messages: Message[], unreadCount: number, lastMessage: Message}} = {};
     
     allMessages.forEach(msg => {
-      const otherUser = msg.from_user_email === user.email ? msg.to_user_email : msg.from_user_email;
+      const otherUserId = msg.fromUserId === authUser.uid ? msg.toUserId : msg.fromUserId;
+      const otherUser = allUsers.find(u => u.uid === otherUserId);
+
+      if (!otherUser) return;
       
-      if (!conversations[otherUser]) {
-        conversations[otherUser] = {
-          email: otherUser,
+      if (!conversations[otherUser.uid]) {
+        conversations[otherUser.uid] = {
+          user: otherUser,
           messages: [],
           unreadCount: 0,
           lastMessage: msg
         };
       }
       
-      conversations[otherUser].messages.push(msg);
+      conversations[otherUser.uid].messages.push(msg);
       
-      if (!msg.read && msg.to_user_email === user.email) {
-        conversations[otherUser].unreadCount++;
+      if (!msg.read && msg.toUserId === authUser.uid) {
+        conversations[otherUser.uid].unreadCount++;
       }
-      if (new Date(msg.created_date) > new Date(conversations[otherUser].lastMessage.created_date)) {
-        conversations[otherUser].lastMessage = msg;
+      if (new Date(msg.created_date) > new Date(conversations[otherUser.uid].lastMessage.created_date)) {
+        conversations[otherUser.uid].lastMessage = msg;
       }
     });
 
@@ -124,49 +119,50 @@ export default function Messaggi() {
       .sort((a, b) => new Date(b.lastMessage.created_date).getTime() - new Date(a.lastMessage.created_date).getTime());
   };
 
-  const getMessagesWithUser = (userEmail: string) => {
-    if (!user || !allMessages) return [];
-    
+  const getMessagesWithUser = (otherUserUid: string) => {
+    if (!authUser || !allMessages) return [];
     return allMessages
-      .filter(msg => 
-        (msg.from_user_email === user.email && msg.to_user_email === userEmail) ||
-        (msg.to_user_email === user.email && msg.from_user_email === userEmail)
-      )
+      .filter(msg => msg.participants.includes(otherUserUid) && msg.participants.includes(authUser.uid))
       .sort((a, b) => new Date(a.created_date).getTime() - new Date(b.created_date).getTime());
   };
 
-  const handleSelectUser = (userEmail: string) => {
-    setSelectedUser(userEmail);
-    if (!user || !allMessages) return;
+  const handleSelectUser = (user: UserType) => {
+    setSelectedUserEmail(user.email);
+    if (!authUser || !allMessages) return;
     
     const unreadMessages = allMessages
-      .filter(msg => msg.from_user_email === userEmail && msg.to_user_email === user.email && !msg.read)
+      .filter(msg => msg.fromUserId === user.uid && msg.toUserId === authUser.uid && !msg.read)
       .map(msg => msg.id);
     
     if (unreadMessages.length > 0) {
-      markAsReadMutation.mutate(unreadMessages);
+      unreadMessages.forEach(id => {
+          const msgRef = doc(firestore, 'messages', id);
+          updateDocumentNonBlocking(msgRef, { read: true });
+      });
     }
   };
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageText.trim() || !selectedUser) return;
+    if (!messageText.trim() || !selectedUserEmail) return;
     
     sendMessageMutation.mutate({
-      to: selectedUser,
+      to: selectedUserEmail,
       message: messageText
     });
   };
 
   const conversations = getConversations();
-  const currentMessages = selectedUser ? getMessagesWithUser(selectedUser) : [];
+  const selectedUser = allUsers?.find(u => u.email === selectedUserEmail);
+  const currentMessages = selectedUser ? getMessagesWithUser(selectedUser.uid) : [];
+  
   const filteredUsers = (allUsers || []).filter(u => 
-    u.email !== user?.email && 
+    u.email !== authUser?.email && 
     (u.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
      u.email.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  if (!user) {
+  if (isUserLoading || !authUser) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -206,7 +202,7 @@ export default function Messaggi() {
                       <button
                         key={u.email}
                         onClick={() => {
-                          handleSelectUser(u.email);
+                          handleSelectUser(u);
                           setSearchQuery("");
                         }}
                         className="w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors"
@@ -230,10 +226,10 @@ export default function Messaggi() {
                   <div className="space-y-1">
                     {conversations.map(conv => (
                       <button
-                        key={conv.email}
-                        onClick={() => handleSelectUser(conv.email)}
+                        key={conv.user.email}
+                        onClick={() => handleSelectUser(conv.user)}
                         className={`w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors ${
-                          selectedUser === conv.email ? "bg-muted" : ""
+                          selectedUserEmail === conv.user.email ? "bg-muted" : ""
                         }`}
                       >
                         <div className="relative">
@@ -247,7 +243,7 @@ export default function Messaggi() {
                           )}
                         </div>
                         <div className="flex-1 text-left min-w-0">
-                          <p className="font-medium text-foreground text-sm">{conv.email.split('@')[0]}</p>
+                          <p className="font-medium text-foreground text-sm">{conv.user.full_name || conv.user.email.split('@')[0]}</p>
                           <p className="text-xs text-muted-foreground truncate">
                             {conv.lastMessage.message}
                           </p>
@@ -271,15 +267,15 @@ export default function Messaggi() {
                         <User className="w-5 h-5 text-primary-foreground" />
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">{selectedUser.split('@')[0]}</p>
-                        <p className="text-xs text-muted-foreground">{selectedUser}</p>
+                        <p className="font-semibold text-foreground">{selectedUser.full_name || selectedUser.email.split('@')[0]}</p>
+                        <p className="text-xs text-muted-foreground">{selectedUser.email}</p>
                       </div>
                     </div>
                   </CardHeader>
                   
                   <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
                     {currentMessages.map((msg, index) => {
-                      const isMe = msg.from_user_email === user?.email;
+                      const isMe = msg.fromUserId === authUser?.uid;
                       return (
                         <div
                           key={index}
@@ -340,3 +336,5 @@ export default function Messaggi() {
     </div>
   );
 }
+
+    

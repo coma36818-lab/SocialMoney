@@ -7,7 +7,10 @@ import Image from 'next/image';
 import logo from '@/app/logo.png';
 import { usePathname, useRouter } from 'next/navigation';
 import { createPageUrl } from "@/lib/utils";
-import { base44 } from "@/lib/api";
+import { useUser, useFirestore, useCollection, useMemoFirebase, useAuth } from "@/firebase";
+import { collection, query, where } from "firebase/firestore";
+import { signOut } from "firebase/auth";
+
 import { 
   Home, 
   User, 
@@ -27,52 +30,29 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { User as UserType, Notification, Message } from "@/lib/types";
 
-export function AppHeader({ user: initialUser }: { user: UserType }) {
+export function AppHeader({ user }: { user: UserType }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState(initialUser);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const [unreadMessages, setUnreadMessages] = useState(0);
+  const firestore = useFirestore();
+  const auth = useAuth();
+  
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    setUser(initialUser);
-    loadUnreadCounts();
-
-    const interval = setInterval(() => {
-      loadUnreadCounts();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [initialUser]);
-
-  const loadUnreadCounts = async () => {
-    try {
-        if (!user) return;
-        const notifications = await base44.entities.Notification.list('-created_date');
-        const unreadNotifs = notifications.filter((n: Notification) => !n.read);
-        if (unreadNotifs.length > unreadNotifications) {
-            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
-            audio.volume = 0.3;
-            audio.play();
-        }
-        setUnreadNotifications(unreadNotifs.length);
-
-        const messages = await base44.entities.Message.filter({ to_user_email: user.email, read: false });
-        if (messages.length > unreadMessages) {
-             const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
-            audio.volume = 0.4;
-            audio.play();
-        }
-        setUnreadMessages(messages.length);
-
-    } catch (error) {
-        console.log("Error loading unread counts", error);
-    }
-  }
+  const notificationsQuery = useMemoFirebase(() => {
+    if (!user) return null;
+    return query(collection(firestore, `users/${user.uid}/notifications`), where("read", "==", false));
+  }, [firestore, user]);
+  const { data: unreadNotifications } = useCollection<Notification>(notificationsQuery);
+  
+  const messagesQuery = useMemoFirebase(() => {
+    if(!user) return null;
+    return query(collection(firestore, 'messages'), where('toUserId', '==', user.uid), where('read', '==', false));
+  }, [firestore, user]);
+  const { data: unreadMessages } = useCollection<Message>(messagesQuery);
 
 
   const handleLogout = async () => {
-    await base44.auth.logout();
+    await signOut(auth);
     router.push('/login');
   };
 
@@ -82,9 +62,9 @@ export function AppHeader({ user: initialUser }: { user: UserType }) {
     { name: "Profilo", href: createPageUrl("profilo"), icon: User },
     { name: "Wallet", href: createPageUrl("wallet"), icon: Wallet },
     { name: "Upload", href: createPageUrl("upload"), icon: Upload },
-    { name: "Messaggi", href: createPageUrl("messages"), icon: MessageCircle, badge: unreadMessages },
+    { name: "Messaggi", href: createPageUrl("messages"), icon: MessageCircle, badge: unreadMessages?.length || 0 },
     { name: "Classifica", href: createPageUrl("leaderboard"), icon: Trophy },
-    { name: "Notifiche", href: createPageUrl("notifications"), icon: Bell, badge: unreadNotifications },
+    { name: "Notifiche", href: createPageUrl("notifications"), icon: Bell, badge: unreadNotifications?.length || 0 },
     { name: "Impostazioni", href: createPageUrl("impostazioni"), icon: Settings },
   ];
 
@@ -215,3 +195,5 @@ export function AppHeader({ user: initialUser }: { user: UserType }) {
       </>
   );
 }
+
+    

@@ -1,8 +1,6 @@
 
 'use client';
-import React, { useState, useEffect } from "react";
-import { base44 } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { User as UserIcon, Heart, Wallet, TrendingUp, MapPin, Calendar, Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -10,25 +8,29 @@ import { motion } from "framer-motion";
 import type { User, Post } from "@/lib/types";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useFirestore, useCollection, useDoc, useMemoFirebase } from "@/firebase";
+import { collection, doc, query, where, limit } from "firebase/firestore";
 
 export default function ProfiloUtentePage() {
   const searchParams = useSearchParams();
-  const targetEmail = searchParams?.get('email');
+  const targetUserUid = searchParams?.get('uid');
+  const firestore = useFirestore();
 
-  const { data: allUsers = [] } = useQuery<User[]>({
-    queryKey: ['allUsers'],
-    queryFn: () => base44.entities.User.list(),
-  });
+  const userProfileRef = useMemoFirebase(() => {
+    if (!targetUserUid) return null;
+    return doc(firestore, 'users', targetUserUid);
+  }, [firestore, targetUserUid]);
 
-  const { data: userPosts = [], isLoading } = useQuery({
-    queryKey: ['userPosts', targetEmail],
-    queryFn: () => base44.entities.Post.filter({ created_by: targetEmail! }, '-created_date'),
-    enabled: !!targetEmail,
-  });
+  const { data: targetUser, isLoading: isUserLoading } = useDoc<User>(userProfileRef);
 
-  const targetUser = allUsers.find(u => u.email === targetEmail);
+  const userPostsQuery = useMemoFirebase(() => {
+    if (!targetUserUid) return null;
+    return query(collection(firestore, "posts"), where("userId", "==", targetUserUid));
+  }, [firestore, targetUserUid]);
 
-  if (!targetUser) {
+  const { data: userPosts, isLoading: isLoadingPosts } = useCollection<Post>(userPostsQuery);
+
+  if (isUserLoading || !targetUser) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -124,7 +126,7 @@ export default function ProfiloUtentePage() {
                     </div>
                     <p className="text-xs text-muted-foreground mb-1">Post</p>
                     <p className="text-2xl font-bold text-accent">
-                      {userPosts.length}
+                      {userPosts?.length || 0}
                     </p>
                   </div>
 
@@ -151,16 +153,16 @@ export default function ProfiloUtentePage() {
         >
           <div className="mb-4">
             <h2 className="text-2xl font-bold text-foreground mb-2">Post di {targetUser.username}</h2>
-            <p className="text-muted-foreground">{userPosts.length} contenuti</p>
+            <p className="text-muted-foreground">{userPosts?.length || 0} contenuti</p>
           </div>
 
-          {isLoading ? (
+          {isLoadingPosts ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {[1, 2, 3, 4, 5, 6].map(i => (
                 <div key={i} className="aspect-square glass-card rounded-xl animate-pulse bg-muted" />
               ))}
             </div>
-          ) : userPosts.length === 0 ? (
+          ) : !userPosts || userPosts.length === 0 ? (
             <div className="glass-card rounded-2xl p-12 text-center">
               <UserIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-bold text-foreground mb-2">Nessun post</h3>
@@ -213,3 +215,5 @@ export default function ProfiloUtentePage() {
     </div>
   );
 }
+
+    

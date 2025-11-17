@@ -1,7 +1,6 @@
 
 'use client';
-import React, { useState, useEffect } from "react";
-import { base44 } from "@/lib/api";
+import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,8 @@ import type { User } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import { useUser, useFirestore, useDoc, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase";
+import { doc } from "firebase/firestore";
 
 const likePackages = [
     { name: 'Base', likes: 100, price: 1.99, icon: Heart, color: 'text-muted-foreground' },
@@ -24,46 +25,40 @@ export default function RicaricaPage() {
     const router = useRouter();
     const queryClient = useQueryClient();
     const { toast } = useToast();
-    const [user, setUser] = useState<User | null>(null);
+    const { user: authUser, isUserLoading } = useUser();
+    const firestore = useFirestore();
     const [selectedPackage, setSelectedPackage] = useState(likePackages[2]);
 
-    useEffect(() => {
-        loadUser();
-    }, []);
+    const userProfileRef = useMemoFirebase(() => {
+        if (!authUser) return null;
+        return doc(firestore, 'users', authUser.uid);
+    }, [firestore, authUser]);
 
-    const loadUser = async () => {
-        try {
-            const userData = await base44.auth.me();
-            setUser(userData);
-        } catch (error) {
-            router.push(createPageUrl("login"));
-        }
-    };
+    const { data: userProfile, isLoading: isProfileLoading } = useDoc<User>(userProfileRef);
 
     const purchaseMutation = useMutation({
         mutationFn: async (pkg: typeof likePackages[0]) => {
-            if (!user) throw new Error("Utente non autenticato");
+            if (!authUser || !userProfileRef || !userProfile) throw new Error("Utente non autenticato");
             
             // Simulate payment processing
             await new Promise(resolve => setTimeout(resolve, 1500));
 
-            const updatedUser = await base44.auth.updateMe({
-                likeBalance: (user.likeBalance || 0) + pkg.likes,
+            updateDocumentNonBlocking(userProfileRef, {
+                likeBalance: (userProfile.likeBalance || 0) + pkg.likes,
             });
 
-            await base44.entities.Transaction.create({
-                userId: user.id,
+            const transactionsCollRef = collection(firestore, `users/${authUser.uid}/transactions`);
+            addDocumentNonBlocking(transactionsCollRef, {
+                userId: authUser.uid,
                 type: 'like_purchase',
                 description: `Acquisto pacchetto ${pkg.name}`,
                 amount: -pkg.price,
                 status: 'completed',
+                created_date: new Date().toISOString(),
             });
-
-            return updatedUser;
         },
-        onSuccess: (updatedUser) => {
-            setUser(updatedUser as User);
-            queryClient.invalidateQueries({ queryKey: ['user'] });
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user', authUser?.uid] });
             toast({
                 title: "Ricarica Effettuata!",
                 description: `Hai aggiunto ${selectedPackage.likes} like al tuo account.`,
@@ -78,7 +73,7 @@ export default function RicaricaPage() {
         }
     });
 
-    if (!user) {
+    if (isUserLoading || isProfileLoading || !userProfile) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <Loader2 className="animate-spin h-12 w-12 text-primary" />
@@ -138,7 +133,7 @@ export default function RicaricaPage() {
                                 <div className="border-t border-border pt-4 mt-4 space-y-2">
                                      <div className="flex justify-between text-lg">
                                         <span>Like attuali:</span>
-                                        <span className="font-semibold">{(user.likeBalance || 0).toLocaleString('it-IT')}</span>
+                                        <span className="font-semibold">{(userProfile.likeBalance || 0).toLocaleString('it-IT')}</span>
                                     </div>
                                     <div className="flex justify-between text-lg text-primary">
                                         <span>Nuovi like:</span>
@@ -146,7 +141,7 @@ export default function RicaricaPage() {
                                     </div>
                                      <div className="flex justify-between text-xl font-bold border-t border-border pt-2 mt-2">
                                         <span>Totale dopo acquisto:</span>
-                                        <span>{((user.likeBalance || 0) + selectedPackage.likes).toLocaleString('it-IT')}</span>
+                                        <span>{((userProfile.likeBalance || 0) + selectedPackage.likes).toLocaleString('it-IT')}</span>
                                     </div>
                                 </div>
                                 <Button 
@@ -173,3 +168,5 @@ export default function RicaricaPage() {
         </div>
     );
 }
+
+    

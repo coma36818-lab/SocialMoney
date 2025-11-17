@@ -1,10 +1,11 @@
 
 export type User = {
-    id: string;
+    id: string; // Firestore document ID
+    uid: string; // Firebase Auth UID
     username: string;
     email: string;
-    createdAt: string;
-    verified?: boolean;
+    createdAt: string; // ISO timestamp
+    verified?: boolean; // Email verification status
     likeBalance: number;
     walletBalance: number;
     totalLikesReceived: number;
@@ -21,68 +22,52 @@ export type User = {
     gender?: 'uomo' | 'donna' | 'altro' | 'non specificato';
     age?: number;
     relationship_status?: string;
-    password?: string;
     full_name?: string;
-    created_date?: string;
     role?: string;
 };
 
 export type Post = {
   id: string;
-  userId: string;
-  text?: string;
-  mediaType?: "image" | "video" | "text";
-  mediaURL?: string;
-  thumbnailURL?: string;
-  likeCount?: number;
-  createdAt: string; // ISO timestamp
-  status?: "visible" | "removed";
-  earnings?: number;
-  imageUrl?: string;
+  userId: string; // Corresponds to Firebase Auth UID
   description?: string;
-  likes?: number;
+  media_type: 'image' | 'video' | 'text';
   media_url?: string;
-  media_type?: 'image' | 'video' | 'text';
-  created_by?: any;
-  owner_id?: any;
-  created_date?: any;
-  likes_count?: any;
+  likes_count: number;
+  earnings: number;
+  created_date: string; // ISO timestamp
 };
 
-export type LikeEvent = {
-  id: string; // eventId
+export type Like = {
+  id: string;
   postId: string;
-  fromUser: string; 
-  toUser: string; 
-  value: number; // e.g. 0.01
-  timestamp: string; // ISO timestamp
+  userId: string; // UID of the user who liked the post
+  created_date: string; // ISO timestamp
 };
 
 export type Transaction = {
-  id: string; // transactionId
+  id: string;
   userId: string;
-  type: "like" | "like_purchase" | "payout" | "reward" | "purchase";
+  type: "like_purchase" | "payout" | "earning_from_like";
   amount: number;
   description: string;
-  createdAt: string; // timestamp
-  status?: "pending" | "completed" | "failed";
-  created_date?: any;
+  created_date: string; // ISO timestamp
+  status: 'pending' | 'completed' | 'failed';
 };
 
 export type Notification = {
     id: string;
-    created_by: string; // user email of the person who triggered the notification
+    userId: string; // UID of the user to notify
     message: string;
     type: "like" | "follow" | "earning" | "system" | "referral";
     read: boolean;
-    related_id?: string;
-    created_date: string;
+    created_date: string; // ISO timestamp
 };
 
 export type Message = {
   id: string;
-  from_user_email: string;
-  to_user_email: string;
+  participants: string[]; // Array of participant UIDs
+  fromUserId: string;
+  toUserId: string;
   message: string;
   created_date: string;
   read: boolean;
@@ -90,52 +75,22 @@ export type Message = {
 
 export type Comment = {
   id: string;
-  post_id: string;
-  user_email: string;
-  user_name?: string;
+  postId: string;
+  userId: string;
+  username: string;
+  avatar?: string;
   comment_text: string;
   created_date: string;
 };
 
 export type CommentReply = {
   id: string;
-  comment_id: string;
+  commentId: string;
+  userId: string;
+  username: string;
+  avatar?: string;
   reply_text: string;
-  user_email: string;
-  user_name?: string;
   created_date: string;
 };
 
-export type CommentLike = {
-  id: string;
-  comment_id: string;
-  user_email: string;
-  user_name?: string;
-  created_date: string;
-};
-
-export type Like = {
-  id: string;
-  post_id: string;
-  post_owner_email: string;
-  like_value: number;
-  created_by: string;
-};
-
-export type Payout = {
-    id: string;
-    userId: string;
-    amount: number;
-    paypal_email: string;
-    status: "pending" | "approved" | "rejected";
-    requestedAt: string; // ISO timestamp
-};
-
-export type DailyStats = {
-  date: string; // YYYY-MM-DD
-  total_users: number;
-  total_posts: number;
-  total_likes: number;
-  total_payouts: number;
-  revenue: number;
-};
+    

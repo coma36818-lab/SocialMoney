@@ -1,8 +1,7 @@
 
 'use client';
-import React, { useState, useEffect } from "react";
-import { base44 } from "@/lib/api";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wallet, TrendingUp, TrendingDown, DollarSign, Download, Heart, FileText, Shield, CreditCard, Info, Loader2 } from "lucide-react";
@@ -13,59 +12,57 @@ import { createPageUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
 import type { User, Transaction } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { useUser, useFirestore, useCollection, useDoc, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase";
+import { collection, doc, query, orderBy } from "firebase/firestore";
 
 export default function WalletPage() {
     const router = useRouter();
     const { toast } = useToast();
     const queryClient = useQueryClient();
-    const [user, setUser] = useState<User | null>(null);
+    const { user: authUser, isUserLoading: isAuthLoading } = useUser();
+    const firestore = useFirestore();
 
-    useEffect(() => {
-        loadUser();
-    }, []);
+    const userProfileRef = useMemoFirebase(() => {
+        if (!authUser) return null;
+        return doc(firestore, 'users', authUser.uid);
+    }, [firestore, authUser]);
+    const { data: userProfile, isLoading: isProfileLoading } = useDoc<User>(userProfileRef);
 
-    const loadUser = async () => {
-        try {
-            const userData = await base44.auth.me();
-            setUser(userData);
-        } catch (error) {
-            router.push(createPageUrl("login"));
-        }
-    };
-
-    const { data: transactions, isLoading } = useQuery({
-        queryKey: ['transactions', user?.id],
-        queryFn: () => base44.entities.Transaction.list('-created_date'),
-        enabled: !!user,
-    });
+    const transactionsQuery = useMemoFirebase(() => {
+        if (!authUser) return null;
+        return query(collection(firestore, `users/${authUser.uid}/transactions`), orderBy('created_date', 'desc'));
+    }, [firestore, authUser]);
+    const { data: transactions, isLoading: isLoadingTransactions } = useCollection<Transaction>(transactionsQuery);
 
     const requestPayoutMutation = useMutation({
         mutationFn: async () => {
-            if (!user) throw new Error("Utente non autenticato");
-            if (!user.paypalEmail) throw new Error("Per prelevare, imposta prima il tuo indirizzo email PayPal nelle impostazioni del profilo.");
-            if ((user.walletBalance || 0) < 10) throw new Error("Il saldo minimo per il prelievo è di 10€.");
+            if (!authUser || !userProfile || !userProfileRef) throw new Error("Utente non autenticato");
+            if (!userProfile.paypalEmail) throw new Error("Per prelevare, imposta prima il tuo indirizzo email PayPal nelle impostazioni del profilo.");
+            if ((userProfile.walletBalance || 0) < 10) throw new Error("Il saldo minimo per il prelievo è di 10€.");
 
             const lastPayout = transactions?.find(t => t.type === 'payout');
             if (lastPayout && new Date(lastPayout.created_date) > subDays(new Date(), 7)) {
                 throw new Error("Puoi richiedere un solo prelievo ogni 7 giorni.");
             }
 
-            const amountToWithdraw = user.walletBalance!;
+            const amountToWithdraw = userProfile.walletBalance!;
             const fee = amountToWithdraw * 0.10; // 10% fee
             const finalAmount = amountToWithdraw - fee;
 
             await new Promise(resolve => setTimeout(resolve, 2000));
 
-            await base44.auth.updateMe({
+            updateDocumentNonBlocking(userProfileRef, {
                 walletBalance: 0,
             });
 
-            await base44.entities.Transaction.create({
-                userId: user.id,
+            const transactionsCollRef = collection(firestore, `users/${authUser.uid}/transactions`);
+            addDocumentNonBlocking(transactionsCollRef, {
+                userId: authUser.uid,
                 type: 'payout',
                 description: `Prelievo di ${finalAmount.toFixed(2)}€ (lordo ${amountToWithdraw.toFixed(2)}€ - 10% fee)`,
                 amount: -amountToWithdraw,
                 status: 'completed',
+                created_date: new Date().toISOString(),
             });
 
             return finalAmount;
@@ -73,10 +70,10 @@ export default function WalletPage() {
         onSuccess: (finalAmount) => {
             toast({
                 title: "Prelievo in corso!",
-                description: `Il tuo pagamento di ${finalAmount.toFixed(2)}€ è stato inviato a ${user?.paypalEmail}. Riceverai una conferma a breve.`,
+                description: `Il tuo pagamento di ${finalAmount.toFixed(2)}€ è stato inviato a ${userProfile?.paypalEmail}. Riceverai una conferma a breve.`,
             });
-            queryClient.invalidateQueries({ queryKey: ['transactions', user?.id] });
-            loadUser(); // Refetch user to update balance
+            queryClient.invalidateQueries({ queryKey: ['transactions', authUser?.uid] });
+            queryClient.invalidateQueries({ queryKey: ['user', authUser?.uid] });
         },
         onError: (error: Error) => {
             toast({
@@ -89,11 +86,8 @@ export default function WalletPage() {
 
     const getTransactionIcon = (type: Transaction['type']) => {
         switch (type) {
-            case "like": return <Heart className="w-4 h-4" />;
-            case "purchase":
-            case "like_purchase":
-                 return <TrendingDown className="w-4 h-4" />;
-            case "reward": return <TrendingUp className="w-4 h-4" />;
+            case "like_purchase": return <TrendingDown className="w-4 h-4" />;
+            case "earning_from_like": return <Heart className="w-4 h-4" />;
             case "payout": return <Download className="w-4 h-4" />;
             default: return <DollarSign className="w-4 h-4" />;
         }
@@ -101,10 +95,8 @@ export default function WalletPage() {
 
     const getTransactionColor = (type: Transaction['type']) => {
         switch (type) {
-            case "like":
-            case "reward":
+            case "earning_from_like":
                 return "text-green-500";
-            case "purchase":
             case "like_purchase":
             case "payout":
                 return "text-red-500";
@@ -113,7 +105,9 @@ export default function WalletPage() {
         }
     };
 
-    if (!user) {
+    const isLoading = isAuthLoading || isProfileLoading;
+
+    if (isLoading || !userProfile) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <Loader2 className="animate-spin rounded-full h-12 w-12 text-primary" />
@@ -146,9 +140,9 @@ export default function WalletPage() {
                                     <div>
                                         <p className="text-muted-foreground text-sm mb-2">Saldo Disponibile</p>
                                         <motion.h2 animate={{ scale: [1, 1.02, 1] }} transition={{ duration: 2, repeat: Infinity }} className="text-5xl font-bold text-foreground mb-4">
-                                            <span className="text-accent">€</span> {user.walletBalance?.toFixed(2) || "0.00"}
+                                            <span className="text-accent">€</span> {userProfile.walletBalance?.toFixed(2) || "0.00"}
                                         </motion.h2>
-                                        <p className="text-sm text-muted-foreground">Guadagni totali: <span className="text-accent font-semibold">€{user.totalLikesReceived ? (user.totalLikesReceived * 0.01).toFixed(2) : "0.00"}</span></p>
+                                        <p className="text-sm text-muted-foreground">Guadagni totali: <span className="text-accent font-semibold">€{userProfile.totalLikesReceived ? (userProfile.totalLikesReceived * 0.01).toFixed(2) : "0.00"}</span></p>
                                     </div>
                                     <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }} className="w-20 h-20 bg-gradient-to-br from-accent to-yellow-500 rounded-2xl flex items-center justify-center gold-glow">
                                         <Wallet className="w-10 h-10 text-accent-foreground" />
@@ -157,7 +151,7 @@ export default function WalletPage() {
                                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                                     <Button 
                                         onClick={() => requestPayoutMutation.mutate()}
-                                        disabled={requestPayoutMutation.isPending || (user.walletBalance || 0) < 10}
+                                        disabled={requestPayoutMutation.isPending || (userProfile.walletBalance || 0) < 10}
                                         className="w-full bg-gradient-to-r from-accent to-yellow-500 hover:opacity-90 text-accent-foreground font-bold text-lg py-6 gold-glow" 
                                         size="lg"
                                     >
@@ -198,7 +192,7 @@ export default function WalletPage() {
                     <Card className="glass-card">
                         <CardHeader><CardTitle className="text-foreground">Storico Transazioni</CardTitle></CardHeader>
                         <CardContent>
-                            {isLoading ? (
+                            {isLoadingTransactions ? (
                                 <div className="space-y-3 p-4">
                                     {[...Array(3)].map((_, i) => (
                                         <div key={i} className="animate-pulse bg-muted/50 h-16 rounded-xl" />
@@ -217,7 +211,7 @@ export default function WalletPage() {
                                                 <div className={`w-10 h-10 ${getTransactionColor(transaction.type)} bg-muted/50 rounded-xl flex items-center justify-center`}>{getTransactionIcon(transaction.type)}</div>
                                                 <div>
                                                     <p className="font-medium text-foreground capitalize">{transaction.description || transaction.type.replace(/_/g, ' ')}</p>
-                                                    <p className="text-xs text-muted-foreground">{format(new Date(transaction.createdAt), "d MMM yyyy 'alle' HH:mm", { locale: it })}</p>
+                                                    <p className="text-xs text-muted-foreground">{format(new Date(transaction.created_date), "d MMM yyyy 'alle' HH:mm", { locale: it })}</p>
                                                 </div>
                                             </div>
                                             <motion.p initial={{ scale: 0 }} animate={{ scale: 1 }} className={`font-bold ${getTransactionColor(transaction.type)}`}>
@@ -234,3 +228,5 @@ export default function WalletPage() {
         </div>
     );
 }
+
+    

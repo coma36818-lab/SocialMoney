@@ -4,14 +4,14 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Camera, StopCircle, Upload, Loader2, Video as VideoIcon, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { auth, storage } from '@/firebase';
+import { storage, useUser, useFirestore, addDocumentNonBlocking } from '@/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { v4 as uuid } from 'uuid';
-import { base44 } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { createPageUrl } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { collection } from 'firebase/firestore';
 
 export default function VideoRecorder() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -23,6 +23,8 @@ export default function VideoRecorder() {
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const { user: authUser } = useUser();
+  const firestore = useFirestore();
 
   useEffect(() => {
     return () => {
@@ -99,15 +101,14 @@ export default function VideoRecorder() {
       toast({ variant: 'destructive', title: 'Nessun video da caricare' });
       return;
     }
-    const user = auth.currentUser;
-    if (!user || !user.email) {
+    if (!authUser) {
       toast({ variant: 'destructive', title: 'Autenticazione richiesta' });
       return;
     }
 
     setIsUploading(true);
     const videoId = uuid();
-    const videoRefPath = `videos/${user.uid}/${videoId}.webm`;
+    const videoRefPath = `videos/${authUser.uid}/${videoId}.webm`;
     const storageRef = ref(storage, videoRefPath);
     const uploadTask = uploadBytesResumable(storageRef, recordedBlob);
 
@@ -124,12 +125,15 @@ export default function VideoRecorder() {
       async () => {
         try {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          await base44.entities.Post.create({
-            created_by: user.email!,
+          const postsCollRef = collection(firestore, 'posts');
+          await addDocumentNonBlocking(postsCollRef, {
+            userId: authUser.uid,
             media_url: downloadURL,
             media_type: 'video',
             description: 'Video registrato dall\'app!',
             created_date: new Date().toISOString(),
+            likes_count: 0,
+            earnings: 0,
           });
           toast({ title: 'Successo!', description: 'Video pubblicato con successo!' });
           router.push(createPageUrl('feed'));
@@ -225,7 +229,7 @@ export default function VideoRecorder() {
                 </>
             ) : (
                 <>
-                    <StopCircle className="mr-2" /> Inizia a registrare
+                    <Camera className="mr-2" /> Inizia a registrare
                 </>
             )}
           </Button>
@@ -234,3 +238,5 @@ export default function VideoRecorder() {
     </div>
   );
 }
+
+    

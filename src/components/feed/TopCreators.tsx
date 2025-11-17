@@ -1,12 +1,13 @@
+
 'use client';
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { base44 } from "@/lib/api";
-import type { Post, User } from "@/lib/types";
+import type { User } from "@/lib/types";
 import { useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection, query, orderBy, limit } from "firebase/firestore";
 
 interface Creator extends Partial<User> {
     email: string;
@@ -14,40 +15,28 @@ interface Creator extends Partial<User> {
     username: string;
 }
 
-export default function TopCreators({ posts }: { posts: Post[] }) {
-    const { data: users = [] } = useQuery<User[]>({
-        queryKey: ['allUsers'],
-        queryFn: () => base44.entities.User.list(),
-    });
+export default function TopCreators() {
+    const firestore = useFirestore();
 
-    const topCreators: Creator[] = useMemo(() => {
-        const creatorEarnings: { [key: string]: number } = {};
-        
-        posts.forEach(post => {
-            if (!creatorEarnings[post.created_by]) {
-                creatorEarnings[post.created_by] = 0;
-            }
-            creatorEarnings[post.created_by] += post.earnings || 0;
-        });
+    const topUsersQuery = useMemoFirebase(() => {
+        return query(collection(firestore, "users"), orderBy("walletBalance", "desc"), limit(5));
+    }, [firestore]);
 
-        return Object.entries(creatorEarnings)
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, 5)
-            .map(([email, earnings]) => {
-                const user = users.find(u => u.email === email);
-                return {
-                    ...user,
-                    email,
-                    earnings,
-                    username: user?.full_name || email.split('@')[0]
-                };
-            });
-    }, [posts, users]);
+    const { data: topUsers = [] } = useCollection<User>(topUsersQuery);
 
     const getInitials = (name: string) => {
         if (!name) return '';
         return name.split(' ').map(n => n[0]).join('').toUpperCase();
     }
+
+    const topCreators: Creator[] = useMemo(() => {
+        return (topUsers || []).map(user => ({
+            ...user,
+            email: user.email,
+            earnings: user.walletBalance || 0,
+            username: user.full_name || user.email.split('@')[0],
+        }));
+    }, [topUsers]);
 
     return (
         <Card className="glass-card">
@@ -102,3 +91,5 @@ export default function TopCreators({ posts }: { posts: Post[] }) {
         </Card>
     );
 }
+
+    

@@ -1,7 +1,6 @@
-
 'use client';
-import React, { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Heart, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -9,74 +8,89 @@ import { createPageUrl } from "@/lib/utils";
 import PostCard from "@/components/feed/PostCard";
 import TopCreators from "@/components/feed/TopCreators";
 import UserStats from "@/components/feed/UserStats";
-import { base44 } from "@/lib/api";
+import { useUser, useCollection, useFirestore, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
+import { collection, query, orderBy, doc, getDoc, runTransaction } from "firebase/firestore";
 import type { Post, User } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
 export default function FeedPage() {
     const router = useRouter();
-    const [user, setUser] = useState<User | null>(null);
-    const queryClient = useQueryClient();
+    const firestore = useFirestore();
+    const { user: authUser, isUserLoading: isAuthLoading } = useUser();
     const { toast } = useToast();
 
-    useEffect(() => {
-        loadUser();
-    }, []);
+    const postsQuery = useMemoFirebase(() => {
+      return query(collection(firestore, "posts"), orderBy("created_date", "desc"));
+    }, [firestore]);
 
-    const loadUser = async () => {
-        try {
-            const userData = await base44.auth.me();
-            setUser(userData);
-        } catch (error) {
-            router.push(createPageUrl("login"));
-        }
-    };
+    const { data: posts, isLoading: isLoadingPosts } = useCollection<Post>(postsQuery);
 
-    const { data: posts, isLoading: isLoadingPosts } = useQuery({
-        queryKey: ['posts'],
-        queryFn: () => base44.entities.Post.list('-createdAt'),
-    });
+    const userProfileQuery = useMemoFirebase(() => {
+        if (!authUser) return null;
+        return doc(firestore, 'users', authUser.uid);
+      }, [firestore, authUser]);
+    
+      const { data: userProfile, isLoading: isProfileLoading } = useDoc<User>(userProfileQuery);
+
 
     const sendLikeMutation = useMutation({
         mutationFn: async ({ post }: { post: Post }) => {
-            if (!user) throw new Error("Utente non autenticato");
-            if (user.likeBalance <= 0) {
-                throw new Error("Non hai like disponibili. Ricarica!");
-            }
-            if (post.userId === user.id) {
-                throw new Error("Non puoi mettere like ai tuoi post.");
-            }
-
-            const existingLikes = await base44.entities.LikeEvent.filter({ fromUser: user.id, postId: post.id });
-            if (existingLikes.length > 0) {
-                throw new Error("Hai già messo like a questo post.");
-            }
-
-            await base44.entities.LikeEvent.create({ 
-                fromUser: user.id, 
-                toUser: post.userId, 
-                postId: post.id, 
-                value: 0.01 
-            });
-
-            await base44.entities.Post.update(post.id, { likes: (post.likes || 0) + 1, earnings: (post.earnings || 0) + 0.01 });
+            if (!authUser || !userProfile) throw new Error("User not authenticated.");
+            if (userProfile.likeBalance <= 0) throw new Error("Non hai like disponibili. Ricarica!");
+            if (post.userId === authUser.uid) throw new Error("Non puoi mettere like ai tuoi post.");
             
-            await base44.entities.Transaction.create({
-                userId: post.userId,
-                type: 'like',
-                amount: 0.01,
-                status: 'completed',
-                description: `Hai ricevuto un like da ${user.username}`
-            });
+            const likeRef = doc(firestore, "likes", `${authUser.uid}_${post.id}`);
+            const postRef = doc(firestore, "posts", post.id);
+            const postOwnerRef = doc(firestore, "users", post.userId);
+            const likerRef = doc(firestore, "users", authUser.uid);
+            const notificationRef = doc(collection(firestore, `users/${post.userId}/notifications`));
 
-            const ownerData = await base44.entities.User.filter({ id: post.userId });
-            if (ownerData.length > 0) {
-                await base44.entities.Notification.create({ created_by: ownerData[0].email, type: "like", message: `${user.username} ha inviato un like al tuo post! +0.01€` });
-            }
+            await runTransaction(firestore, async (transaction) => {
+                const likeDoc = await transaction.get(likeRef);
+                if (likeDoc.exists()) {
+                    throw new Error("Hai già messo like a questo post.");
+                }
+
+                // 1. Create the like document
+                transaction.set(likeRef, {
+                    postId: post.id,
+                    userId: authUser.uid,
+                    created_date: new Date().toISOString(),
+                });
+
+                // 2. Update post
+                transaction.update(postRef, {
+                    likes_count: (post.likes_count || 0) + 1,
+                    earnings: (post.earnings || 0) + 0.01
+                });
+                
+                // 3. Update post owner's wallet
+                transaction.update(postOwnerRef, {
+                    walletBalance: (await transaction.get(postOwnerRef)).data()?.walletBalance + 0.01,
+                    totalLikesReceived: (await transaction.get(postOwnerRef)).data()?.totalLikesReceived + 1
+                });
+
+                // 4. Decrement liker's like balance
+                transaction.update(likerRef, {
+                    likeBalance: userProfile.likeBalance - 1,
+                    totalLikesSent: userProfile.totalLikesSent + 1,
+                });
+
+                // 5. Create notification for post owner
+                transaction.set(notificationRef, {
+                    userId: post.userId,
+                    message: `${userProfile.username} ha inviato un like al tuo post! +0.01€`,
+                    type: "like",
+                    read: false,
+                    created_date: new Date().toISOString()
+                });
+            });
         },
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['posts'] });
-            await loadUser(); // Refetch user to update likeBalance
+        onSuccess: () => {
+            // Real-time updates handle UI invalidation
+            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
+            audio.volume = 0.4;
+            audio.play();
         },
         onError: (error: Error) => {
             toast({ variant: 'destructive', title: 'Errore', description: error.message });
@@ -85,24 +99,26 @@ export default function FeedPage() {
 
     const deletePostMutation = useMutation({
         mutationFn: async (postId: string) => {
-            await base44.entities.Post.delete(postId);
+            const postRef = doc(firestore, 'posts', postId);
+            deleteDocumentNonBlocking(postRef);
+        },
+        onSuccess: () => {
             const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
             audio.volume = 0.3;
             audio.play();
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['posts'] });
             toast({ title: 'Successo', description: 'Post eliminato.'});
         }
     });
     
-    if (!user) {
+    if (isAuthLoading || isProfileLoading || !userProfile) {
         return (
              <div className="min-h-screen w-full flex items-center justify-center">
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
             </div>
         )
     }
+    
+    const fullUser = { ...authUser, ...userProfile };
 
     return (
         <div className="min-h-screen bg-background">
@@ -148,7 +164,7 @@ export default function FeedPage() {
                                                 deletePostMutation.mutate(post.id);
                                             }
                                         }}
-                                        user={user} 
+                                        user={fullUser}
                                         isLiking={sendLikeMutation.isPending}
                                     />
                                 ))}
@@ -156,7 +172,7 @@ export default function FeedPage() {
                         )}
                     </div>
                     <div className="space-y-4 sm:space-y-6">
-                        {user && <UserStats user={user} />}
+                        <UserStats user={fullUser} />
                         <TopCreators posts={posts || []} />
                     </div>
                 </div>

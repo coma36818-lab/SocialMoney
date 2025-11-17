@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,6 @@ import { Heart, User, MessageCircle, Share2, Send, Trash2, Reply, ThumbsUp, Load
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
-import { base44 } from "@/lib/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
@@ -23,10 +23,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { Post, User as UserType, Comment, CommentReply, Like } from "@/lib/types";
+import type { Post, User as UserType, Comment, Like } from "@/lib/types";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { useUser, useFirestore, useCollection, useDoc, useMemoFirebase, addDocumentNonBlocking } from "@/firebase";
+import { collection, query, where, doc, orderBy } from "firebase/firestore";
 
 
 interface PostCardProps {
@@ -40,87 +42,81 @@ interface PostCardProps {
 export default function PostCard({ post, user, onSendLike, onDelete }: PostCardProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const firestore = useFirestore();
+
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
   const [showLikesModal, setShowLikesModal] = useState(false);
   const queryClient = useQueryClient();
 
-  const canLike = user && user.likeBalance > 0 && post.created_by !== user?.email;
-  const isOwner = post.created_by === user?.email;
+  const canLike = user && user.likeBalance > 0 && post.userId !== user?.uid;
+  const isOwner = post.userId === user?.uid;
 
-  const { data: owner } = useQuery({
-      queryKey: ['user', post.created_by],
-      queryFn: async () => {
-          const users = await base44.entities.User.filter({ email: post.created_by });
-          return users[0] || null;
-      },
-      enabled: !!post.created_by,
-  });
+  const ownerRef = useMemoFirebase(() => doc(firestore, 'users', post.userId), [firestore, post.userId]);
+  const { data: owner } = useDoc<UserType>(ownerRef);
 
-  const { data: comments = [] } = useQuery({
-    queryKey: ['comments', post.id],
-    queryFn: () => base44.entities.Comment.filter({ post_id: post.id }, '-created_date'),
-    enabled: showComments,
-  });
+  const commentsQuery = useMemoFirebase(() => {
+      if (!showComments) return null;
+      return query(collection(firestore, 'comments'), where('postId', '==', post.id), orderBy('created_date', 'desc'));
+  }, [firestore, post.id, showComments]);
+  const { data: comments = [] } = useCollection<Comment>(commentsQuery);
 
-  const { data: likes = [] } = useQuery({
-    queryKey: ['postLikes', post.id],
-    queryFn: () => base44.entities.Like.filter({ post_id: post.id }),
-    enabled: showLikesModal,
-  });
+  const likesQuery = useMemoFirebase(() => {
+    if (!showLikesModal) return null;
+    return query(collection(firestore, 'likes'), where('postId', '==', post.id));
+  }, [firestore, post.id, showLikesModal]);
+  const { data: likesData = [] } = useCollection<Like>(likesQuery);
+
+  // Fetch user profiles for the likes
+  const likerIds = useMemo(() => likesData.map(like => like.userId), [likesData]);
+  const likersQuery = useMemoFirebase(() => {
+      if(likerIds.length === 0) return null;
+      return query(collection(firestore, 'users'), where('uid', 'in', likerIds));
+  }, [firestore, likerIds]);
+  const { data: likers = [] } = useCollection<UserType>(likersQuery);
+
+  const likesWithProfiles = likesData.map(like => ({
+      ...like,
+      user: likers.find(u => u.uid === like.userId)
+  }));
+
 
   const addCommentMutation = useMutation({
     mutationFn: async (text: string) => {
       if (!user) throw new Error("User not authenticated");
 
-      if (replyingTo) {
-        await base44.entities.CommentReply.create({
-          comment_id: replyingTo.id,
-          reply_text: text,
-          user_email: user.email,
-          user_name: user.full_name
-        });
-      } else {
-        await base44.entities.Comment.create({
-          post_id: post.id,
+      const commentData = {
+          postId: post.id,
+          userId: user.uid,
+          username: user.username,
+          avatar: user.avatar,
           comment_text: text,
-          user_email: user.email,
-          user_name: user.full_name
-        });
-      }
-
-      await base44.entities.Notification.create({
-        created_by: replyingTo ? replyingTo.user_email : post.created_by,
+          created_date: new Date().toISOString(),
+      };
+      
+      const commentsCollRef = collection(firestore, 'comments');
+      addDocumentNonBlocking(commentsCollRef, commentData);
+      
+      const notificationsCollRef = collection(firestore, `users/${post.userId}/notifications`);
+      addDocumentNonBlocking(notificationsCollRef, {
+        userId: post.userId,
+        message: `${user.username} ha commentato il tuo post.`,
         type: "system",
-        message: `${user.full_name} ha ${replyingTo ? 'risposto al tuo' : 'commentato il tuo'} post`
+        read: false,
+        created_date: new Date().toISOString()
       });
-
-      const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
-      audio.volume = 0.3;
-      audio.play();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', post.id] });
       setCommentText("");
       setReplyingTo(null);
+      const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
+      audio.volume = 0.3;
+      audio.play();
     }
   });
 
-  const likeCommentMutation = useMutation({
-    mutationFn: async (commentId: string) => {
-        if (!user) throw new Error("User not authenticated");
-      await base44.entities.CommentLike.create({
-        comment_id: commentId,
-        user_email: user.email,
-        user_name: user.full_name
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', post.id] });
-      toast({ title: "Commento piaciuto!" });
-    }
-  });
 
   const handleComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,10 +125,8 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
   };
 
   const handleLike = () => {
+    if (isLiking) return;
     onSendLike();
-    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
-    audio.volume = 0.4;
-    audio.play();
   };
 
   const handleShare = (platform: string) => {
@@ -169,11 +163,11 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
       return name.split(' ').map(n => n[0]).join('').toUpperCase();
   }
 
-  const handleProfileClick = (email: string) => {
-    if (user && email === user.email) {
+  const handleProfileClick = (uid: string) => {
+    if (user && uid === user.uid) {
       router.push(createPageUrl("profilo"));
     } else {
-       router.push(createPageUrl("profiloutente") + "?email=" + email);
+       router.push(createPageUrl("profiloutente") + "?uid=" + uid);
     }
   };
 
@@ -188,15 +182,15 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
       <div className="p-4 sm:p-6 pb-4 flex items-center justify-between">
         <div 
           className="flex items-center gap-3 cursor-pointer"
-          onClick={() => handleProfileClick(post.created_by)}
+          onClick={() => handleProfileClick(post.userId)}
         >
             <Avatar className="h-11 w-11 border-2 border-primary/50">
               <AvatarImage src={owner?.avatar} alt={owner?.full_name} className="object-cover" />
-              <AvatarFallback className="bg-muted">{getInitials(owner?.full_name || post.created_by.split('@')[0])}</AvatarFallback>
+              <AvatarFallback className="bg-muted">{getInitials(owner?.full_name || owner?.email.split('@')[0] || '')}</AvatarFallback>
           </Avatar>
           <div>
             <p className="font-semibold text-foreground hover:text-primary transition-colors">
-              {owner?.full_name || post.created_by?.split('@')[0]}
+              {owner?.full_name || owner?.email?.split('@')[0]}
             </p>
             <p className="text-xs text-muted-foreground">
               {format(new Date(post.created_date), "d MMM yyyy · HH:mm", { locale: it })}
@@ -333,9 +327,10 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 onClick={handleLike}
+                disabled={isLiking}
                 className="bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground neon-glow text-sm sm:text-base"
               >
-                <Heart className="w-4 h-4 mr-2" />
+                {isLiking ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Heart className="w-4 h-4 mr-2" />}
                 <span className="hidden sm:inline">Invia Like (-1)</span>
                 <span className="sm:hidden">Like</span>
               </Button>
@@ -368,20 +363,6 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
               {/* Comment Form */}
               {user && (
                 <form onSubmit={handleComment} className="space-y-2">
-                  {replyingTo && (
-                    <div className="flex items-center justify-between bg-muted/50 px-3 py-2 rounded-lg">
-                      <span className="text-sm text-muted-foreground">
-                        Rispondi a {replyingTo.user_name || replyingTo.user_email.split('@')[0]}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setReplyingTo(null)}
-                        className="text-muted-foreground hover:text-foreground"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  )}
                   <div className="flex gap-2">
                     <Input
                       value={commentText}
@@ -415,35 +396,26 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
                   >
                     <div className="flex gap-3">
                       <div 
-                        className="w-8 h-8 bg-gradient-to-br from-blue-500 to-sky-400 rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer"
-                        onClick={() => handleProfileClick(comment.user_email)}
+                        className="w-8 h-8 rounded-full flex-shrink-0 cursor-pointer"
+                        onClick={() => handleProfileClick(comment.userId)}
                       >
-                        <User className="w-4 h-4 text-white" />
+                        <Avatar className="h-8 w-8">
+                            <AvatarImage src={comment.avatar} alt={comment.username} />
+                            <AvatarFallback>{getInitials(comment.username)}</AvatarFallback>
+                        </Avatar>
                       </div>
                       <div className="flex-1">
                         <p 
                           className="font-semibold text-foreground text-sm cursor-pointer hover:text-blue-500 transition-colors"
-                          onClick={() => handleProfileClick(comment.user_email)}
+                          onClick={() => handleProfileClick(comment.userId)}
                         >
-                          {comment.user_name || comment.user_email.split('@')[0]}
+                          {comment.username}
                         </p>
                         <p className="text-muted-foreground text-sm mt-1">{comment.comment_text}</p>
                         <div className="flex items-center gap-3 mt-2">
                           <p className="text-xs text-muted-foreground">
                             {format(new Date(comment.created_date), "d MMM · HH:mm", { locale: it })}
                           </p>
-                          <button
-                            onClick={() => likeCommentMutation.mutate(comment.id)}
-                            className="text-xs text-muted-foreground hover:text-accent transition-colors flex items-center gap-1"
-                          >
-                            <ThumbsUp className="w-3 h-3" /> Mi piace
-                          </button>
-                          <button
-                            onClick={() => setReplyingTo(comment)}
-                            className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-                          >
-                            <Reply className="w-3 h-3" /> Rispondi
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -464,13 +436,13 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
       <Dialog open={showLikesModal} onOpenChange={setShowLikesModal}>
         <DialogContent className="bg-card border-border text-foreground sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-foreground">Like ricevuti ({likes.length})</DialogTitle>
+            <DialogTitle className="text-foreground">Like ricevuti ({likesData.length})</DialogTitle>
           </DialogHeader>
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {likes.length === 0 ? (
+            {likesData.length === 0 ? (
               <p className="text-center text-muted-foreground py-4">Nessun like ancora</p>
             ) : (
-              (likes as Like[]).map((like, index) => (
+              likesWithProfiles.map((like, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, x: -20 }}
@@ -479,14 +451,14 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted cursor-pointer"
                   onClick={() => {
                     setShowLikesModal(false);
-                    handleProfileClick(like.created_by);
+                    if (like.user) handleProfileClick(like.user.uid);
                   }}
                 >
                     <Avatar className="h-10 w-10 border-2 border-primary/50">
-                        <AvatarImage src={undefined} alt={like.created_by} className="object-cover" />
-                        <AvatarFallback className="bg-muted">{getInitials(like.created_by)}</AvatarFallback>
+                        <AvatarImage src={like.user?.avatar} alt={like.user?.username} className="object-cover" />
+                        <AvatarFallback className="bg-muted">{getInitials(like.user?.username || '')}</AvatarFallback>
                     </Avatar>
-                  <p className="text-foreground font-medium">{like.created_by?.split('@')[0]}</p>
+                  <p className="text-foreground font-medium">{like.user?.username || 'Utente'}</p>
                 </motion.div>
               ))
             )}
@@ -496,3 +468,5 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
     </motion.div>
   );
 }
+
+    

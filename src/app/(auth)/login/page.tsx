@@ -17,9 +17,10 @@ import {
 } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { base44 } from '@/lib/api';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/firebase';
+import { signInWithEmailAndPassword, AuthError } from 'firebase/auth';
 
 const loginSchema = z.object({
   email: z.string().email('Email non valida'),
@@ -32,6 +33,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const auth = useAuth();
   
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -41,17 +43,31 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      await base44.auth.login(data.email, data.password);
+      await signInWithEmailAndPassword(auth, data.email, data.password);
       toast({
         title: 'Accesso effettuato',
         description: 'Bentornato!',
       });
       router.push('/feed');
     } catch (error) {
+      const authError = error as AuthError;
+      let description = 'Credenziali non valide o utente non trovato.';
+      switch (authError.code) {
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+          description = 'Email o password non corretti.';
+          break;
+        case 'auth/invalid-credential':
+            description = 'Le credenziali fornite non sono valide.';
+            break;
+        default:
+          description = 'Si è verificato un errore durante l\'accesso.';
+          break;
+      }
       toast({
         variant: 'destructive',
         title: 'Errore di accesso',
-        description: error instanceof Error ? error.message : 'Credenziali non valide',
+        description,
       });
     } finally {
         setIsLoading(false);

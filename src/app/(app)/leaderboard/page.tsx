@@ -1,59 +1,23 @@
+
 'use client';
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { base44 } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Crown, Medal, TrendingUp, User, Loader2 } from "lucide-react";
 import type { Post, User as UserType } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { collection, query, orderBy, limit } from "firebase/firestore";
 
 export default function Classifica() {
-  const { data: allUsers, isLoading: usersLoading } = useQuery<UserType[]>({
-    queryKey: ['allUsers'],
-    queryFn: () => base44.entities.User.list(),
-    initialData: [],
-  });
+  const firestore = useFirestore();
 
-  const { data: posts, isLoading: postsLoading } = useQuery<Post[]>({
-    queryKey: ['posts'],
-    queryFn: () => base44.entities.Post.list('-created_date'),
-    initialData: [],
-  });
+  const usersQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    // Query for top users based on earnings. Adjust field and limit as needed.
+    return query(collection(firestore, "users"), orderBy("walletBalance", "desc"), limit(20));
+  }, [firestore]);
 
-  const getLeaderboard = () => {
-    const userEarnings: {[key: string]: {email: string, earnings: number, likes: number, posts: number, avatar?: string}} = {};
-    
-    if(!posts) return [];
-
-    posts.forEach(post => {
-      if (!userEarnings[post.created_by]) {
-        const user = allUsers.find(u => u.email === post.created_by);
-        userEarnings[post.created_by] = {
-          email: post.created_by,
-          earnings: 0,
-          likes: 0,
-          posts: 0,
-          avatar: user?.avatar
-        };
-      }
-      userEarnings[post.created_by].earnings += post.earnings || 0;
-      userEarnings[post.created_by].likes += post.likes_count || 0;
-      userEarnings[post.created_by].posts += 1;
-    });
-    
-    return Object.values(userEarnings)
-      .sort((a, b) => b.earnings - a.earnings)
-      .map((user, index) => {
-        const userData = allUsers.find(u => u.email === user.email);
-        return {
-        ...user,
-        rank: index + 1,
-        username: userData?.full_name || user.email.split('@')[0]
-      }});
-  };
-
-  const leaderboard = getLeaderboard();
-  const isLoading = usersLoading || postsLoading;
+  const { data: topUsers, isLoading: usersLoading } = useCollection<UserType>(usersQuery);
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -86,6 +50,17 @@ export default function Classifica() {
       return name.split(' ').map(n => n[0]).join('').toUpperCase();
   }
 
+  const leaderboard = topUsers?.map((user, index) => ({
+      ...user,
+      rank: index + 1,
+      username: user.full_name || user.email.split('@')[0],
+      earnings: user.walletBalance || 0,
+      likes: user.totalLikesReceived || 0,
+      posts: 0 // Note: post count is not directly available on user doc in this model
+  }));
+
+  const isLoading = usersLoading;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-5xl mx-auto px-4 py-8">
@@ -99,7 +74,7 @@ export default function Classifica() {
           <p className="text-muted-foreground text-lg">I migliori guadagni della piattaforma</p>
         </div>
 
-        {!isLoading && leaderboard.length >= 3 && (
+        {!isLoading && leaderboard && leaderboard.length >= 3 && (
           <div className="grid md:grid-cols-3 gap-6 mb-12 items-end">
             <div className="md:order-1 order-2">
               <Card className="glass-card text-center pt-8 h-full flex flex-col justify-end">
@@ -112,7 +87,7 @@ export default function Classifica() {
                     €{leaderboard[1].earnings.toFixed(2)}
                   </p>
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <p>{leaderboard[1].likes} like · {leaderboard[1].posts} post</p>
+                    <p>{leaderboard[1].likes} like</p>
                   </div>
                 </CardContent>
               </Card>
@@ -134,7 +109,7 @@ export default function Classifica() {
                     €{leaderboard[0].earnings.toFixed(2)}
                   </p>
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <p>{leaderboard[0].likes} like · {leaderboard[0].posts} post</p>
+                    <p>{leaderboard[0].likes} like</p>
                   </div>
                 </CardContent>
               </Card>
@@ -151,7 +126,7 @@ export default function Classifica() {
                     €{leaderboard[2].earnings.toFixed(2)}
                   </p>
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <p>{leaderboard[2].likes} like · {leaderboard[2].posts} post</p>
+                    <p>{leaderboard[2].likes} like</p>
                   </div>
                 </CardContent>
               </Card>
@@ -171,7 +146,7 @@ export default function Classifica() {
                <div className="flex items-center justify-center p-12">
                   <Loader2 className="w-8 h-8 animate-spin text-primary"/>
                </div>
-            ) : leaderboard.length === 0 ? (
+            ) : !leaderboard || leaderboard.length === 0 ? (
               <div className="text-center py-12">
                 <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                 <p className="text-muted-foreground">Nessun creator ancora</p>
@@ -202,7 +177,7 @@ export default function Classifica() {
                       <div>
                         <p className="font-semibold text-foreground">{creator.username}</p>
                         <p className="text-sm text-muted-foreground">
-                          {creator.likes} like · {creator.posts} post
+                          {creator.likes} like
                         </p>
                       </div>
                     </div>
@@ -222,3 +197,5 @@ export default function Classifica() {
     </div>
   );
 }
+
+    

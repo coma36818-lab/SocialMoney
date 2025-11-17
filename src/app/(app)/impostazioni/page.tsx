@@ -13,17 +13,27 @@ import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
-import { base44 } from "@/lib/api";
+import { useUser, useFirestore, useDoc, useMemoFirebase, updateDocumentNonBlocking } from "@/firebase";
 import type { User as UserType } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import EmojiPicker from "@/components/EmojiPicker";
+import { doc } from "firebase/firestore";
 
 export default function Impostazioni() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [user, setUser] = useState<UserType | null>(null);
+  const firestore = useFirestore();
+  const { user: authUser, isUserLoading } = useUser();
+
+  const userProfileRef = useMemoFirebase(() => {
+    if (!authUser) return null;
+    return doc(firestore, 'users', authUser.uid);
+  }, [firestore, authUser]);
+
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserType>(userProfileRef);
+
   const [formData, setFormData] = useState({
     full_name: "",
     bio: "",
@@ -37,7 +47,6 @@ export default function Impostazioni() {
   });
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [darkMode, setDarkMode] = useState(false);
-  const [isLoadingUser, setIsLoadingUser] = useState(true);
 
   useEffect(() => {
     const isDark = localStorage.getItem('theme') === 'dark';
@@ -45,8 +54,26 @@ export default function Impostazioni() {
     if (isDark) {
       document.documentElement.classList.add('dark');
     }
-    loadUser();
   }, []);
+
+  useEffect(() => {
+    if (userProfile) {
+        setFormData({
+            full_name: userProfile.full_name || "",
+            bio: userProfile.bio || "",
+            city: userProfile.city || "",
+            region: userProfile.region || "",
+            country: userProfile.country || "",
+            gender: userProfile.gender || "non specificato",
+            relationship_status: userProfile.relationship_status || "",
+            avatar: userProfile.avatar || "",
+            paypalEmail: userProfile.paypalEmail || "",
+        });
+        if (userProfile.avatar) {
+            setAvatarPreview(userProfile.avatar);
+        }
+    }
+  }, [userProfile]);
 
   useEffect(() => {
     if (darkMode) {
@@ -58,32 +85,6 @@ export default function Impostazioni() {
     }
   }, [darkMode]);
 
-
-  const loadUser = async () => {
-    setIsLoadingUser(true);
-    try {
-      const userData = await base44.auth.me();
-      setUser(userData);
-      setFormData({
-        full_name: userData.full_name || "",
-        bio: userData.bio || "",
-        city: userData.city || "",
-        region: userData.region || "",
-        country: userData.country || "",
-        gender: userData.gender || "non specificato",
-        relationship_status: userData.relationship_status || "",
-        avatar: userData.avatar || "",
-        paypalEmail: userData.paypalEmail || "",
-      });
-      if (userData.avatar) {
-        setAvatarPreview(userData.avatar);
-      }
-    } catch (error) {
-      router.push(createPageUrl("login"));
-    } finally {
-        setIsLoadingUser(false);
-    }
-  };
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -100,8 +101,9 @@ export default function Impostazioni() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      if (!user) throw new Error("Utente non autenticato");
-      await base44.auth.updateMe({
+      if (!userProfileRef) throw new Error("Utente non autenticato");
+      
+      updateDocumentNonBlocking(userProfileRef, {
         full_name: data.full_name,
         username: data.full_name, // Manteniamo username sincronizzato con full_name
         bio: data.bio,
@@ -113,14 +115,14 @@ export default function Impostazioni() {
         avatar: data.avatar,
         paypalEmail: data.paypalEmail,
       });
+
       const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
       audio.volume = 0.3;
       audio.play();
     },
     onSuccess: () => {
       toast({ title: "Successo", description: "Profilo aggiornato con successo!" });
-      queryClient.invalidateQueries({ queryKey: ['user', user?.email] });
-      loadUser();
+      queryClient.invalidateQueries({ queryKey: ['user', authUser?.uid] });
     },
     onError: (error: Error) => {
       toast({ variant: 'destructive', title: "Errore", description: "Errore nell'aggiornamento del profilo: " + error.message });
@@ -132,7 +134,7 @@ export default function Impostazioni() {
     updateProfileMutation.mutate(formData);
   };
 
-  if (isLoadingUser || !user) {
+  if (isUserLoading || isProfileLoading || !userProfile || !authUser) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -348,18 +350,18 @@ export default function Impostazioni() {
               <CardContent className="space-y-4">
                 <div>
                   <Label className="text-muted-foreground text-sm">Email</Label>
-                  <p className="text-foreground font-medium mt-1">{user.email}</p>
+                  <p className="text-foreground font-medium mt-1">{userProfile.email}</p>
                 </div>
-                 {user.role && (
+                 {userProfile.role && (
                   <div>
                     <Label className="text-muted-foreground text-sm">Ruolo</Label>
-                    <p className="text-foreground font-medium mt-1 capitalize">{user.role}</p>
+                    <p className="text-foreground font-medium mt-1 capitalize">{userProfile.role}</p>
                   </div>
                  )}
                 <div>
                   <Label className="text-muted-foreground text-sm">Membro da</Label>
                   <p className="text-foreground font-medium mt-1">
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString('it-IT') : 'N/A'}
+                    {userProfile.createdAt ? new Date(userProfile.createdAt).toLocaleDateString('it-IT') : 'N/A'}
                   </p>
                 </div>
               </CardContent>
@@ -425,5 +427,7 @@ export default function Impostazioni() {
     </div>
   );
 }
+
+    
 
     

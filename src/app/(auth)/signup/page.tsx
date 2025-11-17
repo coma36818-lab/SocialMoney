@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -19,9 +18,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { base44 } from '@/lib/api';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
+import { useAuth, useFirestore, setDocumentNonBlocking } from '@/firebase';
+import { createUserWithEmailAndPassword, sendEmailVerification, AuthError } from 'firebase/auth';
+import { doc, serverTimestamp } from 'firebase/firestore';
+import type { User } from '@/lib/types';
+import { faker } from '@faker-js/faker';
 
 const signupSchema = z.object({
   username: z.string().min(3, 'Il nome utente deve avere almeno 3 caratteri'),
@@ -41,6 +44,8 @@ export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const auth = useAuth();
+  const firestore = useFirestore();
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -60,17 +65,54 @@ export default function SignupPage() {
   const onSubmit = async (data: SignupFormValues) => {
     setIsLoading(true);
     try {
-      await base44.auth.signup(data);
+      // 1. Create user in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const firebaseUser = userCredential.user;
+
+      // 2. Create user profile in Firestore
+      const newUserProfile: Omit<User, 'id'> = {
+        uid: firebaseUser.uid,
+        username: data.username,
+        full_name: data.username,
+        email: data.email,
+        age: data.age,
+        gender: data.gender,
+        city: data.city,
+        country: data.country,
+        region: data.region,
+        referredBy: data.referredBy || null,
+        likeBalance: 20, // Default starting likes
+        totalLikesReceived: 0,
+        totalLikesSent: 0,
+        walletBalance: 0,
+        createdAt: new Date().toISOString(),
+        referralCode: faker.string.alphanumeric(8),
+        accountStatus: 'active',
+        verified: false, // Email is not verified on creation
+      };
+
+      const userDocRef = doc(firestore, 'users', firebaseUser.uid);
+      setDocumentNonBlocking(userDocRef, newUserProfile, { merge: true });
+
+      // 3. Send verification email
+      await sendEmailVerification(firebaseUser);
+
       toast({
-        title: 'Registrazione completata',
-        description: 'Benvenuto in Social Money!',
+        title: 'Registrazione completata!',
+        description: 'Ti abbiamo inviato un\'email di conferma. Controlla la tua casella di posta!',
       });
       router.push('/feed');
+
     } catch (error) {
+      const authError = error as AuthError;
+      let description = 'Si è verificato un errore durante la registrazione.';
+      if (authError.code === 'auth/email-already-in-use') {
+        description = 'Questa email è già stata utilizzata per un altro account.';
+      }
       toast({
         variant: 'destructive',
         title: 'Errore di registrazione',
-        description: error instanceof Error ? error.message : 'Si è verificato un errore',
+        description,
       });
     } finally {
       setIsLoading(false);

@@ -1,67 +1,64 @@
+
 'use client';
-import React, { useState, useEffect } from "react";
-import { base44 } from "@/lib/api";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Bell, Heart, UserPlus, DollarSign, Info, Check, Trash2, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import { useRouter } from "next/navigation";
-import { createPageUrl } from "@/lib/utils";
+import { useUser, useFirestore, useCollection, useMemoFirebase, updateDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
 import type { User, Notification } from "@/lib/types";
+import { collection, query, orderBy, doc } from "firebase/firestore";
 
 export default function Notifiche() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [user, setUser] = useState<User | null>(null);
+  const { user: authUser, isUserLoading } = useUser();
+  const firestore = useFirestore();
 
-  useEffect(() => {
-    loadUser();
-  }, []);
+  const notificationsQuery = useMemoFirebase(() => {
+    if (!authUser) return null;
+    return query(collection(firestore, `users/${authUser.uid}/notifications`), orderBy('created_date', 'desc'));
+  }, [firestore, authUser]);
 
-  const loadUser = async () => {
-    try {
-      const userData = await base44.auth.me();
-      setUser(userData);
-    } catch (error) {
-      router.push(createPageUrl("Login"));
-    }
-  };
+  const { data: notifications = [], isLoading } = useCollection<Notification>(notificationsQuery);
 
-  const { data: notifications = [], isLoading } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: () => base44.entities.Notification.list('-created_date'),
-    enabled: !!user,
-  });
 
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      await base44.entities.Notification.update(notificationId, { read: true });
+        if (!authUser) throw new Error("User not authenticated");
+        const notifRef = doc(firestore, `users/${authUser.uid}/notifications`, notificationId);
+        updateDocumentNonBlocking(notifRef, { read: true });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', authUser?.uid] });
     }
   });
 
   const deleteNotificationMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      await base44.entities.Notification.delete(notificationId);
+      if (!authUser) throw new Error("User not authenticated");
+      const notifRef = doc(firestore, `users/${authUser.uid}/notifications`, notificationId);
+      deleteDocumentNonBlocking(notifRef);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', authUser?.uid] });
     }
   });
 
   const markAllAsReadMutation = useMutation({
     mutationFn: async () => {
-      const unreadNotifications = notifications.filter(n => !n.read);
-      for (const notification of unreadNotifications) {
-        await base44.entities.Notification.update(notification.id, { read: true });
-      }
+        if (!authUser) throw new Error("User not authenticated");
+        const unreadNotifications = notifications.filter(n => !n.read);
+        for (const notification of unreadNotifications) {
+            const notifRef = doc(firestore, `users/${authUser.uid}/notifications`, notification.id);
+            updateDocumentNonBlocking(notifRef, { read: true });
+        }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', authUser?.uid] });
     }
   });
 
@@ -93,7 +90,7 @@ export default function Notifiche() {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  if (!user) {
+  if (isUserLoading || !authUser) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -199,3 +196,5 @@ export default function Notifiche() {
     </div>
   );
 }
+
+    

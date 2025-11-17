@@ -1,7 +1,6 @@
+
 'use client';
 import React, { useState } from "react";
-import { base44 } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,9 +11,13 @@ import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
 import type { User as UserType } from "@/lib/types";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection, query, where, or, and } from "firebase/firestore";
 
 export default function Cerca() {
   const router = useRouter();
+  const { user: authUser } = useUser();
+  const firestore = useFirestore();
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
     gender: "all",
@@ -22,26 +25,38 @@ export default function Cerca() {
     region: ""
   });
 
-  const { data: allUsers = [], isLoading } = useQuery({
-    queryKey: ['allUsers'],
-    queryFn: () => base44.entities.User.list(),
-  });
+  const usersQuery = useMemoFirebase(() => {
+    const queryConstraints = [];
 
-  const filteredUsers = allUsers.filter((user: UserType) => {
-    if (!user) return false;
+    if (filters.gender !== 'all') {
+      queryConstraints.push(where("gender", "==", filters.gender));
+    }
+    if (filters.city) {
+      queryConstraints.push(where("city", ">=", filters.city), where("city", "<=", filters.city + '\uf8ff'));
+    }
+    if (filters.region) {
+      queryConstraints.push(where("region", ">=", filters.region), where("region", "<=", filters.region + '\uf8ff'));
+    }
 
-    const matchesSearch = 
-      user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.region?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesGender = filters.gender === "all" || user.gender === filters.gender;
-    const matchesCity = !filters.city || user.city?.toLowerCase().includes(filters.city.toLowerCase());
-    const matchesRegion = !filters.region || user.region?.toLowerCase().includes(filters.region.toLowerCase());
+    if (searchQuery) {
+        queryConstraints.push(
+            or(
+                where("full_name", ">=", searchQuery), where("full_name", "<=", searchQuery + '\uf8ff'),
+                where("email", ">=", searchQuery), where("email", "<=", searchQuery + '\uf8ff')
+            )
+        )
+    }
 
-    return matchesSearch && matchesGender && matchesCity && matchesRegion;
-  });
+    if (queryConstraints.length > 0) {
+        return query(collection(firestore, "users"), and(...queryConstraints));
+    }
+    return collection(firestore, "users");
+  }, [firestore, filters, searchQuery]);
+
+  const { data: allUsers = [], isLoading } = useCollection<UserType>(usersQuery);
+
+  const filteredUsers = allUsers.filter(user => user.uid !== authUser?.uid);
+
 
   const getGenderLabel = (gender: UserType['gender']) => {
     if (!gender) return "";
@@ -154,7 +169,7 @@ export default function Cerca() {
                     <div className="flex items-center justify-between">
                       <div 
                         className="flex items-center gap-4 flex-1 cursor-pointer"
-                        onClick={() => router.push(createPageUrl("profiloutente") + "?email=" + user.email)}
+                        onClick={() => router.push(createPageUrl("profiloutente") + "?uid=" + user.uid)}
                       >
                         <motion.div
                           whileHover={{ scale: 1.1 }}
@@ -188,7 +203,7 @@ export default function Cerca() {
 
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button
-                          onClick={() => router.push(createPageUrl("profiloutente") + "?email=" + user.email)}
+                          onClick={() => router.push(createPageUrl("profiloutente") + "?uid=" + user.uid)}
                           className="bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground"
                         >
                           Vedi Profilo
@@ -205,3 +220,5 @@ export default function Cerca() {
     </div>
   );
 }
+
+    

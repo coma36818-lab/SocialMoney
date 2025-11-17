@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { auth, storage } from "@/firebase";
+import { storage, useUser, useFirestore, addDocumentNonBlocking } from "@/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { v4 as uuid } from "uuid";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
@@ -11,9 +11,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Upload } from "lucide-react";
-import { base44 } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
+import { collection } from "firebase/firestore";
 
 export default function VideoUploader() {
   const [progress, setProgress] = useState(0);
@@ -21,6 +21,8 @@ export default function VideoUploader() {
   const [status, setStatus] = useState("Inattivo");
   const { toast } = useToast();
   const router = useRouter();
+  const { user: authUser } = useUser();
+  const firestore = useFirestore();
 
   const MAX_SIZE_MB = 100;
 
@@ -28,18 +30,11 @@ export default function VideoUploader() {
     const file = e.target.files[0];
     if (!file) return;
 
-    const user = auth.currentUser;
-    if (!user) {
+    if (!authUser) {
         toast({ variant: "destructive", title: "Autenticazione richiesta", description: "Devi accedere per caricare un video." });
         return;
     }
     
-    // This check is often not populated immediately, so we rely on backend rules
-    // if (!user.emailVerified) {
-    //     toast({ variant: "destructive", title: "Email non verificata", description: "Verifica la tua email prima di caricare video." });
-    //     return;
-    // }
-
     if (file.size > MAX_SIZE_MB * 1024 * 1024) {
       toast({ variant: "destructive", title: "File troppo grande", description: `Il video supera il limite di ${MAX_SIZE_MB}MB` });
       return;
@@ -49,10 +44,10 @@ export default function VideoUploader() {
 
     try {
       let finalFile = file;
+      let fileType = file.type.startsWith('image') ? 'image' : 'video';
 
-      // Simple client-side check if conversion is needed
-      if (!file.type.includes('mp4')) {
-        // 2) CONVERSIONE MP4 (ffmpeg WASM)
+      // Simple client-side check if conversion is needed for videos
+      if (fileType === 'video' && !file.type.includes('mp4')) {
         setStatus("Conversione in MP4...");
         const ffmpeg = new FFmpeg();
         await ffmpeg.load();
@@ -63,10 +58,10 @@ export default function VideoUploader() {
         finalFile = new File([mp4Data], `${uuid()}.mp4`, { type: "video/mp4" });
       }
 
-      // UPLOAD IN BACKGROUND (QUEUE AUTOMATICO)
-      setStatus("Caricamento video...");
-      const videoRef = ref(storage, `videos/${user.uid}/${finalFile.name}`);
-      const uploadTask = uploadBytesResumable(videoRef, finalFile);
+      setStatus("Caricamento...");
+      const filePath = `${fileType}s/${authUser.uid}/${finalFile.name}`;
+      const storageRef = ref(storage, filePath);
+      const uploadTask = uploadBytesResumable(storageRef, finalFile);
 
       uploadTask.on(
         "state_changed",
@@ -77,17 +72,19 @@ export default function VideoUploader() {
         },
         (err) => { throw err }, // Rethrow to be caught by outer catch
         async () => {
-          const videoURL = await getDownloadURL(uploadTask.snapshot.ref);
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
           // Salva nel database
           setStatus("Finalizzazione...");
-          await base44.entities.Post.create({
-            created_by: user.email,
-            media_url: videoURL,
-            media_type: 'video',
-            imageUrl: '', // Thumbnails can be generated server-side
+          const postsCollRef = collection(firestore, 'posts');
+          await addDocumentNonBlocking(postsCollRef, {
+            userId: authUser.uid,
+            media_url: downloadURL,
+            media_type: fileType,
             description: "", // Can be filled from another input
             created_date: new Date().toISOString(),
+            likes_count: 0,
+            earnings: 0,
           });
 
           setLoading(false);
@@ -107,20 +104,20 @@ export default function VideoUploader() {
   return (
     <div className="space-y-6">
        <label
-            htmlFor="video-upload"
+            htmlFor="media-upload"
             className="relative flex flex-col items-center justify-center w-full p-12 border-2 border-dashed rounded-2xl cursor-pointer bg-muted/50 hover:bg-muted/80 transition-colors"
         >
             <div className="text-center">
                 <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
                 <h3 className="mt-4 text-lg font-semibold text-foreground">
-                    Seleziona un video da caricare
+                    Seleziona un video o un'immagine
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                    Video fino a ${MAX_SIZE_MB} MB.
+                    File fino a ${MAX_SIZE_MB} MB.
                 </p>
             </div>
             <Input
-                id="video-upload"
+                id="media-upload"
                 type="file"
                 className="sr-only"
                 accept="video/*,image/*"
@@ -142,3 +139,5 @@ export default function VideoUploader() {
     </div>
   );
 }
+
+    

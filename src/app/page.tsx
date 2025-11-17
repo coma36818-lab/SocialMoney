@@ -1,23 +1,22 @@
 'use client';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { base44 } from '@/lib/api';
+import { useUser } from '@/firebase';
 import { Loader2 } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
+  const { user, isUserLoading } = useUser();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        await base44.auth.me();
+    if (!isUserLoading) {
+      if (user) {
         router.replace('/feed');
-      } catch (error) {
+      } else {
         router.replace('/login');
       }
-    };
-    checkAuth();
-  }, [router]);
+    }
+  }, [user, isUserLoading, router]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">

@@ -9,56 +9,51 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Image as ImageIcon, Video, X, Loader2, Type, Camera, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
-import { base44 } from "@/lib/api";
 import Image from "next/image";
 import type { User } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import VideoUploader from "@/components/upload/VideoUploader";
 import VideoRecorder from "@/components/upload/VideoRecorder";
+import { useUser, useFirestore, addDocumentNonBlocking } from "@/firebase";
+import { collection } from "firebase/firestore";
 
 
 export default function UploadPage() {
   const router = useRouter();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [user, setUser] = useState<User | null>(null);
+  const { user: authUser, isUserLoading } = useUser();
+  const firestore = useFirestore();
+
   const [textContent, setTextContent] = useState("");
   const [postType, setPostType] = useState("media");
-   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    try {
-      const userData = await base44.auth.me();
-      setUser(userData);
-    } catch (error) {
-      router.push(createPageUrl("Upload"));
-    }
-  };
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
 
   const textUploadMutation = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error("Utente non autenticato");
+      if (!authUser) throw new Error("Utente non autenticato");
       if (!textContent.trim()) {
         throw new Error("Inserisci un testo");
       }
       
-      await base44.entities.Post.create({
-        created_by: user.email,
+      const postsCollRef = collection(firestore, 'posts');
+      addDocumentNonBlocking(postsCollRef, {
+        userId: authUser.uid,
         description: textContent,
-        media_url: "",
         media_type: "text",
-        created_date: new Date().toISOString()
+        created_date: new Date().toISOString(),
+        likes_count: 0,
+        earnings: 0,
       });
 
-      await base44.entities.Notification.create({
-        created_by: user.email,
+      const notificationsCollRef = collection(firestore, `users/${authUser.uid}/notifications`);
+      addDocumentNonBlocking(notificationsCollRef, {
+        userId: authUser.uid,
         type: "system",
-        message: "Post pubblicato con successo!"
+        message: "Post pubblicato con successo!",
+        read: false,
+        created_date: new Date().toISOString()
       });
     },
     onSuccess: () => {
@@ -75,7 +70,7 @@ export default function UploadPage() {
   });
 
 
-  if (!user) {
+  if (isUserLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -85,8 +80,14 @@ export default function UploadPage() {
       </div>
     );
   }
+  
+  if (!authUser) {
+    // This case should be handled by the layout, but as a fallback:
+    router.replace('/login');
+    return null;
+  }
 
-  if (!user.verified) {
+  if (!authUser.emailVerified) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-full max-w-md mx-auto text-center glass-card p-8 rounded-2xl">
@@ -221,3 +222,5 @@ export default function UploadPage() {
     </div>
   );
 }
+
+    
