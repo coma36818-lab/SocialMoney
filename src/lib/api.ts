@@ -105,12 +105,7 @@ export const base44 = {
             const referrer = users.find(u => u.referralCode === data.referredBy);
             if (referrer) {
                 startingLikes += 10;
-                
-                const updatedReferrer: User = {
-                    ...referrer,
-                    likeBalance: (referrer.likeBalance || 0) + 50,
-                };
-                users = users.map(u => u.id === referrer.id ? updatedReferrer : u);
+                updateUser(referrer.id, { likeBalance: (referrer.likeBalance || 0) + 50 });
             }
         }
         
@@ -133,7 +128,7 @@ export const base44 = {
             created_date: new Date().toISOString(),
             referralCode: faker.string.alphanumeric(8),
             accountStatus: 'active',
-            verified: false, // Default to true for mock, in real app this would be false
+            verified: false,
         };
         
         users.push(newUser);
