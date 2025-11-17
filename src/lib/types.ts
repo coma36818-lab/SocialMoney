@@ -15,6 +15,9 @@ export type User = {
   likes_received: number;
   balance: number;
   total_earnings: number;
+  role?: string;
+  relationship_status?: string;
+  created_date?: string;
 };
 
 export type Post = {
@@ -48,14 +51,14 @@ export type Transaction = {
 };
 
 export type Notification = {
-    id: string;
-    user_id: string;
-    created_by_name: string;
-    type: 'like' | 'follow' | 'earning' | 'system';
-    message: string;
-    created_date: string;
-    is_read: boolean;
-    related_id?: string;
+  id: string;
+  user_id: string;
+  created_by_name: string;
+  type: 'like' | 'follow' | 'earning' | 'system';
+  message: string;
+  created_date: string;
+  is_read: boolean;
+  related_id?: string;
 };
 
 export type Message = {
