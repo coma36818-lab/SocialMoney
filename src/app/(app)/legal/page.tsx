@@ -219,7 +219,7 @@ export default function LegalPage() {
                             <h3>Segnalazioni</h3>
                             <p>
                               Puoi segnalare contenuti inappropriati o comportamenti scorretti. 
-                              Il team di moderazione esaminerà ogni segnalazione entro 24-48 ore.
+                              Il nostro team di moderazione (simulato) esaminerà ogni segnalazione entro 24-48 ore.
                             </p>
                         </LegalContent>
                     </TabsContent>
@@ -227,50 +227,56 @@ export default function LegalPage() {
                         <LegalContent title="Rischi e Contromisure" icon={AlertTriangle} iconClass="text-yellow-500">
                             <h3>1. Abusi e Frodi (Auto-Like, Multi-Account, Like Farming)</h3>
                             <p>
-                                <strong>Rischio:</strong> Utenti malintenzionati potrebbero tentare di manipolare il sistema per guadagnare ingiustamente, ad esempio tramite bot, account falsi o scambi di like concordati.
+                                <strong>Rischio:</strong> Utenti malintenzionati potrebbero tentare di manipolare il sistema per guadagnare ingiustamente.
                             </p>
                             <p>
-                                <strong>Contromisure:</strong> Abbiamo implementato una serie di controlli automatici, tra cui:
+                                <strong>Contromisure Implementate:</strong>
                             </p>
                             <ul className="list-disc list-inside space-y-2 ml-4">
-                                <li>Limite di like giornalieri inviabili per utente.</li>
-                                <li>Limite di like che un utente può dare a un singolo creator.</li>
-                                <li>Rilevamento di scambi di like anomali e reciproci tra due account.</li>
-                                <li>Sistema di sospensione automatica per attività simili a bot (es. troppi like in un breve lasso di tempo).</li>
-                                <li>Monitoraggio (simulato) degli indirizzi IP per flaggare possibili abusi di account multipli.</li>
+                                <li><strong>Limiti Giornalieri:</strong> Un utente può inviare un massimo di 100 like al giorno per prevenire l'abuso di account fake. Esiste anche un limite di 30 like totali che un utente può dare a un singolo creator.</li>
+                                <li><strong>Anti-Bot e Sospensioni Automatiche:</strong> Il sistema monitora la frequenza dei like. Se un account invia più di 10 like in 10 secondi (attività tipica di un bot), viene automaticamente sospeso.</li>
+                                <li><strong>Controllo Like Farming:</strong> Se due utenti si scambiano reciprocamente più di 20 like, il sistema li blocca per prevenire scambi concordati.</li>
+                                <li><strong>Controlli Visibilità IP (Simulati):</strong> Il sistema è progettato per includere un controllo (attualmente simulato) sugli indirizzi IP per identificare l'uso di account multipli dalla stessa fonte, segnalando anomalie.</li>
+                                <li><strong>Log di Audit Dettagliati:</strong> Ogni like e transazione vengono registrati nelle collezioni `likeEvents` e `transactions` di Firestore. Questi log fungono da traccia di audit per future indagini.</li>
+                                 <li><strong>Verifica Email:</strong> La registrazione richiede un'email valida, un primo passo per garantire l'autenticità degli utenti.</li>
                             </ul>
 
-                            <h3>2. Costi Operativi (PayPal)</h3>
+                            <h3>2. Prelievi Sospetti e Costi Operativi</h3>
                              <p>
-                                <strong>Rischio:</strong> Le transazioni di pagamento, sia in entrata (acquisti) che in uscita (prelievi), hanno dei costi imposti dal provider (es. PayPal).
+                                <strong>Rischio:</strong> Prelievi fraudolenti o una gestione inefficiente dei costi di transazione (es. PayPal) possono erodere i profitti.
                             </p>
                             <p>
-                                <strong>Contromisure:</strong> Il nostro modello di business è progettato per coprire questi costi. La commissione del 10% applicata ai prelievi dei creator e il margine sui pacchetti di like acquistati sono calcolati per garantire la sostenibilità della piattaforma.
+                                <strong>Contromisure Implementate:</strong>
                             </p>
+                            <ul className="list-disc list-inside space-y-2 ml-4">
+                                <li><strong>Requisiti di Prelievo:</strong> È richiesto un saldo minimo di 10€ e un account PayPal valido. È possibile effettuare un solo prelievo ogni 7 giorni per evitare transazioni troppo frequenti e costose.</li>
+                                <li><strong>Controllo Crescita Anomala (Simulato):</strong> Il sistema è predisposto per monitorare tassi di crescita di like anomali (+300/ora) e bloccare temporaneamente i prelievi per un account in attesa di verifica manuale.</li>
+                                 <li><strong>Verifica PayPal:</strong> Richiedere un account PayPal valido per i prelievi funge da ulteriore livello di verifica dell'identità del creator.</li>
+                            </ul>
 
-                            <h3>3. Regolamentazione e Aspetti Legali</h3>
+                            <h3>3. Qualità dei Contenuti e Regolamentazione</h3>
                              <p>
-                                <strong>Rischio:</strong> Le normative su valute virtuali, pagamenti online e gestione dei dati (GDPR) sono complesse e in continua evoluzione.
+                                <strong>Rischio:</strong> La pubblicazione di contenuti illegali, offensivi o protetti da copyright espone la piattaforma a rischi legali.
                             </p>
                             <p>
-                                <strong>Contromisure:</strong> La piattaforma opera in conformità con le leggi vigenti. La separazione netta tra "like acquistati" (non convertibili) e "saldo guadagnato" (convertibile) è una misura di progettazione chiave per mitigare i rischi normativi. Ci affidiamo a consulenti legali per rimanere aggiornati.
+                                <strong>Contromisure Implementate:</strong>
                             </p>
+                             <ul className="list-disc list-inside space-y-2 ml-4">
+                                <li><strong>Regole della Community:</strong> Abbiamo definito chiare linee guida sui contenuti ammessi e vietati.</li>
+                                <li><strong>Funzione di Moderazione Contenuti:</strong> Sebbene la moderazione attiva richieda un team umano, il sistema attuale permette agli utenti di segnalare contenuti, e l'architettura è pronta per integrare un pannello di moderazione.</li>
+                             </ul>
                             
-                            <h3>4. Necessità di Liquidità</h3>
+                            <h3>4. Sostenibilità Economica (Liquidità e Concorrenza)</h3>
                              <p>
-                                <strong>Rischio:</strong> È necessario disporre di fondi sufficienti per pagare i prelievi richiesti dai creator in modo tempestivo.
+                                <strong>Rischio:</strong> Garantire la liquidità per pagare i creator e distinguersi in un mercato competitivo.
                             </p>
                             <p>
-                                <strong>Contromisure:</strong> I requisiti di prelievo (saldo minimo di 10€ e un prelievo ogni 7 giorni) aiutano a gestire il flusso di cassa. I tempi di elaborazione dei pagamenti (3-5 giorni lavorativi) forniscono un ulteriore buffer per la gestione della liquidità.
+                                <strong>Contromisure di Design:</strong>
                             </p>
-
-                             <h3>5. Concorrenza</h3>
-                             <p>
-                                <strong>Rischio:</strong> Il mercato dei social media è altamente competitivo.
-                            </p>
-                            <p>
-                                <strong>Contromisure:</strong> Il nostro modello di monetizzazione diretta per i creator è un fattore differenziante chiave. L'obiettivo è costruire una community forte e fedele, offrendo un modo trasparente e immediato per supportare i propri creator preferiti.
-                            </p>
+                             <ul className="list-disc list-inside space-y-2 ml-4">
+                                <li><strong>Modello di Business Robusto:</strong> La netta separazione tra "like acquistati" (un bene virtuale non convertibile) e "saldo guadagnato" (derivato dai like ricevuti) garantisce che la piattaforma sia sempre in profitto e abbia la liquidità necessaria, dato che i fondi per i pagamenti provengono dagli acquisti di altri utenti.</li>
+                                 <li><strong>Fattore Differenziante:</strong> Il modello di monetizzazione diretta e trasparente è il nostro principale vantaggio competitivo per attrarre e fidelizzare i creator.</li>
+                             </ul>
                         </LegalContent>
                     </TabsContent>
                 </Tabs>
@@ -278,5 +284,3 @@ export default function LegalPage() {
         </div>
     );
 }
-
-    
