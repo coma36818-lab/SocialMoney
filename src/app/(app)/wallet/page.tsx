@@ -30,11 +30,8 @@ export default function WalletPage() {
     };
 
     const { data: transactions, isLoading } = useQuery({
-        queryKey: ['transactions', user?.id],
-        queryFn: () => {
-            if (!user) return Promise.resolve([]);
-            return base44.entities.Transaction.list('-created_date', 50);
-        },
+        queryKey: ['transactions', user?.email],
+        queryFn: () => base44.entities.Transaction.list('-created_date', 50),
         enabled: !!user,
     });
 
@@ -159,7 +156,7 @@ export default function WalletPage() {
                                                 </div>
                                             </div>
                                             <motion.p initial={{ scale: 0 }} animate={{ scale: 1 }} className={`font-bold ${getTransactionColor(transaction.type)}`}>
-                                                {transaction.amount > 0 ? "+" : ""} €{transaction.amount.toFixed(2)}
+                                                {transaction.amount >= 0 ? "+" : "-"}€{Math.abs(transaction.amount).toFixed(2)}
                                             </motion.p>
                                         </motion.div>
                                     ))}
