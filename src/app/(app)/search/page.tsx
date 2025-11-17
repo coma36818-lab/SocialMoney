@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, User, MapPin, Heart, Loader2 } from "lucide-react";
+import { Search, User, MapPin, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
@@ -152,7 +152,8 @@ export default function Cerca() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div 
-                        className="flex items-center gap-4 flex-1"
+                        className="flex items-center gap-4 flex-1 cursor-pointer"
+                        onClick={() => router.push(createPageUrl("profiloutente") + "?email=" + user.email)}
                       >
                         <motion.div
                           whileHover={{ scale: 1.1 }}
