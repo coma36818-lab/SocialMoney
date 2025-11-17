@@ -31,6 +31,7 @@ const signupSchema = z.object({
   city: z.string().min(1, 'La città è richiesta'),
   country: z.string().min(1, 'Il paese è richiesto'),
   region: z.string().min(1, 'La regione è richiesta'),
+  referred_by: z.string().optional(),
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
@@ -51,6 +52,7 @@ export default function SignupPage() {
       city: '',
       country: 'Italia',
       region: '',
+      referred_by: ''
     },
   });
 
@@ -119,6 +121,14 @@ export default function SignupPage() {
                 <FormItem><FormLabel>Paese</FormLabel><FormControl><Input placeholder="Italia" {...field} /></FormControl><FormMessage /></FormItem>
               )} />
             </div>
+             <FormField name="referred_by" control={form.control} render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Codice Referral (Opzionale)</FormLabel>
+                  <FormControl><Input placeholder="Codice amico" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
 
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 neon-glow" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

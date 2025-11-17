@@ -16,8 +16,11 @@ const createMockUser = (email: string, nickname: string, avatar?: string): User 
     avatar: avatar,
     likes_available: faker.number.int({ min: 5, max: 100 }),
     likes_received: faker.number.int({ min: 100, max: 5000 }),
+    likes_sent: faker.number.int({min: 50, max: 2000}),
     balance: faker.number.float({ min: 10, max: 1000, multipleOf: 0.01 }),
     total_earnings: faker.number.float({ min: 100, max: 10000, multipleOf: 0.01 }),
+    referral_code: faker.string.alphanumeric(8),
+    created_date: faker.date.past().toISOString(),
 });
 
 export const mockUsers: User[] = [
@@ -172,4 +175,3 @@ export const mockNotifications: Notification[] = [
         created_date: faker.date.recent({days: 3}).toISOString()
     }
 ];
-    

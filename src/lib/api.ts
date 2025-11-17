@@ -82,7 +82,7 @@ export const base44 = {
         }
         throw new Error('Invalid credentials');
     },
-    signup: async (data: Omit<User, 'id' | 'full_name' | 'likes_available' | 'likes_received' | 'balance' | 'total_earnings' | 'created_date'>): Promise<User> => {
+    signup: async (data: Omit<User, 'id' | 'full_name' | 'likes_available' | 'likes_received' | 'likes_sent' | 'balance' | 'total_earnings' | 'created_date'>): Promise<User> => {
         if(users.some(u => u.email === data.email)) {
             throw new Error('User already exists');
         }
@@ -92,9 +92,11 @@ export const base44 = {
             full_name: data.nickname,
             likes_available: 20,
             likes_received: 0,
+            likes_sent: 0,
             balance: 0,
             total_earnings: 0,
             created_date: new Date().toISOString(),
+            referral_code: faker.string.alphanumeric(8),
         };
         users.push(newUser);
         saveData(USERS_KEY, users);
@@ -202,6 +204,14 @@ export const base44 = {
         };
         likes.push(newLike);
         saveData(LIKES_KEY, likes);
+        
+        // Update user's likes_sent count
+        const currentUser = users.find(u => u.email === userEmail);
+        if (currentUser) {
+            currentUser.likes_sent = (currentUser.likes_sent || 0) + 1;
+            saveData(USERS_KEY, users);
+        }
+
         return newLike;
       },
     },

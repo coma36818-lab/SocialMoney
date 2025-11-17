@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { User as UserIcon, Heart, Wallet, TrendingUp, Edit, Loader2, MapPin, Calendar } from "lucide-react";
+import { User as UserIcon, Heart, Wallet, TrendingUp, Edit, Loader2, MapPin, Calendar, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -70,6 +70,11 @@ export default function ProfiloPage() {
         { label: "Like Ricevuti", value: user.likes_received || 0, icon: Heart, color: "text-primary", gradient: "from-primary to-[#ff3366]" },
         { label: "Post", value: userPosts?.length || 0, icon: TrendingUp, color: "text-blue-500", gradient: "from-blue-500 to-sky-400" },
     ];
+    
+    const secondaryStats = [
+        {label: "Like Inviati", value: user.likes_sent || 0, icon: Heart},
+        {label: "Referral Code", value: user.referral_code || "N/A", icon: Users},
+    ];
 
     const getInitials = (name: string) => {
         return name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : '';
@@ -125,6 +130,20 @@ export default function ProfiloPage() {
                                             <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
                                         </motion.div>
                                     ))}
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                     {secondaryStats.map((stat, index) => (
+                                        <div key={stat.label} className="glass-card rounded-xl p-4 flex items-center gap-4">
+                                            <div className="bg-muted p-3 rounded-lg">
+                                                <stat.icon className="w-5 h-5 text-muted-foreground" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-muted-foreground">{stat.label}</p>
+                                                <p className="font-bold text-foreground">{stat.value}</p>
+                                            </div>
+                                        </div>
+                                     ))}
                                 </div>
                                 
                                 <div className="flex flex-wrap gap-3 mt-6">

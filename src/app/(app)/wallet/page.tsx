@@ -39,7 +39,7 @@ export default function WalletPage() {
         switch (type) {
             case "like_received": return <Heart className="w-4 h-4" />;
             case "like_purchase": return <TrendingDown className="w-4 h-4" />;
-            case "conversion": return <TrendingUp className="w-4 h-4" />;
+            case "referral_bonus": return <TrendingUp className="w-4 h-4" />;
             case "payout": return <Download className="w-4 h-4" />;
             default: return <DollarSign className="w-4 h-4" />;
         }
@@ -48,7 +48,7 @@ export default function WalletPage() {
     const getTransactionColor = (type: Transaction['type']) => {
         switch (type) {
             case "like_received":
-            case "conversion":
+            case "referral_bonus":
                 return "text-green-500";
             case "like_purchase":
             case "payout":

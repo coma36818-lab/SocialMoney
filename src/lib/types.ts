@@ -13,11 +13,14 @@ export type User = {
   avatar?: string;
   likes_available: number;
   likes_received: number;
+  likes_sent: number;
   balance: number;
   total_earnings: number;
   role?: string;
   relationship_status?: string;
   created_date?: string;
+  referral_code?: string;
+  referred_by?: string;
 };
 
 export type Post = {
@@ -44,7 +47,7 @@ export type Transaction = {
   id: string;
   user_id: string;
   created_date: string;
-  type: 'like_received' | 'like_purchase' | 'conversion' | 'payout';
+  type: 'like_received' | 'like_purchase' | 'conversion' | 'payout' | 'referral_bonus';
   description: string;
   amount: number;
   related_id?: string;
@@ -54,7 +57,7 @@ export type Notification = {
     id: string;
     created_by: string; // user email of the person who triggered the notification
     message: string;
-    type: "like" | "follow" | "earning" | "system";
+    type: "like" | "follow" | "earning" | "system" | "referral";
     read: boolean;
     related_id?: string;
     created_date: string;
