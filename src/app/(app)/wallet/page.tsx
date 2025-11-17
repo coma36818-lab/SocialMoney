@@ -31,7 +31,11 @@ export default function WalletPage() {
 
     const { data: transactions, isLoading } = useQuery({
         queryKey: ['transactions', user?.email],
-        queryFn: () => base44.entities.Transaction.list('-created_date', 50),
+        queryFn: () => {
+            if (!user) return Promise.resolve([]);
+            // The list function for transactions in the mock API takes sort and limit
+            return base44.entities.Transaction.list('-created_date', 50);
+        },
         enabled: !!user,
     });
 
