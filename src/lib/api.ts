@@ -133,7 +133,7 @@ export const base44 = {
             created_date: new Date().toISOString(),
             referralCode: faker.string.alphanumeric(8),
             accountStatus: 'active',
-            verified: true, // Default to true for mock, in real app this would be false
+            verified: false, // Default to true for mock, in real app this would be false
         };
         
         users.push(newUser);
