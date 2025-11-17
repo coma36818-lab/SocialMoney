@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -5,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Image as ImageIcon, Video, X, Loader2, Type } from "lucide-react";
+import { Upload, Image as ImageIcon, Video, X, Loader2, Type, Camera } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
 import { base44 } from "@/lib/api";
 import Image from "next/image";
 import type { User } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import VideoRecorder from "@/components/upload/VideoRecorder";
 
 
 export default function UploadPage() {
@@ -83,7 +85,7 @@ export default function UploadPage() {
   };
 
   const uploadMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (mediaUrl?: string) => {
       if (!user) throw new Error("Utente non autenticato");
 
       if (postType === "text") {
@@ -98,14 +100,15 @@ export default function UploadPage() {
           media_type: "text",
           created_date: new Date().toISOString()
         });
-      } else {
-        if (!file || !preview) throw new Error("File non selezionato");
-        const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
+      } else { // media or record
+        const finalMediaUrl = mediaUrl || preview;
+        if (!finalMediaUrl) throw new Error("File non selezionato o non registrato");
+        const mediaType = file?.type.startsWith('image/') ? 'image' : 'video';
         
         await base44.entities.Post.create({
           created_by: user.email,
           description,
-          media_url: preview,
+          media_url: finalMediaUrl,
           media_type: mediaType,
           created_date: new Date().toISOString()
         });
@@ -127,16 +130,20 @@ export default function UploadPage() {
     }
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = (mediaUrl?: string) => {
     if (postType === "media" && !file) {
       toast({ variant: 'destructive', title: "Errore", description: "Seleziona un file da caricare" });
+      return;
+    }
+     if (postType === "record" && !mediaUrl) {
+      toast({ variant: 'destructive', title: "Errore", description: "Nessun video registrato da pubblicare." });
       return;
     }
     if (postType === "text" && !textContent.trim()) {
        toast({ variant: 'destructive', title: "Errore", description: "Scrivi qualcosa da pubblicare" });
       return;
     }
-    uploadMutation.mutate();
+    uploadMutation.mutate(mediaUrl);
   };
 
   if (!user) {
@@ -158,14 +165,18 @@ export default function UploadPage() {
           <h1 className="text-4xl font-bold text-foreground mb-2">
             Pubblica <span className="text-primary">Contenuto</span>
           </h1>
-          <p className="text-muted-foreground">Carica foto, video o testo e inizia a guadagnare</p>
+          <p className="text-muted-foreground">Carica, registra o scrivi e inizia a guadagnare</p>
         </div>
 
         <Tabs value={postType} onValueChange={setPostType} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-muted text-muted-foreground">
+          <TabsList className="grid w-full grid-cols-3 bg-muted text-muted-foreground">
             <TabsTrigger value="media" className="data-[state=active]:bg-card data-[state=active]:text-foreground">
               <ImageIcon className="w-4 h-4 mr-2" />
               Media
+            </TabsTrigger>
+             <TabsTrigger value="record" className="data-[state=active]:bg-card data-[state=active]:text-foreground">
+              <Camera className="w-4 h-4 mr-2" />
+              Registra
             </TabsTrigger>
             <TabsTrigger value="text" className="data-[state=active]:bg-card data-[state=active]:text-foreground">
               <Type className="w-4 h-4 mr-2" />
@@ -268,7 +279,7 @@ export default function UploadPage() {
 
                     {/* Submit Button */}
                     <Button
-                      onClick={handleSubmit}
+                      onClick={() => handleSubmit()}
                       disabled={uploadMutation.isPending}
                       className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground text-lg py-6 neon-glow"
                       size="lg"
@@ -287,6 +298,15 @@ export default function UploadPage() {
                     </Button>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+           {/* Record Video */}
+          <TabsContent value="record">
+            <Card className="glass-card">
+              <CardContent className="p-8 space-y-6">
+                <VideoRecorder onUploadComplete={handleSubmit} isSubmitting={uploadMutation.isPending} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -311,7 +331,7 @@ export default function UploadPage() {
                 </div>
 
                 <Button
-                  onClick={handleSubmit}
+                  onClick={() => handleSubmit()}
                   disabled={uploadMutation.isPending || !textContent.trim()}
                   className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground text-lg py-6 neon-glow"
                   size="lg"
