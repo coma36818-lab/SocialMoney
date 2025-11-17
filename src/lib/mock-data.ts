@@ -1,4 +1,4 @@
-import type { Post, User, Message } from './types';
+import type { Post, User, Message, Comment, CommentReply, CommentLike, Like } from './types';
 import {faker} from '@faker-js/faker';
 
 const createMockUser = (email: string, nickname: string, avatar?: string): User => ({
@@ -18,6 +18,7 @@ const createMockUser = (email: string, nickname: string, avatar?: string): User 
     likes_received: faker.number.int({ min: 100, max: 5000 }),
     balance: faker.number.float({ min: 10, max: 1000, precision: 0.01 }),
     total_earnings: faker.number.float({ min: 100, max: 10000, precision: 0.01 }),
+    created_date: faker.date.past().toISOString(),
 });
 
 export const mockUsers: User[] = [
@@ -29,7 +30,7 @@ export const mockUsers: User[] = [
 
 export const mockPosts: Post[] = [
     {
-        id: faker.string.uuid(),
+        id: 'post-1',
         created_by: 'mario.rossi@email.com',
         owner_id: mockUsers.find(u => u.email === 'mario.rossi@email.com')!.id,
         created_date: faker.date.recent({ days: 1 }).toISOString(),
@@ -40,17 +41,18 @@ export const mockPosts: Post[] = [
         earnings: faker.number.float({ min: 0.5, max: 5, precision: 0.01 }),
     },
     {
-        id: faker.string.uuid(),
+        id: 'post-2',
         created_by: 'anna.verdi@email.com',
         owner_id: mockUsers.find(u => u.email === 'anna.verdi@email.com')!.id,
         created_date: faker.date.recent({ days: 2 }).toISOString(),
-        media_type: 'text',
+        media_type: 'image',
+        media_url: 'https://picsum.photos/seed/book/800/600',
         description: 'Oggi ho letto un libro fantastico. "Il nome della rosa" di Umberto Eco. Qual è il vostro libro preferito?',
         likes_count: faker.number.int({ min: 20, max: 150 }),
         earnings: faker.number.float({ min: 0.2, max: 1.5, precision: 0.01 }),
     },
     {
-        id: faker.string.uuid(),
+        id: 'post-3',
         created_by: 'luca.bianchi@email.com',
         owner_id: mockUsers.find(u => u.email === 'luca.bianchi@email.com')!.id,
         created_date: faker.date.recent({ days: 3 }).toISOString(),
@@ -61,7 +63,7 @@ export const mockPosts: Post[] = [
         earnings: faker.number.float({ min: 1, max: 8, precision: 0.01 }),
     },
     {
-        id: faker.string.uuid(),
+        id: 'post-4',
         created_by: 'mario.rossi@email.com',
         owner_id: mockUsers.find(u => u.email === 'mario.rossi@email.com')!.id,
         created_date: faker.date.recent({ days: 5 }).toISOString(),
@@ -80,8 +82,8 @@ for (let i = 0; i < 6; i++) {
         created_by: 'user@test.com',
         owner_id: mockUsers.find(u => u.email === 'user@test.com')!.id,
         created_date: faker.date.recent({ days: i + 1 }).toISOString(),
-        media_type: faker.helpers.arrayElement(['image', 'text']),
-        media_url: i % 2 === 0 ? `https://picsum.photos/seed/test${i}/800/800` : undefined,
+        media_type: 'image',
+        media_url: `https://picsum.photos/seed/test${i}/800/800`,
         description: faker.lorem.paragraph(),
         likes_count: faker.number.int({ min: 10, max: 100 }),
         earnings: faker.number.float({ min: 0.1, max: 1, precision: 0.01 }),
@@ -114,3 +116,35 @@ export const mockMessages: Message[] = [
         read: true,
     }
 ];
+
+export const mockComments: Comment[] = [
+    {
+        id: 'comment-1',
+        post_id: 'post-1',
+        user_email: 'anna.verdi@email.com',
+        user_name: 'Anna Verdi',
+        comment_text: 'Che vista spettacolare!',
+        created_date: faker.date.recent({ days: 1 }).toISOString(),
+    }
+];
+export const mockCommentReplies: CommentReply[] = [];
+export const mockCommentLikes: CommentLike[] = [];
+
+export const mockLikes: Like[] = [
+    {
+        id: faker.string.uuid(),
+        post_id: 'post-1',
+        post_owner_email: 'mario.rossi@email.com',
+        like_value: 0.01,
+        created_by: 'anna.verdi@email.com',
+    },
+    {
+        id: faker.string.uuid(),
+        post_id: 'post-1',
+        post_owner_email: 'mario.rossi@email.com',
+        like_value: 0.01,
+        created_by: 'luca.bianchi@email.com',
+    }
+];
+
+    

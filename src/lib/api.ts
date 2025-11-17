@@ -1,11 +1,15 @@
 'use client';
-import { mockPosts, mockUsers, mockMessages } from './mock-data';
-import type { Like, Notification, Post, Transaction, User, Message } from './types';
+import { mockPosts, mockUsers, mockMessages, mockComments, mockCommentReplies, mockCommentLikes, mockLikes } from './mock-data';
+import type { Like, Notification, Post, Transaction, User, Message, Comment, CommentReply, CommentLike } from './types';
 import { faker } from '@faker-js/faker';
 
 const CURRENT_USER_KEY = 'connect_now_user';
 const USERS_KEY = 'connect_now_users';
 const POSTS_KEY = 'connect_now_posts';
+const LIKES_KEY = 'connect_now_likes';
+const COMMENTS_KEY = 'connect_now_comments';
+const COMMENT_REPLIES_KEY = 'connect_now_comment_replies';
+const COMMENT_LIKES_KEY = 'connect_now_comment_likes';
 const TRANSACTIONS_KEY = 'connect_now_transactions';
 const MESSAGES_KEY = 'connect_now_messages';
 
@@ -27,6 +31,10 @@ const initializeData = <T>(key: string, initialData: T): T => {
 
 let users: User[] = initializeData(USERS_KEY, mockUsers);
 let posts: Post[] = initializeData(POSTS_KEY, mockPosts);
+let likes: Like[] = initializeData(LIKES_KEY, mockLikes);
+let comments: Comment[] = initializeData(COMMENTS_KEY, mockComments);
+let commentReplies: CommentReply[] = initializeData(COMMENT_REPLIES_KEY, mockCommentReplies);
+let commentLikes: CommentLike[] = initializeData(COMMENT_LIKES_KEY, mockCommentLikes);
 let transactions: Transaction[] = initializeData(TRANSACTIONS_KEY, []);
 let messages: Message[] = initializeData(MESSAGES_KEY, mockMessages);
 
@@ -71,7 +79,7 @@ export const base44 = {
         }
         throw new Error('Invalid credentials');
     },
-    signup: async (data: Omit<User, 'id' | 'full_name' | 'likes_available' | 'likes_received' | 'balance' | 'total_earnings'>): Promise<User> => {
+    signup: async (data: Omit<User, 'id' | 'full_name' | 'likes_available' | 'likes_received' | 'balance' | 'total_earnings' | 'created_date'>): Promise<User> => {
         if(users.some(u => u.email === data.email)) {
             throw new Error('User already exists');
         }
@@ -83,6 +91,7 @@ export const base44 = {
             likes_received: 0,
             balance: 0,
             total_earnings: 0,
+            created_date: new Date().toISOString(),
         };
         users.push(newUser);
         saveData(USERS_KEY, users);
@@ -108,10 +117,7 @@ export const base44 = {
         return user;
     },
     redirectToLogin: (url: string) => {
-        // This is a mock. In a real app, you'd use the router.
-        // The calling component will handle redirection.
         console.log(`Redirecting to login, return to: ${url}`);
-        // In components, this will be replaced with `router.push('/login')`
     }
   },
   entities: {
@@ -123,7 +129,7 @@ export const base44 = {
         }
         return limit ? sortedPosts.slice(0, limit) : sortedPosts;
       },
-      filter: async (filter: Partial<Post>, sort: string): Promise<Post[]> => {
+      filter: async (filter: Partial<Post>, sort?: string): Promise<Post[]> => {
         let filteredPosts = posts.filter(p => Object.entries(filter).every(([key, value]) => p[key as keyof Post] === value));
         if (sort === '-created_date') {
           filteredPosts.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
@@ -177,6 +183,9 @@ export const base44 = {
       },
     },
     Like: {
+      filter: async (filter: Partial<Like>): Promise<Like[]> => {
+        return likes.filter(l => Object.entries(filter).every(([key, value]) => l[key as keyof Like] === value));
+      },
       create: async (data: Omit<Like, 'id' | 'created_by'>): Promise<Like> => {
         const userEmail = localStorage.getItem(CURRENT_USER_KEY);
         if(!userEmail) throw new Error('Not authenticated');
@@ -186,7 +195,51 @@ export const base44 = {
             id: faker.string.uuid(),
             created_by: userEmail
         };
-        // In a real app, we would save this. Here we just return it.
+        likes.push(newLike);
+        saveData(LIKES_KEY, likes);
+        return newLike;
+      },
+    },
+    Comment: {
+       filter: async (filter: Partial<Comment>, sort?: string): Promise<Comment[]> => {
+        let filteredComments = comments.filter(c => Object.entries(filter).every(([key, value]) => c[key as keyof Comment] === value));
+        if (sort === '-created_date') {
+          filteredComments.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
+        }
+        return filteredComments;
+      },
+      create: async (data: Omit<Comment, 'id' | 'created_date'>): Promise<Comment> => {
+        const newComment: Comment = {
+          ...data,
+          id: faker.string.uuid(),
+          created_date: new Date().toISOString(),
+        };
+        comments.unshift(newComment);
+        saveData(COMMENTS_KEY, comments);
+        return newComment;
+      },
+    },
+     CommentReply: {
+      create: async (data: Omit<CommentReply, 'id' | 'created_date'>): Promise<CommentReply> => {
+        const newReply: CommentReply = {
+          ...data,
+          id: faker.string.uuid(),
+          created_date: new Date().toISOString(),
+        };
+        commentReplies.unshift(newReply);
+        saveData(COMMENT_REPLIES_KEY, commentReplies);
+        return newReply;
+      },
+    },
+    CommentLike: {
+       create: async (data: Omit<CommentLike, 'id' | 'created_date'>): Promise<CommentLike> => {
+        const newLike: CommentLike = {
+          ...data,
+          id: faker.string.uuid(),
+          created_date: new Date().toISOString(),
+        };
+        commentLikes.unshift(newLike);
+        saveData(COMMENT_LIKES_KEY, commentLikes);
         return newLike;
       },
     },
@@ -260,3 +313,5 @@ export const base44 = {
     }
   },
 };
+
+    
