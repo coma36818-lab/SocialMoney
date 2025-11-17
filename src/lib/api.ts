@@ -96,6 +96,26 @@ export const base44 = {
         if(users.some(u => u.email === data.email)) {
             throw new Error('User already exists');
         }
+
+        let startingLikes = 20; // Default starting likes
+        
+        // Referral logic
+        if (data.referred_by) {
+            const referrer = users.find(u => u.referralCode === data.referred_by);
+            if (referrer) {
+                // Bonus for new user
+                startingLikes += 10;
+                
+                // Bonus for referrer
+                const updatedReferrer: User = {
+                    ...referrer,
+                    likeBalance: (referrer.likeBalance || 0) + 50,
+                    likes_available: (referrer.likes_available || 0) + 50,
+                };
+                users = users.map(u => u.id === referrer.id ? updatedReferrer : u);
+            }
+        }
+        
         const newUser: User = {
             id: faker.string.uuid(),
             username: data.nickname,
@@ -107,16 +127,20 @@ export const base44 = {
             country: data.country,
             region: data.region,
             referredBy: data.referred_by || null,
-            likeBalance: 20, // Starting likes
+            likeBalance: startingLikes,
+            likes_available: startingLikes,
             totalLikesReceived: 0,
             totalLikesSent: 0,
             walletBalance: 0,
             createdAt: new Date().toISOString(),
+            created_date: new Date().toISOString(),
             referralCode: faker.string.alphanumeric(8),
             accountStatus: 'active',
         };
+        
         users.push(newUser);
         saveData(USERS_KEY, users);
+
         if (typeof window !== 'undefined') {
             localStorage.setItem(CURRENT_USER_KEY, newUser.email);
         }
@@ -255,6 +279,7 @@ export const base44 = {
         updateUser(fromUser.id, { 
             totalLikesSent: (fromUser.totalLikesSent || 0) + 1,
             likeBalance: (fromUser.likeBalance || 0) - 1,
+            likes_available: (fromUser.likes_available || 1) - 1,
         });
         
         let toUser = users.find(u => u.id === data.toUser);
@@ -262,6 +287,9 @@ export const base44 = {
             updateUser(toUser.id, {
                  totalLikesReceived: (toUser.totalLikesReceived || 0) + 1,
                  walletBalance: (toUser.walletBalance || 0) + data.value,
+                 balance: (toUser.balance || 0) + data.value,
+                 likes_received: (toUser.likes_received || 0) + 1,
+                 total_earnings: (toUser.total_earnings || 0) + data.value,
             });
         }
         
@@ -334,6 +362,7 @@ export const base44 = {
           ...data,
           id: faker.string.uuid(),
           createdAt: new Date().toISOString(),
+          created_date: new Date().toISOString(),
         };
         transactions.unshift(newTransaction);
         saveData(TRANSACTIONS_KEY, transactions);
@@ -409,3 +438,5 @@ export const base44 = {
     }
   },
 }
+
+    

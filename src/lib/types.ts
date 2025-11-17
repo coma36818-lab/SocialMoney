@@ -1,8 +1,4 @@
 
-
-
-
-
 export type User = {
   id: string; // Firestore document ID
   username: string;
@@ -131,3 +127,5 @@ export type Like = {
   like_value: number;
   created_by: string;
 };
+
+    
