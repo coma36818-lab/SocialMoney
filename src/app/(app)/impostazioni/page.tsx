@@ -39,11 +39,6 @@ export default function Impostazioni() {
   useEffect(() => {
     const isDark = localStorage.getItem('theme') !== 'light';
     setDarkMode(isDark);
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
     loadUser();
   }, []);
 
