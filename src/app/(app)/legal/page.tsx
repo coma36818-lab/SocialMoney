@@ -7,14 +7,14 @@ import { FileText, Shield, CreditCard, Info } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const LegalContent = ({ title, children, icon: Icon, iconClass }: { title: string, children: React.ReactNode, icon: React.ElementType, iconClass: string }) => (
-    <Card className="glass-card border-white/5">
+    <Card className="glass-card">
         <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
+            <CardTitle className="flex items-center gap-2 text-foreground">
                 <Icon className={`w-5 h-5 ${iconClass}`} />
                 {title}
             </CardTitle>
         </CardHeader>
-        <CardContent className="prose prose-invert max-w-none prose-p:text-gray-300 prose-headings:text-white prose-p:leading-relaxed prose-h3:text-xl prose-h3:font-bold prose-h3:text-white prose-h3:mt-6 space-y-4">
+        <CardContent className="prose prose-invert dark:prose-invert max-w-none prose-p:text-muted-foreground prose-headings:text-foreground prose-p:leading-relaxed prose-h3:text-xl prose-h3:font-bold prose-h3:text-foreground prose-h3:mt-6 space-y-4">
             {children}
         </CardContent>
     </Card>
@@ -30,24 +30,24 @@ export default function LegalPage() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-[#111111] text-white">
+        <div className="min-h-screen bg-background text-foreground">
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#3D9DF7] to-[#5ba8f7] rounded-2xl mb-4">
                         <FileText className="w-8 h-8 text-white" />
                     </div>
-                    <h1 className="text-4xl font-bold text-white mb-2">
+                    <h1 className="text-4xl font-bold text-foreground mb-2">
                         Documenti <span className="text-[#3D9DF7]">Legali</span>
                     </h1>
-                    <p className="text-gray-400">Termini, privacy e politiche della piattaforma</p>
+                    <p className="text-muted-foreground">Termini, privacy e politiche della piattaforma</p>
                 </motion.div>
 
                 <Tabs defaultValue={defaultTab} className="w-full">
-                     <TabsList className="grid w-full grid-cols-4 mb-8 bg-white/5">
-                        <TabsTrigger value="terms">Termini</TabsTrigger>
-                        <TabsTrigger value="privacy">Privacy</TabsTrigger>
-                        <TabsTrigger value="payment">Pagamenti</TabsTrigger>
-                        <TabsTrigger value="rules">Regole</TabsTrigger>
+                     <TabsList className="grid w-full grid-cols-4 mb-8 bg-muted text-muted-foreground">
+                        <TabsTrigger value="terms" className="data-[state=active]:bg-card data-[state=active]:text-foreground">Termini</TabsTrigger>
+                        <TabsTrigger value="privacy" className="data-[state=active]:bg-card data-[state=active]:text-foreground">Privacy</TabsTrigger>
+                        <TabsTrigger value="payment" className="data-[state=active]:bg-card data-[state=active]:text-foreground">Pagamenti</TabsTrigger>
+                        <TabsTrigger value="rules" className="data-[state=active]:bg-card data-[state=active]:text-foreground">Regole</TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="terms">

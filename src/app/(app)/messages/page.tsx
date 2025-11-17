@@ -168,34 +168,34 @@ export default function Messaggi() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#111111] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="animate-spin h-12 w-12 text-primary mx-auto mb-4" />
-          <p className="text-gray-400">Caricamento...</p>
+          <p className="text-muted-foreground">Caricamento...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#111111]">
+    <div className="min-h-screen bg-background">
       <div className="h-[calc(100vh-5rem)] max-w-7xl mx-auto px-4 py-8">
         <div className="h-full grid md:grid-cols-3 gap-6">
           {/* Sidebar - Conversazioni */}
           <div className="md:col-span-1">
-            <Card className="glass-card border-white/5 h-full flex flex-col">
+            <Card className="glass-card h-full flex flex-col">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <MessageCircle className="w-5 h-5 text-[#FF0055]" />
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <MessageCircle className="w-5 h-5 text-primary" />
                   Messaggi
                 </CardTitle>
                 <div className="relative mt-4">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Cerca utenti..."
-                    className="pl-10 bg-white/5 border-white/10 text-white"
+                    className="pl-10 bg-muted/50 border-border text-foreground"
                   />
                 </div>
               </CardHeader>
@@ -209,22 +209,22 @@ export default function Messaggi() {
                           handleSelectUser(u.email);
                           setSearchQuery("");
                         }}
-                        className="w-full p-4 flex items-center gap-3 hover:bg-white/5 transition-colors"
+                        className="w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors"
                       >
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#FF0055] to-[#ff3366] rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary to-[#ff3366] rounded-full flex items-center justify-center">
+                          <User className="w-5 h-5 text-primary-foreground" />
                         </div>
                         <div className="flex-1 text-left">
-                          <p className="font-medium text-white text-sm">{u.full_name}</p>
-                          <p className="text-xs text-gray-500">{u.email}</p>
+                          <p className="font-medium text-foreground text-sm">{u.full_name}</p>
+                          <p className="text-xs text-muted-foreground">{u.email}</p>
                         </div>
                       </button>
                     ))}
                   </div>
                 ) : conversations.length === 0 ? (
                   <div className="p-8 text-center">
-                    <MessageCircle className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                    <p className="text-gray-400 text-sm">Nessuna conversazione</p>
+                    <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground text-sm">Nessuna conversazione</p>
                   </div>
                 ) : (
                   <div className="space-y-1">
@@ -232,23 +232,23 @@ export default function Messaggi() {
                       <button
                         key={conv.email}
                         onClick={() => handleSelectUser(conv.email)}
-                        className={`w-full p-4 flex items-center gap-3 hover:bg-white/5 transition-colors ${
-                          selectedUser === conv.email ? "bg-white/10" : ""
+                        className={`w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors ${
+                          selectedUser === conv.email ? "bg-muted" : ""
                         }`}
                       >
                         <div className="relative">
-                          <div className="w-12 h-12 bg-gradient-to-br from-[#FF0055] to-[#ff3366] rounded-full flex items-center justify-center">
-                            <User className="w-6 h-6 text-white" />
+                          <div className="w-12 h-12 bg-gradient-to-br from-primary to-[#ff3366] rounded-full flex items-center justify-center">
+                            <User className="w-6 h-6 text-primary-foreground" />
                           </div>
                           {conv.unreadCount > 0 && (
-                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#FFD700] rounded-full flex items-center justify-center">
-                              <span className="text-xs font-bold text-black">{conv.unreadCount}</span>
+                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
+                              <span className="text-xs font-bold text-accent-foreground">{conv.unreadCount}</span>
                             </div>
                           )}
                         </div>
                         <div className="flex-1 text-left min-w-0">
-                          <p className="font-medium text-white text-sm">{conv.email.split('@')[0]}</p>
-                          <p className="text-xs text-gray-400 truncate">
+                          <p className="font-medium text-foreground text-sm">{conv.email.split('@')[0]}</p>
+                          <p className="text-xs text-muted-foreground truncate">
                             {conv.lastMessage.message}
                           </p>
                         </div>
@@ -262,17 +262,17 @@ export default function Messaggi() {
 
           {/* Chat Area */}
           <div className="md:col-span-2">
-            <Card className="glass-card border-white/5 h-full flex flex-col">
+            <Card className="glass-card h-full flex flex-col">
               {selectedUser ? (
                 <>
-                  <CardHeader className="border-b border-white/5">
+                  <CardHeader className="border-b border-border">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-[#FF0055] to-[#ff3366] rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-white" />
+                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-[#ff3366] rounded-full flex items-center justify-center">
+                        <User className="w-5 h-5 text-primary-foreground" />
                       </div>
                       <div>
-                        <p className="font-semibold text-white">{selectedUser.split('@')[0]}</p>
-                        <p className="text-xs text-gray-500">{selectedUser}</p>
+                        <p className="font-semibold text-foreground">{selectedUser.split('@')[0]}</p>
+                        <p className="text-xs text-muted-foreground">{selectedUser}</p>
                       </div>
                     </div>
                   </CardHeader>
@@ -289,13 +289,13 @@ export default function Messaggi() {
                             <div
                               className={`rounded-2xl px-4 py-2 ${
                                 isMe
-                                  ? "bg-gradient-to-r from-[#FF0055] to-[#ff3366] text-white"
-                                  : "bg-white/5 text-white"
+                                  ? "bg-gradient-to-r from-primary to-[#ff3366] text-primary-foreground"
+                                  : "bg-muted text-foreground"
                               }`}
                             >
                               <p className="break-words">{msg.message}</p>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1 px-2">
+                            <p className="text-xs text-muted-foreground mt-1 px-2">
                               {format(new Date(msg.created_date), "HH:mm", { locale: it })}
                             </p>
                           </div>
@@ -305,19 +305,19 @@ export default function Messaggi() {
                     <div ref={messagesEndRef} />
                   </CardContent>
 
-                  <div className="border-t border-white/5 p-4">
+                  <div className="border-t border-border p-4">
                     <form onSubmit={handleSendMessage} className="flex items-center gap-2">
                       <EmojiPicker onEmojiSelect={(emoji) => setMessageText(prev => prev + emoji)} />
                       <Input
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
                         placeholder="Scrivi un messaggio..."
-                        className="flex-1 bg-white/5 border-white/10 text-white"
+                        className="flex-1 bg-muted/50 border-border text-foreground"
                       />
                       <Button
                         type="submit"
                         disabled={!messageText.trim() || sendMessageMutation.isPending}
-                        className="bg-gradient-to-r from-[#FF0055] to-[#ff3366] hover:opacity-90 text-white"
+                        className="bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground"
                       >
                         <Send className="w-4 h-4" />
                       </Button>
@@ -327,9 +327,9 @@ export default function Messaggi() {
               ) : (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
-                    <MessageCircle className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-white mb-2">Seleziona una conversazione</h3>
-                    <p className="text-gray-400">Scegli un utente per iniziare a chattare</p>
+                    <MessageCircle className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-foreground mb-2">Seleziona una conversazione</h3>
+                    <p className="text-muted-foreground">Scegli un utente per iniziare a chattare</p>
                   </div>
                 </div>
               )}
@@ -340,5 +340,3 @@ export default function Messaggi() {
     </div>
   );
 }
-
-    

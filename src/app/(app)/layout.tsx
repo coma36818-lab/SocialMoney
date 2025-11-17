@@ -13,6 +13,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
 
   useEffect(() => {
+    const isDark = localStorage.getItem('theme') === 'dark';
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    }
     const checkAuth = async () => {
       try {
         const userData = await base44.auth.me();
@@ -37,7 +41,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#111111]">
+    <div className="min-h-screen bg-background">
       <AppHeader user={user} />
       <main className="pt-16 md:pt-20 min-h-screen">
         {children}

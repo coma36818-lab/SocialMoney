@@ -7,10 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Mail, Lock, Trash2, Save, AlertCircle, Moon, Sun, Loader2 } from "lucide-react";
+import { User, Mail, Lock, Trash2, Save, Moon, Sun, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { base44 } from "@/lib/api";
@@ -38,8 +37,11 @@ export default function Impostazioni() {
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
-    const isDark = localStorage.getItem('theme') !== 'light';
+    const isDark = localStorage.getItem('theme') === 'dark';
     setDarkMode(isDark);
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    }
     loadUser();
   }, []);
 
@@ -123,39 +125,39 @@ export default function Impostazioni() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#111111] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="animate-spin h-12 w-12 text-primary mx-auto mb-4" />
-          <p className="text-gray-400">Caricamento...</p>
+          <p className="text-muted-foreground">Caricamento...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#111111] p-4 sm:p-8">
+    <div className="min-h-screen bg-background p-4 sm:p-8">
        <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
+          <h1 className="text-4xl font-bold text-foreground mb-2">
             <span className="text-primary">Impostazioni</span>
           </h1>
-          <p className="text-gray-400">Gestisci il tuo account e le preferenze</p>
+          <p className="text-muted-foreground">Gestisci il tuo account e le preferenze</p>
         </motion.div>
 
         <div className="space-y-6">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                <Card className="glass-card border-white/5">
+                <Card className="glass-card">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-white">
-                    {darkMode ? <Moon className="w-5 h-5 text-[#3D9DF7]" /> : <Sun className="w-5 h-5 text-[#FFD700]" />}
+                    <CardTitle className="flex items-center gap-2 text-foreground">
+                    {darkMode ? <Moon className="w-5 h-5 text-[#3D9DF7]" /> : <Sun className="w-5 h-5 text-yellow-500" />}
                     Aspetto
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="flex items-center justify-between">
                     <div>
-                        <p className="font-medium text-white">Tema Scuro</p>
-                        <p className="text-sm text-gray-400">Attiva/disattiva il tema scuro</p>
+                        <p className="font-medium text-foreground">Tema Scuro</p>
+                        <p className="text-sm text-muted-foreground">Attiva/disattiva il tema scuro</p>
                     </div>
                     <Switch
                         checked={darkMode}
@@ -168,9 +170,9 @@ export default function Impostazioni() {
             </motion.div>
 
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-            <Card className="glass-card border-white/5">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                   <User className="w-5 h-5 text-primary" />
                   Informazioni Profilo
                 </CardTitle>
@@ -184,7 +186,7 @@ export default function Impostazioni() {
                         <Avatar className="w-32 h-32 border-4 border-primary/50 hover:border-primary transition-colors">
                             <AvatarImage src={avatarPreview ?? undefined} alt="Avatar" className="object-cover" />
                             <AvatarFallback className="bg-muted-foreground">
-                                <User className="w-16 h-16 text-white" />
+                                <User className="w-16 h-16 text-foreground" />
                             </AvatarFallback>
                         </Avatar>
                     </label>
@@ -194,23 +196,23 @@ export default function Impostazioni() {
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="full_name" className="text-gray-300">Nickname</Label>
+                      <Label htmlFor="full_name" className="text-muted-foreground">Nickname</Label>
                       <Input
                         id="full_name"
                         value={formData.full_name}
                         onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                        className="bg-white/5 border-white/10 text-white mt-2"
+                        className="bg-muted/30 border-border text-foreground mt-2"
                         placeholder="Il tuo nome"
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="gender" className="text-gray-300">Genere</Label>
+                      <Label htmlFor="gender" className="text-muted-foreground">Genere</Label>
                       <Select
                         value={formData.gender}
                         onValueChange={(value) => setFormData({ ...formData, gender: value })}
                       >
-                        <SelectTrigger className="bg-white/5 border-white/10 text-white mt-2">
+                        <SelectTrigger className="bg-muted/30 border-border text-foreground mt-2">
                           <SelectValue placeholder="Seleziona" />
                         </SelectTrigger>
                         <SelectContent>
@@ -224,13 +226,13 @@ export default function Impostazioni() {
                   </div>
 
                   <div>
-                    <Label htmlFor="bio" className="text-gray-300">Bio</Label>
+                    <Label htmlFor="bio" className="text-muted-foreground">Bio</Label>
                     <div className="relative">
                         <Textarea
                         id="bio"
                         value={formData.bio}
                         onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                        className="bg-white/5 border-white/10 text-white mt-2 min-h-[100px]"
+                        className="bg-muted/30 border-border text-foreground mt-2 min-h-[100px]"
                         placeholder="Racconta qualcosa di te..."
                         />
                         <div className="absolute bottom-1 right-1">
@@ -240,12 +242,12 @@ export default function Impostazioni() {
                   </div>
                   
                   <div>
-                    <Label htmlFor="relationship_status" className="text-gray-300">Stato Sentimentale</Label>
+                    <Label htmlFor="relationship_status" className="text-muted-foreground">Stato Sentimentale</Label>
                     <Select
                       value={formData.relationship_status}
                       onValueChange={(value) => setFormData({ ...formData, relationship_status: value })}
                     >
-                      <SelectTrigger className="bg-white/5 border-white/10 text-white mt-2">
+                      <SelectTrigger className="bg-muted/30 border-border text-foreground mt-2">
                         <SelectValue placeholder="Seleziona" />
                       </SelectTrigger>
                       <SelectContent>
@@ -260,35 +262,35 @@ export default function Impostazioni() {
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="city" className="text-gray-300">Città</Label>
+                      <Label htmlFor="city" className="text-muted-foreground">Città</Label>
                       <Input
                         id="city"
                         value={formData.city}
                         onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        className="bg-white/5 border-white/10 text-white mt-2"
+                        className="bg-muted/30 border-border text-foreground mt-2"
                         placeholder="Es: Roma"
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="region" className="text-gray-300">Regione</Label>
+                      <Label htmlFor="region" className="text-muted-foreground">Regione</Label>
                       <Input
                         id="region"
                         value={formData.region}
                         onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                        className="bg-white/5 border-white/10 text-white mt-2"
+                        className="bg-muted/30 border-border text-foreground mt-2"
                         placeholder="Es: Lazio"
                       />
                     </div>
                   </div>
 
                    <div>
-                      <Label htmlFor="country" className="text-gray-300">Paese</Label>
+                      <Label htmlFor="country" className="text-muted-foreground">Paese</Label>
                       <Input
                         id="country"
                         value={formData.country}
                         onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                        className="bg-white/5 border-white/10 text-white mt-2"
+                        className="bg-muted/30 border-border text-foreground mt-2"
                         placeholder="Es: Italia"
                       />
                     </div>
@@ -313,27 +315,27 @@ export default function Impostazioni() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="glass-card border-white/5">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                   <Mail className="w-5 h-5 text-[#3D9DF7]" />
                   Informazioni Account
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-gray-400 text-sm">Email</Label>
-                  <p className="text-white font-medium mt-1">{user.email}</p>
+                  <Label className="text-muted-foreground text-sm">Email</Label>
+                  <p className="text-foreground font-medium mt-1">{user.email}</p>
                 </div>
                  {user.role && (
                   <div>
-                    <Label className="text-gray-400 text-sm">Ruolo</Label>
-                    <p className="text-white font-medium mt-1 capitalize">{user.role}</p>
+                    <Label className="text-muted-foreground text-sm">Ruolo</Label>
+                    <p className="text-foreground font-medium mt-1 capitalize">{user.role}</p>
                   </div>
                  )}
                 <div>
-                  <Label className="text-gray-400 text-sm">Membro da</Label>
-                  <p className="text-white font-medium mt-1">
+                  <Label className="text-muted-foreground text-sm">Membro da</Label>
+                  <p className="text-foreground font-medium mt-1">
                     {user.created_date ? new Date(user.created_date).toLocaleDateString('it-IT') : 'N/A'}
                   </p>
                 </div>
@@ -346,20 +348,21 @@ export default function Impostazioni() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="glass-card border-white/5">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <Lock className="w-5 h-5 text-[#FFD700]" />
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Lock className="w-5 h-5 text-yellow-500" />
                   Sicurezza
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-gray-400 text-sm mb-4">
+                <p className="text-muted-foreground text-sm mb-4">
                   Gestisci password e sicurezza del tuo account
                 </p>
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
-                    className="w-full border-white/10 text-white hover:bg-white/5 bg-[#1a1a1a] border"
+                    variant="outline"
+                    className="w-full"
                   >
                     <Lock className="w-4 h-4 mr-2" />
                     Cambia Password
@@ -370,15 +373,15 @@ export default function Impostazioni() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} >
-            <Card className="glass-card border-red-500/20">
+            <Card className="glass-card border-destructive/20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-400">
+                <CardTitle className="flex items-center gap-2 text-destructive">
                   <Trash2 className="w-5 h-5" />
                   Gestione Account
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-gray-400 text-sm">
+                <p className="text-muted-foreground text-sm">
                   Una volta eliminato l'account, non c'è modo di tornare indietro. 
                   Tutti i tuoi dati saranno persi permanentemente.
                 </p>
@@ -399,5 +402,3 @@ export default function Impostazioni() {
     </div>
   );
 }
-
-    

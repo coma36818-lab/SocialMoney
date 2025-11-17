@@ -182,7 +182,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="glass-card rounded-2xl overflow-hidden hover:border-white/10 transition-all"
+      className="glass-card rounded-2xl overflow-hidden hover:border-primary/20 transition-all"
     >
       {/* Header */}
       <div className="p-4 sm:p-6 pb-4 flex items-center justify-between">
@@ -192,20 +192,20 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
         >
             <Avatar className="h-11 w-11 border-2 border-primary/50">
               <AvatarImage src={owner?.avatar} alt={owner?.full_name} className="object-cover" />
-              <AvatarFallback className="bg-muted-foreground">{getInitials(owner?.full_name || post.created_by.split('@')[0])}</AvatarFallback>
+              <AvatarFallback className="bg-muted">{getInitials(owner?.full_name || post.created_by.split('@')[0])}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-semibold text-white hover:text-primary transition-colors">
+            <p className="font-semibold text-foreground hover:text-primary transition-colors">
               {owner?.full_name || post.created_by?.split('@')[0]}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               {format(new Date(post.created_date), "d MMM yyyy · HH:mm", { locale: it })}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <div className="text-right">
-            <p className="text-sm text-gray-400">Guadagnato</p>
+            <p className="text-sm text-muted-foreground">Guadagnato</p>
             <motion.p 
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 0.5 }}
@@ -219,7 +219,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
               onClick={onDelete}
               variant="ghost"
               size="icon"
-              className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+              className="text-destructive hover:text-destructive/80 hover:bg-destructive/10"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -234,7 +234,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
           animate={{ opacity: 1 }}
           className="px-4 sm:px-6 py-8"
         >
-          <p className="text-white text-base sm:text-lg whitespace-pre-wrap leading-relaxed">
+          <p className="text-foreground text-base sm:text-lg whitespace-pre-wrap leading-relaxed">
             {post.description}
           </p>
         </motion.div>
@@ -243,7 +243,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
           <motion.div 
             whileHover={{ scale: 1.01 }}
             transition={{ duration: 0.2 }}
-            className="relative aspect-video bg-gradient-to-br from-gray-900 to-black overflow-hidden"
+            className="relative aspect-video bg-muted/50 overflow-hidden"
           >
             {post.media_type === "image" ? (
               <Image
@@ -263,7 +263,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
 
           {post.description && (
             <div className="px-4 sm:px-6 pt-4">
-              <p className="text-gray-300 text-sm sm:text-base">{post.description}</p>
+              <p className="text-muted-foreground text-sm sm:text-base">{post.description}</p>
             </div>
           )}
         </>
@@ -289,7 +289,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <MessageCircle className="w-5 h-5" />
               <span className="text-sm font-medium">{comments.length}</span>
@@ -300,29 +300,29 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
               <DropdownMenuTrigger asChild>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Share2 className="w-5 h-5" />
                   <span className="text-sm font-medium hidden sm:inline">Condividi</span>
                 </motion.button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-[#1a1a1a] border-white/10">
-                <DropdownMenuItem onClick={() => handleShare('whatsapp')} className="text-white hover:bg-white/10 cursor-pointer">
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleShare('whatsapp')} className="cursor-pointer">
                   💬 WhatsApp
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleShare('facebook')} className="text-white hover:bg-white/10 cursor-pointer">
+                <DropdownMenuItem onClick={() => handleShare('facebook')} className="cursor-pointer">
                   📘 Facebook
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleShare('twitter')} className="text-white hover:bg-white/10 cursor-pointer">
+                <DropdownMenuItem onClick={() => handleShare('twitter')} className="cursor-pointer">
                   🐦 Twitter
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleShare('telegram')} className="text-white hover:bg-white/10 cursor-pointer">
+                <DropdownMenuItem onClick={() => handleShare('telegram')} className="cursor-pointer">
                   ✈️ Telegram
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleShare('linkedin')} className="text-white hover:bg-white/10 cursor-pointer">
+                <DropdownMenuItem onClick={() => handleShare('linkedin')} className="cursor-pointer">
                   💼 LinkedIn
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleShare('copy')} className="text-white hover:bg-white/10 cursor-pointer">
+                <DropdownMenuItem onClick={() => handleShare('copy')} className="cursor-pointer">
                   🔗 Copia Link
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -333,7 +333,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 onClick={handleLike}
-                className="bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-white neon-glow text-sm sm:text-base"
+                className="bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground neon-glow text-sm sm:text-base"
               >
                 <Heart className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Invia Like (-1)</span>
@@ -341,15 +341,15 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
               </Button>
             </motion.div>
           ) : !user ? (
-            <Button disabled className="border-white/10 text-gray-400 bg-[#1a1a1a] border text-sm">
+            <Button disabled variant="outline" className="text-sm">
               Accedi
             </Button>
           ) : isOwner ? (
-            <Button disabled className="border-white/10 text-gray-400 bg-[#1a1a1a] border text-sm">
+            <Button disabled variant="outline" className="text-sm">
               Tuo post
             </Button>
           ) : (
-            <Button disabled className="border-white/10 text-gray-400 bg-[#1a1a1a] border text-sm">
+            <Button disabled variant="outline" className="text-sm">
               Esauriti
             </Button>
           )}
@@ -363,20 +363,20 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="border-t border-white/10 pt-4 space-y-4"
+              className="border-t border-border pt-4 space-y-4"
             >
               {/* Comment Form */}
               {user && (
                 <form onSubmit={handleComment} className="space-y-2">
                   {replyingTo && (
-                    <div className="flex items-center justify-between bg-white/5 px-3 py-2 rounded-lg">
-                      <span className="text-sm text-gray-400">
+                    <div className="flex items-center justify-between bg-muted/50 px-3 py-2 rounded-lg">
+                      <span className="text-sm text-muted-foreground">
                         Rispondi a {replyingTo.user_name || replyingTo.user_email.split('@')[0]}
                       </span>
                       <button
                         type="button"
                         onClick={() => setReplyingTo(null)}
-                        className="text-gray-500 hover:text-white"
+                        className="text-muted-foreground hover:text-foreground"
                       >
                         ✕
                       </button>
@@ -387,14 +387,14 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
                       placeholder="Scrivi un commento..."
-                      className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                      className="flex-1 bg-muted/50 border-border text-foreground placeholder:text-muted-foreground"
                     />
                     <EmojiPicker onEmojiSelect={handleEmojiSelect} />
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button
                         type="submit"
                         disabled={!commentText.trim() || addCommentMutation.isPending}
-                        className="bg-gradient-to-r from-[#3D9DF7] to-[#5ba8f7] hover:opacity-90 text-white"
+                        className="bg-gradient-to-r from-blue-500 to-sky-400 hover:opacity-90 text-white"
                       >
                         <Send className="w-4 h-4" />
                       </Button>
@@ -411,36 +411,36 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                    className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
                   >
                     <div className="flex gap-3">
                       <div 
-                        className="w-8 h-8 bg-gradient-to-br from-[#3D9DF7] to-[#5ba8f7] rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer"
+                        className="w-8 h-8 bg-gradient-to-br from-blue-500 to-sky-400 rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer"
                         onClick={() => handleProfileClick(comment.user_email)}
                       >
                         <User className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1">
                         <p 
-                          className="font-semibold text-white text-sm cursor-pointer hover:text-[#3D9DF7] transition-colors"
+                          className="font-semibold text-foreground text-sm cursor-pointer hover:text-blue-500 transition-colors"
                           onClick={() => handleProfileClick(comment.user_email)}
                         >
                           {comment.user_name || comment.user_email.split('@')[0]}
                         </p>
-                        <p className="text-gray-300 text-sm mt-1">{comment.comment_text}</p>
+                        <p className="text-muted-foreground text-sm mt-1">{comment.comment_text}</p>
                         <div className="flex items-center gap-3 mt-2">
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             {format(new Date(comment.created_date), "d MMM · HH:mm", { locale: it })}
                           </p>
                           <button
                             onClick={() => likeCommentMutation.mutate(comment.id)}
-                            className="text-xs text-gray-400 hover:text-accent transition-colors flex items-center gap-1"
+                            className="text-xs text-muted-foreground hover:text-accent transition-colors flex items-center gap-1"
                           >
                             <ThumbsUp className="w-3 h-3" /> Mi piace
                           </button>
                           <button
                             onClick={() => setReplyingTo(comment)}
-                            className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1"
+                            className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
                           >
                             <Reply className="w-3 h-3" /> Rispondi
                           </button>
@@ -450,7 +450,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
                   </motion.div>
                 ))}
                 {comments.length === 0 && (
-                  <p className="text-center text-gray-500 text-sm py-4">
+                  <p className="text-center text-muted-foreground text-sm py-4">
                     Nessun commento ancora. Sii il primo a commentare!
                   </p>
                 )}
@@ -462,13 +462,13 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
 
       {/* Likes Modal */}
       <Dialog open={showLikesModal} onOpenChange={setShowLikesModal}>
-        <DialogContent className="bg-[#1a1a1a] border-white/10 text-white sm:max-w-md">
+        <DialogContent className="bg-card border-border text-foreground sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-white">Like ricevuti ({likes.length})</DialogTitle>
+            <DialogTitle className="text-foreground">Like ricevuti ({likes.length})</DialogTitle>
           </DialogHeader>
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {likes.length === 0 ? (
-              <p className="text-center text-gray-500 py-4">Nessun like ancora</p>
+              <p className="text-center text-muted-foreground py-4">Nessun like ancora</p>
             ) : (
               (likes as Like[]).map((like, index) => (
                 <motion.div
@@ -476,7 +476,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted cursor-pointer"
                   onClick={() => {
                     setShowLikesModal(false);
                     handleProfileClick(like.created_by);
@@ -484,9 +484,9 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
                 >
                     <Avatar className="h-10 w-10 border-2 border-primary/50">
                         <AvatarImage src={undefined} alt={like.created_by} className="object-cover" />
-                        <AvatarFallback className="bg-muted-foreground">{getInitials(like.created_by)}</AvatarFallback>
+                        <AvatarFallback className="bg-muted">{getInitials(like.created_by)}</AvatarFallback>
                     </Avatar>
-                  <p className="text-white font-medium">{like.created_by?.split('@')[0]}</p>
+                  <p className="text-foreground font-medium">{like.created_by?.split('@')[0]}</p>
                 </motion.div>
               ))
             )}
@@ -496,5 +496,3 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
     </motion.div>
   );
 }
-
-    

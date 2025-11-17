@@ -141,33 +141,33 @@ export default function UploadPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#111111] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="animate-spin h-12 w-12 text-primary mx-auto mb-4" />
-          <p className="text-gray-400">Caricamento...</p>
+          <p className="text-muted-foreground">Caricamento...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#111111] p-4 flex items-center justify-center">
+    <div className="min-h-screen bg-background p-4 flex items-center justify-center">
       <div className="w-full max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-white mb-2">
+          <h1 className="text-4xl font-bold text-foreground mb-2">
             Pubblica <span className="text-primary">Contenuto</span>
           </h1>
-          <p className="text-gray-400">Carica foto, video o testo e inizia a guadagnare</p>
+          <p className="text-muted-foreground">Carica foto, video o testo e inizia a guadagnare</p>
         </div>
 
         <Tabs value={postType} onValueChange={setPostType} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-white/5">
-            <TabsTrigger value="media" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+          <TabsList className="grid w-full grid-cols-2 bg-muted text-muted-foreground">
+            <TabsTrigger value="media" className="data-[state=active]:bg-card data-[state=active]:text-foreground">
               <ImageIcon className="w-4 h-4 mr-2" />
               Media
             </TabsTrigger>
-            <TabsTrigger value="text" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+            <TabsTrigger value="text" className="data-[state=active]:bg-card data-[state=active]:text-foreground">
               <Type className="w-4 h-4 mr-2" />
               Solo Testo
             </TabsTrigger>
@@ -175,7 +175,7 @@ export default function UploadPage() {
 
           {/* Media Upload */}
           <TabsContent value="media">
-            <Card className="glass-card border-white/5">
+            <Card className="glass-card">
               <CardContent className="p-8">
                 {!preview ? (
                   <div
@@ -186,7 +186,7 @@ export default function UploadPage() {
                     className={`relative border-2 border-dashed rounded-2xl p-12 transition-all ${
                       dragActive
                         ? "border-primary bg-primary/5"
-                        : "border-white/10 hover:border-white/20"
+                        : "border-border hover:border-border/80"
                     }`}
                   >
                     <input
@@ -198,22 +198,22 @@ export default function UploadPage() {
                     
                     <div className="text-center">
                       <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-primary to-[#ff3366] rounded-2xl flex items-center justify-center neon-glow">
-                        <Upload className="w-10 h-10 text-white" />
+                        <Upload className="w-10 h-10 text-primary-foreground" />
                       </div>
                       
-                      <h3 className="text-2xl font-bold text-white mb-2">
+                      <h3 className="text-2xl font-bold text-foreground mb-2">
                         Carica Media
                       </h3>
-                      <p className="text-gray-400 mb-6">
+                      <p className="text-muted-foreground mb-6">
                         Trascina qui il file o clicca per selezionare
                       </p>
                       
-                      <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                           <ImageIcon className="w-4 h-4" />
                           <span>JPG, PNG</span>
                         </div>
-                        <div className="w-1 h-1 bg-gray-600 rounded-full" />
+                        <div className="w-1 h-1 bg-muted-foreground rounded-full" />
                         <div className="flex items-center gap-2">
                           <Video className="w-4 h-4" />
                           <span>MP4</span>
@@ -255,14 +255,14 @@ export default function UploadPage() {
 
                     {/* Description */}
                     <div>
-                      <label className="block text-white font-semibold mb-2">
+                      <label className="block text-foreground font-semibold mb-2">
                         Descrizione (opzionale)
                       </label>
                       <Textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Scrivi una descrizione per il tuo post..."
-                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 min-h-[120px]"
+                        className="bg-muted/50 border-border text-foreground placeholder:text-muted-foreground min-h-[120px]"
                       />
                     </div>
 
@@ -270,7 +270,7 @@ export default function UploadPage() {
                     <Button
                       onClick={handleSubmit}
                       disabled={uploadMutation.isPending}
-                      className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-white text-lg py-6 neon-glow"
+                      className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground text-lg py-6 neon-glow"
                       size="lg"
                     >
                       {uploadMutation.isPending ? (
@@ -293,19 +293,19 @@ export default function UploadPage() {
 
           {/* Text Post */}
           <TabsContent value="text">
-            <Card className="glass-card border-white/5">
+            <Card className="glass-card">
               <CardContent className="p-8 space-y-6">
                 <div>
-                  <label className="block text-white font-semibold mb-2">
+                  <label className="block text-foreground font-semibold mb-2">
                     Cosa vuoi condividere?
                   </label>
                   <Textarea
                     value={textContent}
                     onChange={(e) => setTextContent(e.target.value)}
                     placeholder="Scrivi i tuoi pensieri, una citazione, un annuncio..."
-                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 min-h-[300px] text-lg"
+                    className="bg-muted/50 border-border text-foreground placeholder:text-muted-foreground min-h-[300px] text-lg"
                   />
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-sm text-muted-foreground mt-2">
                     {textContent.length} caratteri
                   </p>
                 </div>
@@ -313,7 +313,7 @@ export default function UploadPage() {
                 <Button
                   onClick={handleSubmit}
                   disabled={uploadMutation.isPending || !textContent.trim()}
-                  className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-white text-lg py-6 neon-glow"
+                  className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground text-lg py-6 neon-glow"
                   size="lg"
                 >
                   {uploadMutation.isPending ? (
@@ -339,24 +339,24 @@ export default function UploadPage() {
             <div className="w-12 h-12 mx-auto mb-3 bg-accent/10 rounded-xl flex items-center justify-center">
               <span className="text-2xl">💰</span>
             </div>
-            <h4 className="font-bold text-white mb-1 text-sm">Guadagna</h4>
-            <p className="text-xs text-gray-400">€0.01 per ogni like</p>
+            <h4 className="font-bold text-foreground mb-1 text-sm">Guadagna</h4>
+            <p className="text-xs text-muted-foreground">€0.01 per ogni like</p>
           </div>
           
           <div className="glass-card rounded-xl p-4 text-center">
             <div className="w-12 h-12 mx-auto mb-3 bg-primary/10 rounded-xl flex items-center justify-center">
               <span className="text-2xl">🚀</span>
             </div>
-            <h4 className="font-bold text-white mb-1 text-sm">Viralità</h4>
-            <p className="text-xs text-gray-400">Raggiungi migliaia di utenti</p>
+            <h4 className="font-bold text-foreground mb-1 text-sm">Viralità</h4>
+            <p className="text-xs text-muted-foreground">Raggiungi migliaia di utenti</p>
           </div>
           
           <div className="glass-card rounded-xl p-4 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 bg-[#3D9DF7]/10 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 mx-auto mb-3 bg-blue-500/10 rounded-xl flex items-center justify-center">
               <span className="text-2xl">⚡</span>
             </div>
-            <h4 className="font-bold text-white mb-1 text-sm">Istantaneo</h4>
-            <p className="text-xs text-gray-400">Pubblica in pochi secondi</p>
+            <h4 className="font-bold text-foreground mb-1 text-sm">Istantaneo</h4>
+            <p className="text-xs text-muted-foreground">Pubblica in pochi secondi</p>
           </div>
         </div>
       </div>

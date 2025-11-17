@@ -58,7 +58,7 @@ export default function Cerca() {
   }
 
   return (
-    <div className="min-h-screen bg-[#111111]">
+    <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <motion.div
@@ -66,10 +66,10 @@ export default function Cerca() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold text-white mb-2">
-            <span className="text-[#FF0055]">Cerca</span> Utenti
+          <h1 className="text-4xl font-bold text-foreground mb-2">
+            <span className="text-primary">Cerca</span> Utenti
           </h1>
-          <p className="text-gray-400">Trova persone su Social Money</p>
+          <p className="text-muted-foreground">Trova persone su Social Money</p>
         </motion.div>
 
         {/* Search and Filters */}
@@ -78,16 +78,16 @@ export default function Cerca() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="glass-card border-white/5 mb-6">
+          <Card className="glass-card mb-6">
             <CardContent className="p-6 space-y-4">
               {/* Search Bar */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Cerca per nome, email, città..."
-                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                  className="pl-10 bg-muted/50 border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
 
@@ -97,14 +97,14 @@ export default function Cerca() {
                   value={filters.gender}
                   onValueChange={(value) => setFilters({ ...filters, gender: value })}
                 >
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                  <SelectTrigger className="bg-muted/50 border-border text-foreground">
                     <SelectValue placeholder="Genere" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border-white/10">
-                    <SelectItem value="all" className="text-white">Tutti</SelectItem>
-                    <SelectItem value="uomo" className="text-white">Uomo</SelectItem>
-                    <SelectItem value="donna" className="text-white">Donna</SelectItem>
-                    <SelectItem value="altro" className="text-white">Altro</SelectItem>
+                  <SelectContent>
+                    <SelectItem value="all">Tutti</SelectItem>
+                    <SelectItem value="uomo">Uomo</SelectItem>
+                    <SelectItem value="donna">Donna</SelectItem>
+                    <SelectItem value="altro">Altro</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -112,14 +112,14 @@ export default function Cerca() {
                   value={filters.city}
                   onChange={(e) => setFilters({ ...filters, city: e.target.value })}
                   placeholder="Città"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                  className="bg-muted/50 border-border text-foreground placeholder:text-muted-foreground"
                 />
 
                 <Input
                   value={filters.region}
                   onChange={(e) => setFilters({ ...filters, region: e.target.value })}
                   placeholder="Regione"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                  className="bg-muted/50 border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
             </CardContent>
@@ -133,11 +133,11 @@ export default function Cerca() {
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
             </div>
           ) : filteredUsers.length === 0 ? (
-            <Card className="glass-card border-white/5">
+            <Card className="glass-card">
               <CardContent className="p-12 text-center">
-                <Search className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-white mb-2">Nessun risultato</h3>
-                <p className="text-gray-400">Prova a modificare i filtri di ricerca</p>
+                <Search className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground mb-2">Nessun risultato</h3>
+                <p className="text-muted-foreground">Prova a modificare i filtri di ricerca</p>
               </CardContent>
             </Card>
           ) : (
@@ -148,7 +148,7 @@ export default function Cerca() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <Card className="glass-card border-white/5 hover:border-white/10 transition-all">
+                <Card className="glass-card hover:border-primary/50 transition-all">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div 
@@ -158,25 +158,25 @@ export default function Cerca() {
                         <motion.div
                           whileHover={{ scale: 1.1 }}
                         >
-                          <Avatar className="w-16 h-16 bg-gradient-to-br from-[#FF0055] to-[#ff3366] rounded-full flex items-center justify-center">
+                          <Avatar className="w-16 h-16 bg-gradient-to-br from-primary to-[#ff3366] rounded-full flex items-center justify-center">
                             <AvatarImage src={user.avatar} alt={user.full_name} className="object-cover" />
-                            <AvatarFallback className="bg-muted-foreground">
+                            <AvatarFallback className="bg-muted">
                                 {getInitials(user.full_name)}
                             </AvatarFallback>
                           </Avatar>
                         </motion.div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-white text-lg">{user.full_name}</h3>
-                          <p className="text-sm text-gray-400">@{user.email.split('@')[0]}</p>
+                          <h3 className="font-bold text-foreground text-lg">{user.full_name}</h3>
+                          <p className="text-sm text-muted-foreground">@{user.email.split('@')[0]}</p>
                           
                           <div className="flex flex-wrap gap-3 mt-2">
                             {user.gender && user.gender !== 'non specificato' && (
-                              <span className="text-xs text-gray-400">
+                              <span className="text-xs text-muted-foreground">
                                 {getGenderLabel(user.gender)}
                               </span>
                             )}
                             {(user.city || user.region) && (
-                              <span className="text-xs text-gray-400 flex items-center gap-1">
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
                                 <MapPin className="w-3 h-3" />
                                 {[user.city, user.region].filter(Boolean).join(', ')}
                               </span>
@@ -188,7 +188,7 @@ export default function Cerca() {
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button
                           onClick={() => router.push(createPageUrl("profiloutente") + "?email=" + user.email)}
-                          className="bg-gradient-to-r from-[#FF0055] to-[#ff3366] hover:opacity-90 text-white"
+                          className="bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground"
                         >
                           Vedi Profilo
                         </Button>

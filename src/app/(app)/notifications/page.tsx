@@ -70,11 +70,11 @@ export default function Notifiche() {
       case "like":
         return <Heart className="w-5 h-5 text-primary" />;
       case "follow":
-        return <UserPlus className="w-5 h-5 text-[#3D9DF7]" />;
+        return <UserPlus className="w-5 h-5 text-blue-500" />;
       case "earning":
         return <DollarSign className="w-5 h-5 text-accent" />;
       default:
-        return <Info className="w-5 h-5 text-gray-400" />;
+        return <Info className="w-5 h-5 text-muted-foreground" />;
     }
   };
 
@@ -83,11 +83,11 @@ export default function Notifiche() {
       case "like":
         return "bg-primary/10";
       case "follow":
-        return "bg-[#3D9DF7]/10";
+        return "bg-blue-500/10";
       case "earning":
         return "bg-accent/10";
       default:
-        return "bg-white/5";
+        return "bg-muted/50";
     }
   };
 
@@ -95,25 +95,25 @@ export default function Notifiche() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#111111] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="animate-spin h-12 w-12 text-primary mx-auto mb-4" />
-          <p className="text-gray-400">Caricamento...</p>
+          <p className="text-muted-foreground">Caricamento...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#111111]">
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">
+            <h1 className="text-4xl font-bold text-foreground mb-2">
               <span className="text-primary">Notifiche</span>
             </h1>
-            <p className="text-gray-400">
+            <p className="text-muted-foreground">
               {unreadCount > 0 ? `${unreadCount} non lette` : "Tutto letto"}
             </p>
           </div>
@@ -123,7 +123,6 @@ export default function Notifiche() {
               onClick={() => markAllAsReadMutation.mutate()}
               disabled={markAllAsReadMutation.isPending}
               variant="outline"
-              className="border-white/10 text-white hover:bg-white/5"
             >
               <Check className="w-4 h-4 mr-2" />
               Segna tutte lette
@@ -132,27 +131,27 @@ export default function Notifiche() {
         </div>
 
         {/* Notifications */}
-        <Card className="glass-card border-white/5">
+        <Card className="glass-card">
           <CardContent className="p-0">
             {isLoading ? (
               <div className="p-8 space-y-4">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="animate-pulse bg-white/5 h-20 rounded-xl" />
+                  <div key={i} className="animate-pulse bg-muted/50 h-20 rounded-xl" />
                 ))}
               </div>
             ) : notifications.length === 0 ? (
               <div className="text-center py-16">
-                <Bell className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-white mb-2">Nessuna notifica</h3>
-                <p className="text-gray-400">Le tue notifiche appariranno qui</p>
+                <Bell className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground mb-2">Nessuna notifica</h3>
+                <p className="text-muted-foreground">Le tue notifiche appariranno qui</p>
               </div>
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-border">
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-6 hover:bg-white/5 transition-colors ${
-                      !notification.read ? "bg-white/3" : ""
+                    className={`p-6 hover:bg-muted/50 transition-colors ${
+                      !notification.read ? "bg-muted/30" : ""
                     }`}
                   >
                     <div className="flex items-start gap-4">
@@ -161,10 +160,10 @@ export default function Notifiche() {
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium mb-1">
+                        <p className="text-foreground font-medium mb-1">
                           {notification.message}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           {format(new Date(notification.created_date), "d MMM yyyy · HH:mm", { locale: it })}
                         </p>
                       </div>
@@ -175,7 +174,7 @@ export default function Notifiche() {
                             onClick={() => markAsReadMutation.mutate(notification.id)}
                             variant="ghost"
                             size="sm"
-                            className="text-[#3D9DF7] hover:text-[#3D9DF7] hover:bg-[#3D9DF7]/10"
+                            className="text-blue-500 hover:text-blue-400 hover:bg-blue-500/10"
                           >
                             <Check className="w-4 h-4" />
                           </Button>
@@ -184,7 +183,7 @@ export default function Notifiche() {
                           onClick={() => deleteNotificationMutation.mutate(notification.id)}
                           variant="ghost"
                           size="sm"
-                          className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                          className="text-destructive hover:text-destructive/80 hover:bg-destructive/10"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

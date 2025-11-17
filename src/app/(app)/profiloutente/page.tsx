@@ -29,10 +29,10 @@ export default function ProfiloUtentePage() {
 
   if (!targetUser) {
     return (
-      <div className="min-h-screen bg-[#111111] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="animate-spin h-12 w-12 text-primary mx-auto mb-4" />
-          <p className="text-gray-400">Caricamento profilo...</p>
+          <p className="text-muted-foreground">Caricamento profilo...</p>
         </div>
       </div>
     );
@@ -54,7 +54,7 @@ export default function ProfiloUtentePage() {
 
 
   return (
-    <div className="min-h-screen bg-[#111111]">
+    <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Profile Header */}
         <motion.div
@@ -69,7 +69,7 @@ export default function ProfiloUtentePage() {
               >
                 <Avatar className="w-32 h-32 border-4 border-primary neon-glow">
                     <AvatarImage src={targetUser.avatar} alt={targetUser.full_name} className="object-cover" />
-                    <AvatarFallback className="bg-muted-foreground text-4xl">
+                    <AvatarFallback className="bg-muted text-4xl">
                         {getInitials(targetUser.full_name)}
                     </AvatarFallback>
                 </Avatar>
@@ -77,15 +77,15 @@ export default function ProfiloUtentePage() {
 
               {/* Info */}
               <div className="flex-1 text-center md:text-left">
-                <h1 className="text-3xl font-bold text-white mb-2">{targetUser.full_name}</h1>
-                <p className="text-gray-400 mb-4">@{targetUser.email.split('@')[0]}</p>
+                <h1 className="text-3xl font-bold text-foreground mb-2">{targetUser.full_name}</h1>
+                <p className="text-muted-foreground mb-4">@{targetUser.email.split('@')[0]}</p>
                 
                 {targetUser.bio && (
-                  <p className="text-gray-300 mb-6">{targetUser.bio}</p>
+                  <p className="mb-6">{targetUser.bio}</p>
                 )}
 
                 {/* User Info */}
-                <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                   {targetUser.gender && targetUser.gender !== 'non specificato' && (
                     <span>{getGenderLabel(targetUser.gender)}</span>
                   )}
@@ -108,30 +108,30 @@ export default function ProfiloUtentePage() {
                 <div className="grid grid-cols-3 gap-4 mt-6">
                   <div className="glass-card rounded-xl p-4 text-center">
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-primary to-[#ff3366] mb-3">
-                      <Heart className="w-6 h-6 text-white" />
+                      <Heart className="w-6 h-6 text-primary-foreground" />
                     </div>
-                    <p className="text-xs text-gray-500 mb-1">Like Ricevuti</p>
+                    <p className="text-xs text-muted-foreground mb-1">Like Ricevuti</p>
                     <p className="text-2xl font-bold text-primary">
                       {targetUser.likes_received || 0}
                     </p>
                   </div>
 
                   <div className="glass-card rounded-xl p-4 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-accent to-[#FFA500] mb-3">
-                      <TrendingUp className="w-6 h-6 text-white" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-accent to-yellow-500 mb-3">
+                      <TrendingUp className="w-6 h-6 text-accent-foreground" />
                     </div>
-                    <p className="text-xs text-gray-500 mb-1">Post</p>
+                    <p className="text-xs text-muted-foreground mb-1">Post</p>
                     <p className="text-2xl font-bold text-accent">
                       {userPosts.length}
                     </p>
                   </div>
 
                   <div className="glass-card rounded-xl p-4 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-[#3D9DF7] to-[#5ba8f7] mb-3">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-sky-400 mb-3">
                       <Wallet className="w-6 h-6 text-white" />
                     </div>
-                    <p className="text-xs text-gray-500 mb-1">Guadagni</p>
-                    <p className="text-2xl font-bold text-[#3D9DF7]">
+                    <p className="text-xs text-muted-foreground mb-1">Guadagni</p>
+                    <p className="text-2xl font-bold text-blue-500">
                       €{targetUser.total_earnings?.toFixed(2) || "0.00"}
                     </p>
                   </div>
@@ -148,21 +148,21 @@ export default function ProfiloUtentePage() {
           transition={{ delay: 0.3 }}
         >
           <div className="mb-4">
-            <h2 className="text-2xl font-bold text-white mb-2">Post di {targetUser.full_name}</h2>
-            <p className="text-gray-400">{userPosts.length} contenuti</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Post di {targetUser.full_name}</h2>
+            <p className="text-muted-foreground">{userPosts.length} contenuti</p>
           </div>
 
           {isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="aspect-square glass-card rounded-xl animate-pulse bg-white/10" />
+                <div key={i} className="aspect-square glass-card rounded-xl animate-pulse bg-muted" />
               ))}
             </div>
           ) : userPosts.length === 0 ? (
             <div className="glass-card rounded-2xl p-12 text-center">
-              <UserIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">Nessun post</h3>
-              <p className="text-gray-400">Questo utente non ha ancora pubblicato contenuti</p>
+              <UserIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-foreground mb-2">Nessun post</h3>
+              <p className="text-muted-foreground">Questo utente non ha ancora pubblicato contenuti</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -211,5 +211,3 @@ export default function ProfiloUtentePage() {
     </div>
   );
 }
-
-    

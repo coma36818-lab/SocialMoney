@@ -61,7 +61,7 @@ export default function LoginPage() {
   return (
     <Card className="glass-card">
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold text-white">Social Money</CardTitle>
+        <CardTitle className="text-3xl font-bold text-foreground">Social Money</CardTitle>
         <CardDescription>Accedi al tuo account per continuare</CardDescription>
       </CardHeader>
       <CardContent>

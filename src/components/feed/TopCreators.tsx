@@ -50,42 +50,42 @@ export default function TopCreators({ posts }: { posts: Post[] }) {
     }
 
     return (
-        <Card className="glass-card border-white/5">
+        <Card className="glass-card">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                     <Trophy className="w-5 h-5 text-accent" />
                     Top Creator Oggi
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 {topCreators.length === 0 ? (
-                    <p className="text-gray-500 text-sm text-center py-4">
+                    <p className="text-muted-foreground text-sm text-center py-4">
                         Nessun creator ancora
                     </p>
                 ) : (
                     topCreators.map((creator, index) => (
                         <div
                             key={creator.email}
-                            className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all"
+                            className="flex items-center justify-between p-3 rounded-xl bg-muted/50 hover:bg-muted transition-all"
                         >
                             <div className="flex items-center gap-3">
                                 <Avatar className={`h-12 w-12 border-2 ${
                                     index === 0 ? "border-accent" :
-                                    index === 1 ? "border-gray-400" :
-                                    index === 2 ? "border-[#CD7F32]" :
+                                    index === 1 ? "border-slate-400" :
+                                    index === 2 ? "border-orange-400" :
                                     "border-primary/50"
                                 }`}>
                                     <AvatarImage src={creator.avatar} alt={creator.username} className="object-cover"/>
-                                    <AvatarFallback className="bg-muted-foreground">{getInitials(creator.username)}</AvatarFallback>
+                                    <AvatarFallback className="bg-muted">{getInitials(creator.username)}</AvatarFallback>
                                 </Avatar>
 
                                 <div>
-                                    <p className="font-semibold text-white text-sm">{creator.username}</p>
-                                    <div className="text-xs text-gray-500 flex items-center gap-1">
+                                    <p className="font-semibold text-foreground text-sm">{creator.username}</p>
+                                    <div className="text-xs text-muted-foreground flex items-center gap-1">
                                         <div className={`w-2 h-2 rounded-full ${
                                             index === 0 ? "bg-accent" :
-                                            index === 1 ? "bg-gray-400" :
-                                            index === 2 ? "bg-[#CD7F32]" :
+                                            index === 1 ? "bg-slate-400" :
+                                            index === 2 ? "bg-orange-400" :
                                             "bg-primary/50"
                                         }`}></div>
                                         <span>#{index + 1}</span>
@@ -102,5 +102,3 @@ export default function TopCreators({ posts }: { posts: Post[] }) {
         </Card>
     );
 }
-
-    

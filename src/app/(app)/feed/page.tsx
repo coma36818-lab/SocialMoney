@@ -93,17 +93,17 @@ export default function FeedPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#111111]">
+        <div className="min-h-screen bg-background">
             <div className="mx-auto max-w-7xl px-4 py-4 sm:py-8">
                 <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
                     <div className="space-y-4 sm:space-y-6 lg:col-span-2">
                         <div className="glass-card rounded-2xl p-4 sm:p-6 neon-glow">
                             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                                 <div>
-                                    <h3 className="text-lg font-bold text-white sm:text-xl mb-1">Pubblica Contenuto</h3>
-                                    <p className="text-xs text-gray-400 sm:text-sm">Carica foto/video/testo e inizia a guadagnare</p>
+                                    <h3 className="text-lg font-bold text-foreground sm:text-xl mb-1">Pubblica Contenuto</h3>
+                                    <p className="text-xs text-muted-foreground sm:text-sm">Carica foto/video/testo e inizia a guadagnare</p>
                                 </div>
-                                <Button onClick={() => router.push(createPageUrl("Upload"))} className="w-full bg-gradient-to-r from-[#FF0055] to-[#ff3366] hover:opacity-90 text-white sm:w-auto" size="lg" >
+                                <Button onClick={() => router.push(createPageUrl("Upload"))} className="w-full bg-gradient-to-r from-[#FF0055] to-[#ff3366] hover:opacity-90 text-primary-foreground sm:w-auto" size="lg" >
                                     <Plus className="w-5 h-5 mr-2" /> Pubblica
                                 </Button>
                             </div>
@@ -113,16 +113,16 @@ export default function FeedPage() {
                              <div className="space-y-4 sm:space-y-6">
                                 {[1, 2, 3].map(i => (
                                 <div key={i} className="glass-card rounded-2xl p-4 sm:p-6 animate-pulse">
-                                    <div className="h-48 sm:h-64 bg-white/5 rounded-xl" />
+                                    <div className="h-48 sm:h-64 bg-muted/50 rounded-xl" />
                                 </div>
                                 ))}
                             </div>
                         ) : !posts || posts.length === 0 ? (
                             <div className="glass-card rounded-2xl p-8 sm:p-12 text-center">
-                                <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-gray-600 mx-auto mb-4" />
-                                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Nessun post ancora</h3>
-                                <p className="text-gray-400 mb-6 text-sm sm:text-base">Sii il primo a pubblicare!</p>
-                                <Button onClick={() => router.push(createPageUrl("Upload"))} className="bg-[#FF0055] hover:bg-[#ff3366] text-white" > Pubblica Ora </Button>
+                                <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-muted-foreground mx-auto mb-4" />
+                                <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2">Nessun post ancora</h3>
+                                <p className="text-muted-foreground mb-6 text-sm sm:text-base">Sii il primo a pubblicare!</p>
+                                <Button onClick={() => router.push(createPageUrl("Upload"))} className="bg-primary hover:bg-primary/90 text-primary-foreground" > Pubblica Ora </Button>
                             </div>
                         ) : (
                             <div className="space-y-4 sm:space-y-6">

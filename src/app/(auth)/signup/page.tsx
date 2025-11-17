@@ -77,7 +77,7 @@ export default function SignupPage() {
   return (
     <Card className="glass-card">
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold text-white">Crea un Account</CardTitle>
+        <CardTitle className="text-3xl font-bold text-foreground">Crea un Account</CardTitle>
         <CardDescription>Unisciti a Social Money e inizia a guadagnare</CardDescription>
       </CardHeader>
       <CardContent>

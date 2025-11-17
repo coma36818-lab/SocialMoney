@@ -66,9 +66,9 @@ export default function ProfiloPage() {
     };
 
     const stats = [
-        { label: "Guadagni", value: `€${user.total_earnings?.toFixed(2) || "0.00"}`, icon: Wallet, color: "text-accent", gradient: "from-accent to-[#FFA500]" },
+        { label: "Guadagni", value: `€${user.total_earnings?.toFixed(2) || "0.00"}`, icon: Wallet, color: "text-accent", gradient: "from-accent to-yellow-500" },
         { label: "Like Ricevuti", value: user.likes_received || 0, icon: Heart, color: "text-primary", gradient: "from-primary to-[#ff3366]" },
-        { label: "Post", value: userPosts?.length || 0, icon: TrendingUp, color: "text-[#3D9DF7]", gradient: "from-[#3D9DF7] to-[#5ba8f7]" },
+        { label: "Post", value: userPosts?.length || 0, icon: TrendingUp, color: "text-blue-500", gradient: "from-blue-500 to-sky-400" },
     ];
 
     const getInitials = (name: string) => {
@@ -76,7 +76,7 @@ export default function ProfiloPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#111111] text-white">
+        <div className="min-h-screen bg-background text-foreground">
             <div className="max-w-6xl mx-auto px-4 py-8">
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} >
                     <div className="glass-card rounded-3xl p-8 mb-8">
@@ -85,21 +85,21 @@ export default function ProfiloPage() {
                                 <motion.div whileHover={{ scale: 1.05, rotate: 5 }} >
                                      <Avatar className="w-32 h-32 border-4 border-primary neon-glow">
                                         <AvatarImage src={user.avatar} alt={user.full_name} className="object-cover" />
-                                        <AvatarFallback className="bg-muted-foreground text-4xl">
+                                        <AvatarFallback className="bg-muted text-4xl">
                                             {getInitials(user.full_name)}
                                         </AvatarFallback>
                                     </Avatar>
                                 </motion.div>
                                 <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => router.push(createPageUrl("Impostazioni"))} className="absolute bottom-0 right-0 w-10 h-10 bg-accent rounded-full flex items-center justify-center gold-glow hover:opacity-80 transition-opacity" >
-                                    <Edit className="w-5 h-5 text-black" />
+                                    <Edit className="w-5 h-5 text-accent-foreground" />
                                 </motion.button>
                             </div>
                             <div className="flex-1 text-center md:text-left">
-                                <h1 className="text-3xl font-bold text-white mb-2">{user.full_name}</h1>
-                                <p className="text-gray-400 mb-4">@{user.email.split('@')[0]}</p>
-                                {user.bio && (<p className="text-gray-300 mb-6">{user.bio}</p>)}
+                                <h1 className="text-3xl font-bold text-foreground mb-2">{user.full_name}</h1>
+                                <p className="text-muted-foreground mb-4">@{user.email.split('@')[0]}</p>
+                                {user.bio && (<p className="mb-6">{user.bio}</p>)}
                                 
-                                <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-6">
+                                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-6">
                                   {user.gender && (
                                     <span>{getGenderLabel(user.gender)}</span>
                                   )}
@@ -119,9 +119,9 @@ export default function ProfiloPage() {
                                     {stats.map((stat, index) => (
                                         <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} whileHover={{ scale: 1.05 }} className="glass-card rounded-xl p-4 text-center" >
                                             <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br ${stat.gradient} mb-3`}>
-                                                <stat.icon className="w-6 h-6 text-white" />
+                                                <stat.icon className="w-6 h-6 text-primary-foreground" />
                                             </div>
-                                            <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
+                                            <p className="text-xs text-muted-foreground mb-1">{stat.label}</p>
                                             <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
                                         </motion.div>
                                     ))}
@@ -129,17 +129,17 @@ export default function ProfiloPage() {
                                 
                                 <div className="flex flex-wrap gap-3 mt-6">
                                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                        <Button onClick={() => router.push(createPageUrl("Wallet"))} className="bg-gradient-to-r from-accent to-[#FFA500] hover:opacity-90 text-black font-semibold gold-glow" >
+                                        <Button onClick={() => router.push(createPageUrl("Wallet"))} className="bg-gradient-to-r from-accent to-yellow-500 hover:opacity-90 text-accent-foreground font-semibold gold-glow" >
                                             <Wallet className="w-4 h-4 mr-2" /> Il mio Wallet
                                         </Button>
                                     </motion.div>
                                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                        <Button onClick={() => router.push(createPageUrl("Ricarica"))} className="bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-white neon-glow" >
+                                        <Button onClick={() => router.push(createPageUrl("Ricarica"))} className="bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground neon-glow" >
                                             <Heart className="w-4 h-4 mr-2" /> Ricarica Like
                                         </Button>
                                     </motion.div>
                                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                        <Button onClick={() => router.push(createPageUrl("Impostazioni"))} className="border-white/10 text-white hover:bg-white/5 bg-[#1a1a1a] border" >
+                                        <Button onClick={() => router.push(createPageUrl("Impostazioni"))} variant="outline" >
                                             <Edit className="w-4 h-4 mr-2" /> Modifica Profilo
                                         </Button>
                                     </motion.div>
@@ -151,19 +151,19 @@ export default function ProfiloPage() {
                 
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} >
                     <div className="mb-4">
-                        <h2 className="text-2xl font-bold text-white mb-2">I Tuoi Post</h2>
-                        <p className="text-gray-400">{userPosts?.length || 0} contenuti pubblicati</p>
+                        <h2 className="text-2xl font-bold text-foreground mb-2">I Tuoi Post</h2>
+                        <p className="text-muted-foreground">{userPosts?.length || 0} contenuti pubblicati</p>
                     </div>
                     {isLoading ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            {[...Array(6)].map((_, i) => (<div key={i} className="aspect-square glass-card rounded-xl animate-pulse bg-white/10" />))}
+                            {[...Array(6)].map((_, i) => (<div key={i} className="aspect-square glass-card rounded-xl animate-pulse bg-muted" />))}
                         </div>
                     ) : !userPosts || userPosts.length === 0 ? (
                         <div className="glass-card rounded-2xl p-12 text-center">
-                            <UserIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                            <h3 className="text-xl font-bold text-white mb-2">Nessun post ancora</h3>
-                            <p className="text-gray-400 mb-6">Inizia a pubblicare contenuti per guadagnare!</p>
-                            <Button onClick={() => router.push(createPageUrl("Upload"))} className="bg-primary hover:bg-primary/90 text-white">Pubblica Ora</Button>
+                            <UserIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                            <h3 className="text-xl font-bold text-foreground mb-2">Nessun post ancora</h3>
+                            <p className="text-muted-foreground mb-6">Inizia a pubblicare contenuti per guadagnare!</p>
+                            <Button onClick={() => router.push(createPageUrl("Upload"))} className="bg-primary hover:bg-primary/90 text-primary-foreground">Pubblica Ora</Button>
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
@@ -192,6 +192,3 @@ export default function ProfiloPage() {
         </div>
     );
 }
-
-    
-    

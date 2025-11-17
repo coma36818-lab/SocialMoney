@@ -13,9 +13,9 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
 const likePackages = [
-    { name: 'Base', likes: 100, price: 1.00, icon: Heart, color: 'text-gray-400' },
-    { name: 'Spark', likes: 550, price: 5.00, icon: Zap, color: 'text-blue-400', popular: false },
-    { name: 'Superstar', likes: 1200, price: 10.00, icon: Star, color: 'text-yellow-400', popular: true },
+    { name: 'Base', likes: 100, price: 1.00, icon: Heart, color: 'text-muted-foreground' },
+    { name: 'Spark', likes: 550, price: 5.00, icon: Zap, color: 'text-blue-500', popular: false },
+    { name: 'Superstar', likes: 1200, price: 10.00, icon: Star, color: 'text-yellow-500', popular: true },
     { name: 'Legend', likes: 3000, price: 25.00, icon: Crown, color: 'text-primary', popular: false },
 ];
 
@@ -85,11 +85,11 @@ export default function RicaricaPage() {
     }
     
     return (
-        <div className="min-h-screen bg-[#111111] text-white">
+        <div className="min-h-screen bg-background text-foreground">
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
                     <h1 className="text-4xl font-bold mb-2">Ricarica i Tuoi <span className="text-primary">Like</span></h1>
-                    <p className="text-gray-400">Supporta i tuoi creator preferiti e aumenta la tua influenza.</p>
+                    <p className="text-muted-foreground">Supporta i tuoi creator preferiti e aumenta la tua influenza.</p>
                 </motion.div>
 
                 <div className="grid md:grid-cols-2 gap-8 items-start">
@@ -116,7 +116,7 @@ export default function RicaricaPage() {
                                             </div>
                                         </div>
                                         <p className="text-xl font-bold">€{pkg.price.toFixed(2)}</p>
-                                        {pkg.popular && <div className="absolute -top-3 right-4 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">POPULAR</div>}
+                                        {pkg.popular && <div className="absolute -top-3 right-4 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">POPULAR</div>}
                                     </div>
                                 ))}
                             </CardContent>
@@ -130,10 +130,10 @@ export default function RicaricaPage() {
                                 <selectedPackage.icon className={cn("w-16 h-16 mx-auto my-4", selectedPackage.color)} />
                                 <h3 className="text-3xl font-bold">{selectedPackage.name}</h3>
                                 <p className="text-5xl font-extrabold text-primary my-2">{selectedPackage.likes.toLocaleString('it-IT')}</p>
-                                <p className="text-gray-400">Like da aggiungere al tuo account</p>
+                                <p className="text-muted-foreground">Like da aggiungere al tuo account</p>
                             </CardHeader>
                             <CardContent>
-                                <div className="border-t border-white/10 pt-4 mt-4 space-y-2">
+                                <div className="border-t border-border pt-4 mt-4 space-y-2">
                                      <div className="flex justify-between text-lg">
                                         <span>Like attuali:</span>
                                         <span className="font-semibold">{user.likes_available.toLocaleString('it-IT')}</span>
@@ -142,14 +142,14 @@ export default function RicaricaPage() {
                                         <span>Nuovi like:</span>
                                         <span className="font-semibold">+{selectedPackage.likes.toLocaleString('it-IT')}</span>
                                     </div>
-                                     <div className="flex justify-between text-xl font-bold border-t border-white/10 pt-2 mt-2">
+                                     <div className="flex justify-between text-xl font-bold border-t border-border pt-2 mt-2">
                                         <span>Totale dopo acquisto:</span>
                                         <span>{(user.likes_available + selectedPackage.likes).toLocaleString('it-IT')}</span>
                                     </div>
                                 </div>
                                 <Button 
                                     size="lg" 
-                                    className="w-full mt-6 bg-primary text-lg h-14 hover:bg-primary/90 neon-glow"
+                                    className="w-full mt-6 bg-primary text-lg h-14 hover:bg-primary/90 neon-glow text-primary-foreground"
                                     onClick={() => purchaseMutation.mutate(selectedPackage)}
                                     disabled={purchaseMutation.isPending}
                                 >
@@ -162,7 +162,7 @@ export default function RicaricaPage() {
                                         </>
                                     )}
                                 </Button>
-                                <p className="text-xs text-center text-gray-500 mt-3">Pagamento sicuro con Stripe.</p>
+                                <p className="text-xs text-center text-muted-foreground mt-3">Pagamento sicuro con Stripe.</p>
                             </CardContent>
                         </Card>
                     </motion.div>

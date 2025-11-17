@@ -29,15 +29,15 @@ export default function UserStats({ user }: { user: User }) {
       label: "Like Disponibili",
       value: user.likes_available || 0,
       icon: TrendingUp,
-      color: "text-[#3D9DF7]",
-      bg: "bg-[#3D9DF7]/10"
+      color: "text-blue-500",
+      bg: "bg-blue-500/10"
     }
   ];
 
   return (
-    <Card className="glass-card border-white/5">
+    <Card className="glass-card">
       <CardContent className="p-6 space-y-4">
-        <h3 className="text-lg font-bold text-white mb-4">Le Tue Statistiche</h3>
+        <h3 className="text-lg font-bold text-foreground mb-4">Le Tue Statistiche</h3>
         
         <div className="space-y-3">
           {stats.map((stat) => (
@@ -51,7 +51,7 @@ export default function UserStats({ user }: { user: User }) {
                     <stat.icon className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400">{stat.label}</p>
+                    <p className="text-xs text-muted-foreground">{stat.label}</p>
                     <p className={`text-2xl font-bold ${stat.color}`}>
                       {stat.value}
                     </p>
@@ -65,14 +65,14 @@ export default function UserStats({ user }: { user: User }) {
         <div className="pt-4 space-y-2">
           <Button
             onClick={() => router.push(createPageUrl("Ricarica"))}
-            className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-white"
+            className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground"
           >
             <Plus className="w-4 h-4 mr-2" />
             Ricarica Like
           </Button>
           <Button
             onClick={() => router.push(createPageUrl("Wallet"))}
-            className="w-full bg-gradient-to-r from-accent to-[#FFA500] hover:opacity-90 text-black font-semibold"
+            className="w-full bg-gradient-to-r from-accent to-yellow-500 hover:opacity-90 text-accent-foreground font-semibold"
           >
             <Wallet className="w-4 h-4 mr-2" />
             Vai al Wallet
