@@ -138,7 +138,11 @@ export default function WalletPage() {
                         <CardHeader><CardTitle className="text-foreground">Storico Transazioni</CardTitle></CardHeader>
                         <CardContent>
                             {isLoading ? (
-                                <div className="space-y-3 p-4"><{[...Array(3)].map((_, i) => <div key={i} className="animate-pulse bg-muted/50 h-16 rounded-xl" />)}</div>
+                                <div className="space-y-3 p-4">
+                                    {[...Array(3)].map((_, i) => (
+                                        <div key={i} className="animate-pulse bg-muted/50 h-16 rounded-xl" />
+                                    ))}
+                                </div>
                             ) : !transactions || transactions.length === 0 ? (
                                 <div className="text-center py-12">
                                     <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
