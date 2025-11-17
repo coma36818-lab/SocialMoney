@@ -1,25 +1,27 @@
+'use client';
+import React, { useRef, useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Camera, Record, StopCircle, Upload, Loader2, Video as VideoIcon } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { auth, storage } from '@/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { v4 as uuid } from 'uuid';
+import { base44 } from '@/lib/api';
+import { useRouter } from 'next/navigation';
+import { createPageUrl } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
-"use client";
-import React, { useRef, useState, useEffect } from "react";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from "@/firebase";
-import { Button } from "@/components/ui/button";
-import { Camera, Video, Mic, Upload, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertTitle, AlertDescription } from "../ui/alert";
-
-interface VideoRecorderProps {
-  onUploadComplete: (downloadUrl: string) => void;
-  isSubmitting: boolean;
-}
-
-export default function VideoRecorder({ onUploadComplete, isSubmitting }: VideoRecorderProps) {
+export default function VideoRecorder() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const [recording, setRecording] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     return () => {
@@ -31,134 +33,192 @@ export default function VideoRecorder({ onUploadComplete, isSubmitting }: VideoR
     };
   }, []);
 
-  const startCamera = async () => {
+  const getCameraPermission = async () => {
+    if (typeof navigator.mediaDevices === 'undefined') {
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Funzione non supportata',
+          description: 'Il tuo browser non supporta l\'accesso alla fotocamera.',
+        });
+        return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 1080 },
-          height: { ideal: 1920 },
-          facingMode: "user"
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: 'user',
         },
         audio: true,
       });
-
+      setHasCameraPermission(true);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-        setHasCameraPermission(true);
       }
-    } catch (err) {
-      console.error("Errore fotocamera:", err);
+    } catch (error) {
+      console.error('Error accessing camera:', error);
       setHasCameraPermission(false);
       toast({
         variant: 'destructive',
         title: 'Accesso Fotocamera Negato',
-        description: 'Per registrare, abilita i permessi della fotocamera nelle impostazioni del browser.',
+        description: 'Abilita i permessi per la fotocamera nelle impostazioni del browser.',
       });
     }
   };
 
+
   const startRecording = () => {
     if (!videoRef.current?.srcObject) {
-      toast({ variant: 'destructive', title: 'Fotocamera non attiva', description: 'Attiva prima la fotocamera.' });
+      toast({ variant: 'destructive', title: 'Fotocamera non pronta' });
       return;
     }
+    setRecordedBlob(null);
     const stream = videoRef.current.srcObject as MediaStream;
-    const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
-
+    mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
     const chunks: BlobPart[] = [];
-    recorder.ondataavailable = (e) => chunks.push(e.data);
-
-    recorder.onstop = async () => {
-      const videoBlob = new Blob(chunks, { type: "video/webm" });
-      await uploadVideo(videoBlob);
+    mediaRecorderRef.current.ondataavailable = (e) => chunks.push(e.data);
+    mediaRecorderRef.current.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      setRecordedBlob(blob);
     };
-
-    mediaRecorderRef.current = recorder;
-    recorder.start();
-    setRecording(true);
+    mediaRecorderRef.current.start();
+    setIsRecording(true);
   };
 
   const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
-    setRecording(false);
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
   };
 
-  const uploadVideo = async (blob: Blob) => {
-    setUploading(true);
-    const fileRef = ref(storage, `uploads/videos/${Date.now()}.webm`);
-    const uploadTask = uploadBytesResumable(fileRef, blob);
+  const handleUpload = async () => {
+    if (!recordedBlob) {
+      toast({ variant: 'destructive', title: 'Nessun video da caricare' });
+      return;
+    }
+    const user = auth.currentUser;
+    if (!user) {
+      toast({ variant: 'destructive', title: 'Autenticazione richiesta' });
+      return;
+    }
+
+    setIsUploading(true);
+    const videoId = uuid();
+    const videoRefPath = `videos/${user.uid}/${videoId}.webm`;
+    const storageRef = ref(storage, videoRefPath);
+    const uploadTask = uploadBytesResumable(storageRef, recordedBlob);
 
     uploadTask.on(
-      "state_changed",
+      'state_changed',
       (snapshot) => {
-        // Optional: update progress here
+        setUploadProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100));
       },
       (error) => {
-        console.error("Errore upload:", error);
-        toast({ variant: 'destructive', title: 'Upload Fallito', description: 'Riprova.' });
-        setUploading(false);
+        console.error('Upload error:', error);
+        toast({ variant: 'destructive', title: 'Errore di caricamento', description: 'Riprova.' });
+        setIsUploading(false);
       },
       async () => {
-        const url = await getDownloadURL(uploadTask.snapshot.ref);
-        setUploading(false);
-        toast({ title: 'Video Caricato!', description: 'Ora puoi pubblicare il tuo post.' });
-        onUploadComplete(url);
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          await base44.entities.Post.create({
+            created_by: user.email,
+            media_url: downloadURL,
+            media_type: 'video',
+            description: 'Video registrato dall\'app!',
+            created_date: new Date().toISOString(),
+          });
+          toast({ title: 'Successo!', description: 'Video pubblicato con successo!' });
+          router.push(createPageUrl('feed'));
+        } catch (dbError) {
+          console.error('Database error:', dbError);
+          toast({ variant: 'destructive', title: 'Errore Database', description: 'Impossibile salvare il post.' });
+        } finally {
+          setIsUploading(false);
+        }
       }
     );
   };
 
+  const reset = () => {
+    setRecordedBlob(null);
+    setIsRecording(false);
+    setIsUploading(false);
+    setUploadProgress(0);
+    getCameraPermission();
+  };
+
+  if (hasCameraPermission === false) {
+    return (
+      <Alert variant="destructive">
+        <AlertTitle>Accesso Fotocamera Richiesto</AlertTitle>
+        <AlertDescription>
+          Per registrare, abilita i permessi per la fotocamera nel tuo browser.
+          <br />
+          <Button onClick={getCameraPermission} className="mt-4">
+            Riprova
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (hasCameraPermission === null) {
+      return (
+          <div className="text-center">
+              <Button onClick={getCameraPermission} size="lg">
+                  <Camera className="mr-2" /> Attiva Fotocamera
+              </Button>
+          </div>
+      )
+  }
+
+
   return (
-    <div className="space-y-4">
-      <div className="relative aspect-video bg-black rounded-2xl overflow-hidden">
-        <video ref={videoRef} className="w-full h-full object-contain" muted autoPlay playsInline />
-        {hasCameraPermission === false && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                 <Alert variant="destructive" className="m-4">
-                      <AlertTitle>Accesso Fotocamera Richiesto</AlertTitle>
-                      <AlertDescription>
-                        Per favore, consenti l'accesso alla fotocamera per usare questa funzione.
-                      </AlertDescription>
-                </Alert>
-            </div>
+    <div className="space-y-6">
+      <div className="relative w-full aspect-video bg-muted rounded-2xl overflow-hidden">
+        <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+        {recordedBlob && (
+           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+               <VideoIcon className="w-16 h-16 text-white" />
+           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Button onClick={startCamera} variant="outline">
-          <Camera className="mr-2" /> Attiva Fotocamera
-        </Button>
-
-        {!recording ? (
-          <Button onClick={startRecording} disabled={!hasCameraPermission} className="bg-green-600 hover:bg-green-700 text-white">
-            <Mic className="mr-2" /> Registra
+      {isUploading ? (
+        <div className="space-y-2">
+          <div className="flex justify-between items-center text-sm">
+            <p className="text-muted-foreground font-medium">Caricamento in corso...</p>
+            <p className="font-semibold text-primary">{uploadProgress}%</p>
+          </div>
+          <Progress value={uploadProgress} className="w-full" />
+        </div>
+      ) : recordedBlob ? (
+        <div className="grid grid-cols-2 gap-4">
+          <Button onClick={reset} variant="outline" size="lg">
+            Registra di nuovo
           </Button>
-        ) : (
-          <Button onClick={stopRecording} className="bg-red-600 hover:bg-red-700 text-white">
-             <div className="w-4 h-4 mr-2 bg-white rounded-sm"/> Stop
+          <Button onClick={handleUpload} size="lg" className="bg-gradient-to-r from-primary to-[#ff3366] text-primary-foreground">
+            <Upload className="mr-2" /> Pubblica Video
           </Button>
-        )}
-         <Button
-            onClick={() => {
-                // This is handled by onUploadComplete in uploadVideo
-                if (recording) stopRecording();
-            }}
-            disabled={uploading || isSubmitting}
-            className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground neon-glow"
-        >
-            {uploading || isSubmitting ? (
-            <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Caricamento...
-            </>
-            ) : (
-            <>
-                <Upload className="w-5 h-5 mr-2" />
-                Pubblica Video
-            </>
-            )}
-        </Button>
-      </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4">
+          <Button
+            onClick={startRecording}
+            disabled={isRecording}
+            size="lg"
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            <Record className="mr-2" /> Inizia a registrare
+          </Button>
+          <Button onClick={stopRecording} disabled={!isRecording} size="lg" variant="destructive">
+            <StopCircle className="mr-2" /> Ferma registrazione
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

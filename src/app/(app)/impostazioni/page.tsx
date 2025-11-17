@@ -37,6 +37,7 @@ export default function Impostazioni() {
   });
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
 
   useEffect(() => {
     const isDark = localStorage.getItem('theme') === 'dark';
@@ -59,6 +60,7 @@ export default function Impostazioni() {
 
 
   const loadUser = async () => {
+    setIsLoadingUser(true);
     try {
       const userData = await base44.auth.me();
       setUser(userData);
@@ -78,6 +80,8 @@ export default function Impostazioni() {
       }
     } catch (error) {
       router.push(createPageUrl("login"));
+    } finally {
+        setIsLoadingUser(false);
     }
   };
 
@@ -96,9 +100,10 @@ export default function Impostazioni() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      if (!user) throw new Error("Utente non autenticato");
       await base44.auth.updateMe({
         full_name: data.full_name,
-        username: data.full_name,
+        username: data.full_name, // Manteniamo username sincronizzato con full_name
         bio: data.bio,
         city: data.city,
         region: data.region,
@@ -114,7 +119,7 @@ export default function Impostazioni() {
     },
     onSuccess: () => {
       toast({ title: "Successo", description: "Profilo aggiornato con successo!" });
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ['user', user?.email] });
       loadUser();
     },
     onError: (error: Error) => {
@@ -127,7 +132,7 @@ export default function Impostazioni() {
     updateProfileMutation.mutate(formData);
   };
 
-  if (!user) {
+  if (isLoadingUser || !user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -298,6 +303,20 @@ export default function Impostazioni() {
                         placeholder="Es: Italia"
                       />
                     </div>
+                    
+                    <div>
+                    <Label htmlFor="paypalEmail" className="text-muted-foreground">Email PayPal per Prelievi</Label>
+                    <div className="relative mt-2">
+                        <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                            id="paypalEmail"
+                            value={formData.paypalEmail}
+                            onChange={(e) => setFormData({ ...formData, paypalEmail: e.target.value })}
+                            className="bg-muted/30 border-border text-foreground pl-10"
+                            placeholder="paypal@esempio.com"
+                        />
+                    </div>
+                  </div>
 
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
@@ -327,19 +346,6 @@ export default function Impostazioni() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                 <div>
-                    <Label htmlFor="paypalEmail" className="text-muted-foreground">Email PayPal per Prelievi</Label>
-                    <div className="relative">
-                        <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <Input
-                            id="paypalEmail"
-                            value={formData.paypalEmail}
-                            onChange={(e) => setFormData({ ...formData, paypalEmail: e.target.value })}
-                            className="bg-muted/30 border-border text-foreground mt-2 pl-10"
-                            placeholder="paypal@esempio.com"
-                        />
-                    </div>
-                  </div>
                 <div>
                   <Label className="text-muted-foreground text-sm">Email</Label>
                   <p className="text-foreground font-medium mt-1">{user.email}</p>
@@ -419,3 +425,5 @@ export default function Impostazioni() {
     </div>
   );
 }
+
+    
