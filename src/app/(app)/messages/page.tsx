@@ -179,7 +179,7 @@ export default function Messaggi() {
 
   return (
     <div className="min-h-screen bg-[#111111]">
-      <div className="h-[calc(100vh)] max-w-7xl mx-auto px-4 py-8">
+      <div className="h-[calc(100vh-5rem)] max-w-7xl mx-auto px-4 py-8">
         <div className="h-full grid md:grid-cols-3 gap-6">
           {/* Sidebar - Conversazioni */}
           <div className="md:col-span-1">
@@ -340,3 +340,5 @@ export default function Messaggi() {
     </div>
   );
 }
+
+    
