@@ -338,6 +338,4 @@ export const base44 = {
       },
     }
   },
-};
-
-    
+}
