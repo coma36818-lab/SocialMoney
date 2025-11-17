@@ -38,7 +38,8 @@ export default function FeedPage() {
 
     const sendLikeMutation = useMutation({
         mutationFn: async ({ postId, postOwner }: { postId: string, postOwner: string }) => {
-            if (!user || user.likes_available <= 0) {
+            if (!user) throw new Error("Utente non autenticato");
+            if (user.likes_available <= 0) {
                 throw new Error("Non hai like disponibili. Ricarica!");
             }
             await base44.entities.Like.create({ post_id: postId, post_owner_email: postOwner, like_value: 0.01 });
@@ -58,7 +59,7 @@ export default function FeedPage() {
                     total_earnings: (owner.total_earnings || 0) + 0.01 
                 });
                 await base44.entities.Notification.create({ created_by: postOwner, type: "like", message: `${user.full_name} ha inviato un like al tuo post! +0.01€` });
-                await base44.entities.Transaction.create({ user_id: owner.id, type: "like_ricevuto", description: `Like da ${user.full_name}`, amount: 0.01 });
+                await base44.entities.Transaction.create({ user_id: owner.id, type: "like_received", description: `Like da ${user.full_name}`, amount: 0.01 });
             }
         },
         onSuccess: () => {
@@ -83,7 +84,7 @@ export default function FeedPage() {
         }
     });
     
-    if (isLoadingPosts || !user) {
+    if (!user) {
         return (
              <div className="min-h-screen w-full flex items-center justify-center">
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -108,7 +109,15 @@ export default function FeedPage() {
                             </div>
                         </div>
 
-                        {!posts || posts.length === 0 ? (
+                        {isLoadingPosts ? (
+                             <div className="space-y-4 sm:space-y-6">
+                                {[1, 2, 3].map(i => (
+                                <div key={i} className="glass-card rounded-2xl p-4 sm:p-6 animate-pulse">
+                                    <div className="h-48 sm:h-64 bg-white/5 rounded-xl" />
+                                </div>
+                                ))}
+                            </div>
+                        ) : !posts || posts.length === 0 ? (
                             <div className="glass-card rounded-2xl p-8 sm:p-12 text-center">
                                 <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-gray-600 mx-auto mb-4" />
                                 <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Nessun post ancora</h3>
