@@ -1,62 +1,43 @@
 
 export type User = {
-  id: string; // Firestore document ID
-  username: string;
-  email: string;
-  photoURL?: string;
-  createdAt: string; // ISO timestamp
-  verified?: boolean;
-  likes_available: number;
-  likes_received: number;
-  balance: number;
-  total_earnings: number;
-  paypal_email?: string;
-  plan?: "free" | "creator" | "pro";
-  is_banned?: boolean;
-
-
-  walletBalance: number;
-  likeBalance: number;
-  totalLikesReceived: number;
-  totalLikesSent: number;
-  referralCode: string;
-  referredBy?: string | null;
-  accountStatus: 'active' | 'banned' | 'suspended';
-  paypalEmail?: string;
-
-  // Campi del profilo aggiuntivi (mantenuti dal design precedente)
-  bio?: string;
-  avatar?: string;
-  city?: string;
-  country?: string;
-  region?: string;
-  gender?: 'uomo' | 'donna' | 'altro' | 'non specificato';
-  age?: number;
-  relationship_status?: string;
-
-  // Mantenuto per retrocompatibilità con la logica esistente, da mappare
-  password?: string; // Solo per la creazione, non memorizzato
-  full_name?: string; // Derivato da username
-  nickname?: string;
-  referral_code?: string;
-  created_date?: string;
-  role?: string;
-
+    id: string;
+    username: string;
+    email: string;
+    createdAt: string;
+    verified?: boolean;
+    likeBalance: number;
+    walletBalance: number;
+    totalLikesReceived: number;
+    totalLikesSent: number;
+    referralCode: string;
+    referredBy?: string | null;
+    accountStatus: 'active' | 'banned' | 'suspended';
+    paypalEmail?: string;
+    bio?: string;
+    avatar?: string;
+    city?: string;
+    country?: string;
+    region?: string;
+    gender?: 'uomo' | 'donna' | 'altro' | 'non specificato';
+    age?: number;
+    relationship_status?: string;
+    password?: string;
+    full_name?: string;
+    created_date?: string;
+    role?: string;
 };
 
 export type Post = {
   id: string;
   userId: string;
-  text: string;
-  mediaType: "image" | "video" | "text";
-  mediaURL: string;
+  text?: string;
+  mediaType?: "image" | "video" | "text";
+  mediaURL?: string;
   thumbnailURL?: string;
-  likeCount: number;
+  likeCount?: number;
   createdAt: string; // ISO timestamp
-  status: "visible" | "removed";
+  status?: "visible" | "removed";
   earnings?: number;
-  
-  // Fields for backward compatibility in mock data
   imageUrl?: string;
   description?: string;
   likes?: number;
@@ -71,24 +52,20 @@ export type Post = {
 export type LikeEvent = {
   id: string; // eventId
   postId: string;
-  receiverId: string; // userId of user who received the like
-  giverId: string; // userId of user who gave the like
-  value: 1;
-  createdAt: string; // ISO timestamp
-  fromUser?: any;
-  toUser?: any;
-  timestamp?: any;
+  fromUser: string; 
+  toUser: string; 
+  value: number; // e.g. 0.01
+  timestamp: string; // ISO timestamp
 };
 
 export type Transaction = {
   id: string; // transactionId
   userId: string;
-  type: "like_received" | "like_purchase" | "conversion" | "payout";
+  type: "like" | "like_purchase" | "payout" | "reward" | "purchase";
   amount: number;
   description: string;
   createdAt: string; // timestamp
   status?: "pending" | "completed" | "failed";
-  user_id?: string;
   created_date?: any;
 };
 
@@ -162,4 +139,3 @@ export type DailyStats = {
   total_payouts: number;
   revenue: number;
 };
-    
