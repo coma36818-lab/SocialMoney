@@ -37,7 +37,13 @@ export default function Impostazioni() {
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
-    setDarkMode(localStorage.getItem('theme') !== 'light');
+    const isDark = localStorage.getItem('theme') !== 'light';
+    setDarkMode(isDark);
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
     loadUser();
   }, []);
 
@@ -305,7 +311,7 @@ export default function Impostazioni() {
                 <div>
                   <Label className="text-gray-400 text-sm">Membro da</Label>
                   <p className="text-white font-medium mt-1">
-                    {new Date(user.created_date || Date.now()).toLocaleDateString('it-IT')}
+                    {user.created_date ? new Date(user.created_date).toLocaleDateString('it-IT') : 'N/A'}
                   </p>
                 </div>
               </CardContent>
@@ -345,7 +351,7 @@ export default function Impostazioni() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-red-400">
                   <Trash2 className="w-5 h-5" />
-                  Zona Pericolosa
+                  Gestione Account
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -370,5 +376,3 @@ export default function Impostazioni() {
     </div>
   );
 }
-
-    
