@@ -101,7 +101,7 @@ export default function SignupPage() {
         title: 'Registrazione completata!',
         description: 'Ti abbiamo inviato un\'email di conferma. Controlla la tua casella di posta!',
       });
-      router.push('/feed');
+      router.push('/login');
 
     } catch (error) {
       const authError = error as AuthError;
