@@ -70,22 +70,25 @@ export type Post = {
 
 export type LikeEvent = {
   id: string; // eventId
-  fromUser: string; // userId of user who gave the like
-  toUser: string; // userId of user who received the like
   postId: string;
-  value: number; // e.g. 0.01
-  timestamp: string; // ISO timestamp
+  receiverId: string; // userId of user who received the like
+  giverId: string; // userId of user who gave the like
+  value: 1;
+  createdAt: string; // ISO timestamp
+  fromUser?: any;
+  toUser?: any;
+  timestamp?: any;
 };
 
 export type Transaction = {
   id: string; // transactionId
   userId: string;
-  type: "purchase" | "withdraw" | "reward" | "like" | "like_purchase" | "payout";
+  type: "like_received" | "like_purchase" | "conversion" | "payout";
   amount: number;
-  status: "pending" | "completed" | "failed";
+  description: string;
   createdAt: string; // timestamp
+  status?: "pending" | "completed" | "failed";
   user_id?: string;
-  description?: string;
   created_date?: any;
 };
 
