@@ -78,6 +78,7 @@ export default function SettingsPage() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: SettingsFormValues) => {
+      if (!user) throw new Error("Utente non autenticato.");
       const updates: Partial<User> = {
         nickname: data.nickname,
         full_name: data.nickname, // Keep them in sync
@@ -86,7 +87,7 @@ export default function SettingsPage() {
         region: data.region,
       };
 
-      if (avatarPreview && avatarPreview !== user?.avatar) {
+      if (avatarPreview && avatarPreview !== user.avatar) {
         updates.avatar = avatarPreview;
       }
       return await base44.auth.updateMe(updates);
