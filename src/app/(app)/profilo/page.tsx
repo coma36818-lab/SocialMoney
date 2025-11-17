@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { User as UserIcon, Heart, Wallet, TrendingUp, Edit, Loader2 } from "lucide-react";
+import { User as UserIcon, Heart, Wallet, TrendingUp, Edit, Loader2, MapPin, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -54,15 +54,25 @@ export default function ProfiloPage() {
             </div>
         );
     }
+    
+    const getGenderLabel = (gender: User['gender']) => {
+        const labels = {
+        uomo: "Uomo",
+        donna: "Donna",
+        altro: "Altro",
+        'non specificato': "Non specificato"
+        };
+        return labels[gender] || gender;
+    };
 
     const stats = [
-        { label: "Saldo Totale", value: `€${user.balance?.toFixed(2) || "0.00"}`, icon: Wallet, color: "text-accent", gradient: "from-accent to-[#FFA500]" },
-        { label: "Like Ricevuti", value: user.likes_received || 0, icon: Heart, color: "text-primary", gradient: "from-primary to-[#ff3366]" },
-        { label: "Like Disponibili", value: user.likes_available || 0, icon: TrendingUp, color: "text-[#3D9DF7]", gradient: "from-[#3D9DF7] to-[#5ba8f7]" }
+        { label: "Like Ricevuti", value: user.likes_received || 0, icon: Heart, color: "text-primary" },
+        { label: "Post", value: userPosts?.length || 0, icon: TrendingUp, color: "text-accent" },
+        { label: "Guadagni", value: `€${user.total_earnings?.toFixed(2) || "0.00"}`, icon: Wallet, color: "text-[#3D9DF7]" }
     ];
 
     const getInitials = (name: string) => {
-        return name.split(' ').map(n => n[0]).join('').toUpperCase();
+        return name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : '';
     }
 
     return (
@@ -89,10 +99,26 @@ export default function ProfiloPage() {
                                 <p className="text-gray-400 mb-4">@{user.email.split('@')[0]}</p>
                                 {user.bio && (<p className="text-gray-300 mb-6">{user.bio}</p>)}
                                 
+                                <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-6">
+                                  {user.gender && (
+                                    <span>{getGenderLabel(user.gender)}</span>
+                                  )}
+                                  {(user.city || user.region) && (
+                                    <span className="flex items-center gap-1">
+                                      <MapPin className="w-4 h-4" />
+                                      {[user.city, user.region, user.country].filter(Boolean).join(', ')}
+                                    </span>
+                                  )}
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="w-4 h-4" />
+                                    Iscritto il {new Date(user.created_date!).toLocaleDateString('it-IT')}
+                                  </span>
+                                </div>
+                                
                                 <div className="grid grid-cols-3 gap-4 mt-6">
                                     {stats.map((stat, index) => (
                                         <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} whileHover={{ scale: 1.05 }} className="glass-card rounded-xl p-4 text-center" >
-                                            <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br ${stat.gradient} mb-3`}>
+                                            <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-primary to-[#ff3366] mb-3`}>
                                                 <stat.icon className="w-6 h-6 text-white" />
                                             </div>
                                             <p className="text-xs text-gray-500 mb-1">{stat.label}</p>

@@ -54,7 +54,7 @@ export default function Cerca() {
   };
 
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : '';
   }
 
   return (
@@ -186,7 +186,7 @@ export default function Cerca() {
 
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button
-                          onClick={() => router.push(createPageUrl("profilo"))} // In a real app, this would go to a specific user profile page
+                          onClick={() => router.push(createPageUrl("profiloutente") + "?email=" + user.email)}
                           className="bg-gradient-to-r from-[#FF0055] to-[#ff3366] hover:opacity-90 text-white"
                         >
                           Vedi Profilo
