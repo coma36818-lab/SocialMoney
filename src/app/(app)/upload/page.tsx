@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Image as ImageIcon, Video, X, Loader2, Type, Camera } from "lucide-react";
+import { Upload, Image as ImageIcon, Video, X, Loader2, Type, Camera, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
 import { base44 } from "@/lib/api";
@@ -81,6 +81,21 @@ export default function UploadPage() {
         <div className="text-center">
           <Loader2 className="animate-spin h-12 w-12 text-primary mx-auto mb-4" />
           <p className="text-muted-foreground">Caricamento...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user.verified) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-full max-w-md mx-auto text-center glass-card p-8 rounded-2xl">
+            <ShieldCheck className="w-16 h-16 text-primary mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-foreground mb-2">Verifica la tua Email</h2>
+            <p className="text-muted-foreground">
+                Per poter caricare contenuti, devi prima verificare il tuo indirizzo email. 
+                Controlla la tua casella di posta per il link di verifica.
+            </p>
         </div>
       </div>
     );
