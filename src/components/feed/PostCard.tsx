@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Post, User } from "@/lib/types";
@@ -8,6 +8,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { Heart, MessageCircle, DollarSign, Trash2, Loader2 } from "lucide-react";
 import Image from 'next/image';
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/lib/api";
 
 interface PostCardProps {
     post: Post;
@@ -18,8 +20,18 @@ interface PostCardProps {
 }
 
 const PostCard = ({ post, user, onSendLike, onDelete, isLiking }: PostCardProps) => {
+
+    const { data: owner } = useQuery({
+        queryKey: ['user', post.created_by],
+        queryFn: async () => {
+            const users = await base44.entities.User.filter({ email: post.created_by });
+            return users[0] || null;
+        },
+        enabled: !!post.created_by,
+    });
     
     const getInitials = (name: string) => {
+        if (!name) return '';
         return name.split(' ').map(n => n[0]).join('').toUpperCase();
     }
     
@@ -29,10 +41,11 @@ const PostCard = ({ post, user, onSendLike, onDelete, isLiking }: PostCardProps)
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                          <Avatar className="h-11 w-11 border-2 border-primary/50">
-                            <AvatarFallback className="bg-muted-foreground">{getInitials(post.created_by.split('@')[0])}</AvatarFallback>
+                            <AvatarImage src={owner?.avatar} alt={owner?.full_name} className="object-cover" />
+                            <AvatarFallback className="bg-muted-foreground">{getInitials(owner?.full_name || post.created_by.split('@')[0])}</AvatarFallback>
                         </Avatar>
                         <div>
-                            <p className="font-bold text-white">{post.created_by.split('@')[0]}</p>
+                            <p className="font-bold text-white">{owner?.full_name || post.created_by.split('@')[0]}</p>
                             <p className="text-xs text-gray-400">{formatDistanceToNow(new Date(post.created_date), { addSuffix: true, locale: it })}</p>
                         </div>
                     </div>

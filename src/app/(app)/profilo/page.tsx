@@ -9,6 +9,7 @@ import { createPageUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
 import type { User, Post } from "@/lib/types";
 import Image from "next/image";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 
 export default function ProfiloPage() {
@@ -33,6 +34,18 @@ export default function ProfiloPage() {
         queryFn: () => base44.entities.Post.filter({ created_by: user!.email }, '-created_date'),
         enabled: !!user,
     });
+    
+    useEffect(() => {
+        const refetchUser = async () => {
+            if (user) {
+                const updatedUser = await base44.auth.me();
+                setUser(updatedUser);
+            }
+        };
+        const interval = setInterval(refetchUser, 2000); // Refetch every 2 seconds
+        return () => clearInterval(interval);
+    }, [user]);
+
 
     if (!user) {
         return (
@@ -48,6 +61,10 @@ export default function ProfiloPage() {
         { label: "Like Disponibili", value: user.likes_available || 0, icon: TrendingUp, color: "text-[#3D9DF7]", gradient: "from-[#3D9DF7] to-[#5ba8f7]" }
     ];
 
+    const getInitials = (name: string) => {
+        return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    }
+
     return (
         <div className="min-h-screen bg-[#111111] text-white">
             <div className="max-w-6xl mx-auto px-4 py-8">
@@ -55,8 +72,13 @@ export default function ProfiloPage() {
                     <div className="glass-card rounded-3xl p-8 mb-8">
                         <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
                             <div className="relative">
-                                <motion.div whileHover={{ scale: 1.05, rotate: 5 }} className="w-32 h-32 bg-gradient-to-br from-primary to-[#ff3366] rounded-full flex items-center justify-center neon-glow" >
-                                    <UserIcon className="w-16 h-16 text-white" />
+                                <motion.div whileHover={{ scale: 1.05, rotate: 5 }} >
+                                     <Avatar className="w-32 h-32 border-4 border-primary neon-glow">
+                                        <AvatarImage src={user.avatar} alt={user.full_name} className="object-cover" />
+                                        <AvatarFallback className="bg-muted-foreground text-4xl">
+                                            {getInitials(user.full_name)}
+                                        </AvatarFallback>
+                                    </Avatar>
                                 </motion.div>
                                 <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => router.push(createPageUrl("Impostazioni"))} className="absolute bottom-0 right-0 w-10 h-10 bg-accent rounded-full flex items-center justify-center gold-glow hover:opacity-80 transition-opacity" >
                                     <Edit className="w-5 h-5 text-black" />
@@ -126,7 +148,7 @@ export default function ProfiloPage() {
                                             <p className="text-white text-center line-clamp-6 text-sm">{post.description}</p>
                                         </div>
                                     ) : post.media_url ? (
-                                        <Image src={post.media_url} alt="Post" layout="fill" className="object-cover" />
+                                        <Image src={post.media_url} alt="Post" fill className="object-cover" />
                                     ) : null}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                                         <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-4">

@@ -13,17 +13,21 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { base44 } from '@/lib/api';
-import { Loader2 } from 'lucide-react';
+import { Loader2, User as UserIcon } from 'lucide-react';
 import type { User } from '@/lib/types';
 import { createPageUrl } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import EmojiPicker from '@/components/EmojiPicker';
+import Image from 'next/image';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 
 const settingsSchema = z.object({
   nickname: z.string().min(3, 'Il nickname deve avere almeno 3 caratteri'),
   bio: z.string().max(200, 'La bio non può superare i 200 caratteri').optional(),
   city: z.string().min(1, 'La città è richiesta'),
   region: z.string().min(1, 'La regione è richiesta'),
+  avatar: z.any().optional(),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -33,6 +37,8 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -49,6 +55,9 @@ export default function SettingsPage() {
           city: userData.city,
           region: userData.region,
         });
+        if (userData.avatar) {
+          setAvatarPreview(userData.avatar);
+        }
       } catch (error) {
         router.push(createPageUrl("login"));
       }
@@ -56,20 +65,37 @@ export default function SettingsPage() {
     loadUser();
   }, [router, form]);
 
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setAvatarPreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+    }
+  };
+
+
   const updateProfileMutation = useMutation({
     mutationFn: async (data: SettingsFormValues) => {
-      const updates = {
+      const updates: Partial<User> = {
         nickname: data.nickname,
         full_name: data.nickname, // Keep them in sync
         bio: data.bio,
         city: data.city,
         region: data.region,
       };
+
+      if (avatarPreview && avatarPreview !== user?.avatar) {
+        updates.avatar = avatarPreview;
+      }
       return await base44.auth.updateMe(updates);
     },
     onSuccess: (updatedUser) => {
       setUser(updatedUser);
       queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ['userPosts', user?.email] });
       toast({ title: 'Profilo aggiornato!', description: 'Le tue modifiche sono state salvate.' });
     },
     onError: (error: Error) => {
@@ -104,6 +130,26 @@ export default function SettingsPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
+              <FormField name="avatar" control={form.control} render={({ field }) => (
+                <FormItem className="flex flex-col items-center">
+                    <FormLabel>Immagine Profilo</FormLabel>
+                    <FormControl>
+                        <label htmlFor="avatar-upload" className="cursor-pointer">
+                            <Avatar className="w-32 h-32 border-4 border-primary/50 hover:border-primary transition-colors">
+                                <AvatarImage src={avatarPreview ?? undefined} alt="Avatar" className="object-cover" />
+                                <AvatarFallback className="bg-muted-foreground">
+                                    <UserIcon className="w-16 h-16 text-white" />
+                                </AvatarFallback>
+                            </Avatar>
+                            <Input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                        </label>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+              )} />
+
+
               <FormField name="nickname" control={form.control} render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nickname</FormLabel>

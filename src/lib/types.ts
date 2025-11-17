@@ -10,6 +10,7 @@ export type User = {
   region: string;
   full_name: string;
   bio?: string;
+  avatar?: string;
   likes_available: number;
   likes_received: number;
   balance: number;

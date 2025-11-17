@@ -5,9 +5,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Home, User as UserIcon, Wallet, PlusSquare, Settings, LogOut, Search, MessageSquare, Trophy, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { base44 } from '@/lib/api';
 import type { User } from '@/lib/types';
+import { useEffect, useState } from 'react';
 
 const navItems = [
   { href: '/feed', label: 'Feed', icon: Home },
@@ -21,9 +22,28 @@ const navItems = [
   { href: '/impostazioni', label: 'Impostazioni', icon: Settings },
 ];
 
-export function AppSidebar({ user }: { user: User }) {
+export function AppSidebar({ user: initialUser }: { user: User }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [user, setUser] = useState(initialUser);
+
+  useEffect(() => {
+    setUser(initialUser);
+  }, [initialUser]);
+  
+  useEffect(() => {
+    const refetchUser = async () => {
+      try {
+        const updatedUser = await base44.auth.me();
+        setUser(updatedUser);
+      } catch (error) {
+        console.error("Failed to refetch user for sidebar", error);
+      }
+    };
+
+    const interval = setInterval(refetchUser, 2000); // Check for updates every 2 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = async () => {
     await base44.auth.logout();
@@ -31,6 +51,7 @@ export function AppSidebar({ user }: { user: User }) {
   };
 
   const getInitials = (name: string) => {
+    if (!name) return "";
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   }
 
@@ -59,6 +80,7 @@ export function AppSidebar({ user }: { user: User }) {
       <div className="mt-auto border-t border-white/10 p-4">
         <div className="flex items-center gap-4 mb-4">
           <Avatar className="h-10 w-10 border-2 border-primary">
+            <AvatarImage src={user.avatar} alt={user.full_name} className="object-cover" />
             <AvatarFallback className="bg-muted-foreground">{getInitials(user.full_name)}</AvatarFallback>
           </Avatar>
           <div>

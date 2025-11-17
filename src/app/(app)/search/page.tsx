@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
 import type { User as UserType } from "@/lib/types";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Cerca() {
   const router = useRouter();
@@ -51,6 +52,10 @@ export default function Cerca() {
     };
     return labels[gender] || gender;
   };
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  }
 
   return (
     <div className="min-h-screen bg-[#111111]">
@@ -151,16 +156,20 @@ export default function Cerca() {
                       >
                         <motion.div
                           whileHover={{ scale: 1.1 }}
-                          className="w-16 h-16 bg-gradient-to-br from-[#FF0055] to-[#ff3366] rounded-full flex items-center justify-center"
                         >
-                          <User className="w-8 h-8 text-white" />
+                          <Avatar className="w-16 h-16 bg-gradient-to-br from-[#FF0055] to-[#ff3366] rounded-full flex items-center justify-center">
+                            <AvatarImage src={user.avatar} alt={user.full_name} className="object-cover" />
+                            <AvatarFallback className="bg-muted-foreground">
+                                {getInitials(user.full_name)}
+                            </AvatarFallback>
+                          </Avatar>
                         </motion.div>
                         <div className="flex-1">
                           <h3 className="font-bold text-white text-lg">{user.full_name}</h3>
                           <p className="text-sm text-gray-400">@{user.email.split('@')[0]}</p>
                           
                           <div className="flex flex-wrap gap-3 mt-2">
-                            {user.gender && (
+                            {user.gender && user.gender !== 'non specificato' && (
                               <span className="text-xs text-gray-400">
                                 {getGenderLabel(user.gender)}
                               </span>
@@ -177,7 +186,7 @@ export default function Cerca() {
 
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button
-                          onClick={() => router.push(createPageUrl("profilo"))}
+                          onClick={() => router.push(createPageUrl("profilo"))} // In a real app, this would go to a specific user profile page
                           className="bg-gradient-to-r from-[#FF0055] to-[#ff3366] hover:opacity-90 text-white"
                         >
                           Vedi Profilo

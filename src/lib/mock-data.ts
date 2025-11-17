@@ -1,7 +1,7 @@
 import type { Post, User, Message } from './types';
 import {faker} from '@faker-js/faker';
 
-const createMockUser = (email: string, nickname: string): User => ({
+const createMockUser = (email: string, nickname: string, avatar?: string): User => ({
     id: faker.string.uuid(),
     nickname,
     full_name: nickname,
@@ -13,6 +13,7 @@ const createMockUser = (email: string, nickname: string): User => ({
     country: 'Italia',
     region: faker.location.state(),
     bio: faker.lorem.sentence(),
+    avatar: avatar,
     likes_available: faker.number.int({ min: 5, max: 100 }),
     likes_received: faker.number.int({ min: 100, max: 5000 }),
     balance: faker.number.float({ min: 10, max: 1000, precision: 0.01 }),
@@ -20,9 +21,9 @@ const createMockUser = (email: string, nickname: string): User => ({
 });
 
 export const mockUsers: User[] = [
-    createMockUser('mario.rossi@email.com', 'Mario Rossi'),
-    createMockUser('anna.verdi@email.com', 'Anna Verdi'),
-    createMockUser('luca.bianchi@email.com', 'Luca Bianchi'),
+    createMockUser('mario.rossi@email.com', 'Mario Rossi', 'https://picsum.photos/seed/mario/200/200'),
+    createMockUser('anna.verdi@email.com', 'Anna Verdi', 'https://picsum.photos/seed/anna/200/200'),
+    createMockUser('luca.bianchi@email.com', 'Luca Bianchi', 'https://picsum.photos/seed/luca/200/200'),
     createMockUser('user@test.com', 'Test User'),
 ];
 
