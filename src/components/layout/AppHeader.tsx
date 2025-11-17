@@ -1,8 +1,9 @@
-
 'use client';
 
 import React, { useState, useEffect } from "react";
 import Link from 'next/link';
+import Image from 'next/image';
+import logo from '@/app/logo.png';
 import { usePathname, useRouter } from 'next/navigation';
 import { createPageUrl } from "@/lib/utils";
 import { base44 } from "@/lib/api";
@@ -93,12 +94,10 @@ export function AppHeader({ user: initialUser }: { user: UserType }) {
             <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
                 <Link href={createPageUrl("feed")} className="flex items-center gap-3 group">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary to-[#ff3366] rounded-xl flex items-center justify-center neon-glow">
-                    <Heart className="w-6 h-6 text-primary-foreground" fill="currentColor" />
-                </div>
-                <h1 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
-                    Social Money
-                </h1>
+                    <Image src={logo} alt="Social Money" width={40} height={40} className="rounded-xl neon-glow" />
+                    <h1 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                        Social Money
+                    </h1>
                 </Link>
 
                 <div className="flex items-center gap-4">
@@ -146,23 +145,21 @@ export function AppHeader({ user: initialUser }: { user: UserType }) {
         {/* Mobile Header */}
         <div className="md:hidden fixed top-0 left-0 right-0 z-50 glass-card border-b border-border">
             <div className="flex items-center justify-between px-4 py-3">
-            <Link href={createPageUrl("feed")} className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary to-[#ff3366] rounded-lg flex items-center justify-center">
-                <Heart className="w-5 h-5 text-primary-foreground" fill="currentColor" />
-                </div>
-                <span className="text-lg font-bold text-foreground">Social Money</span>
-            </Link>
+                <Link href={createPageUrl("feed")} className="flex items-center gap-2">
+                    <Image src={logo} alt="Social Money" width={32} height={32} className="rounded-lg" />
+                    <span className="text-lg font-bold text-foreground">Social Money</span>
+                </Link>
 
-            <div className="flex items-center gap-2">
-                <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-foreground"
-                >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                </Button>
-            </div>
+                <div className="flex items-center gap-2">
+                    <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="text-foreground"
+                    >
+                    {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    </Button>
+                </div>
             </div>
 
             {/* Mobile Menu */}

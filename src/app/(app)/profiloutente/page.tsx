@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ProfiloUtentePage() {
   const searchParams = useSearchParams();
-  const targetEmail = searchParams.get('email');
+  const targetEmail = searchParams?.get('email');
 
   const { data: allUsers = [] } = useQuery<User[]>({
     queryKey: ['allUsers'],
@@ -40,7 +40,8 @@ export default function ProfiloUtentePage() {
   }
 
   const getGenderLabel = (gender: User['gender']) => {
-    const labels = {
+    if (!gender) return "";
+    const labels: Record<string, string> = {
       uomo: "Uomo",
       donna: "Donna",
       altro: "Altro",
@@ -176,19 +177,19 @@ export default function ProfiloUtentePage() {
                   whileHover={{ scale: 1.05 }}
                   className="group relative aspect-square glass-card rounded-xl overflow-hidden cursor-pointer"
                 >
-                  {post.media_type === "image" ? (
+                  {post.media_url && post.media_type === "image" ? (
                     <Image
                       src={post.media_url}
                       alt={post.description || "Post"}
                       fill
                       className="object-cover"
                     />
-                  ) : (
+                  ) : post.media_url && post.media_type === "video" ? (
                     <video
                       src={post.media_url}
                       className="w-full h-full object-cover"
                     />
-                  )}
+                  ) : null}
                   
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="absolute bottom-0 left-0 right-0 p-4">

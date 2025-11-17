@@ -1,4 +1,3 @@
-
 'use client';
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/lib/api";
@@ -57,11 +56,12 @@ export default function ProfiloPage() {
     }
     
     const getGenderLabel = (gender: User['gender']) => {
-        const labels = {
-        uomo: "Uomo",
-        donna: "Donna",
-        altro: "Altro",
-        'non specificato': "Non specificato"
+        if (!gender) return "";
+        const labels: Record<string, string> = {
+            uomo: "Uomo",
+            donna: "Donna",
+            altro: "Altro",
+            'non specificato': "Non specificato"
         };
         return labels[gender] || gender;
     };

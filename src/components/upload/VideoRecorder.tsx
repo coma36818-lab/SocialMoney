@@ -2,7 +2,7 @@
 'use client';
 import React, { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, Record, StopCircle, Upload, Loader2, Video as VideoIcon, RotateCcw } from 'lucide-react';
+import { Camera, StopCircle, Upload, Loader2, Video as VideoIcon, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { auth, storage } from '@/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
@@ -225,7 +225,7 @@ export default function VideoRecorder() {
                 </>
             ) : (
                 <>
-                    <Record className="mr-2" /> Inizia a registrare
+                    <StopCircle className="mr-2" /> Inizia a registrare
                 </>
             )}
           </Button>

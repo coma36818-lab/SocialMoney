@@ -46,7 +46,7 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
   const [showLikesModal, setShowLikesModal] = useState(false);
   const queryClient = useQueryClient();
 
-  const canLike = user && user.likes_available > 0 && post.created_by !== user?.email;
+  const canLike = user && user.likeBalance > 0 && post.created_by !== user?.email;
   const isOwner = post.created_by === user?.email;
 
   const { data: owner } = useQuery({
@@ -245,20 +245,20 @@ export default function PostCard({ post, user, onSendLike, onDelete }: PostCardP
             transition={{ duration: 0.2 }}
             className="relative aspect-video bg-muted/50 overflow-hidden"
           >
-            {post.media_type === "image" ? (
+            {post.media_type === "image" && post.media_url ? (
               <Image
                 src={post.media_url}
                 alt={post.description || "Post image"}
                 fill
                 className="object-contain"
               />
-            ) : (
+            ) : post.media_type === "video" && post.media_url ? (
               <video
                 src={post.media_url}
                 controls
                 className="w-full h-full object-cover"
               />
-            )}
+            ) : null}
           </motion.div>
 
           {post.description && (

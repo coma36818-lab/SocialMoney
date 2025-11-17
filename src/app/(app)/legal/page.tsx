@@ -23,7 +23,7 @@ const LegalContent = ({ title, children, icon: Icon, iconClass }: { title: strin
 
 export default function LegalPage() {
     const searchParams = useSearchParams();
-    const defaultTab = searchParams.get('tab') || 'terms';
+    const defaultTab = searchParams?.get('tab') || 'terms';
     const [lastUpdated, setLastUpdated] = useState('');
 
     useEffect(() => {

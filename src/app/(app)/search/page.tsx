@@ -44,7 +44,8 @@ export default function Cerca() {
   });
 
   const getGenderLabel = (gender: UserType['gender']) => {
-    const labels = {
+    if (!gender) return "";
+    const labels: Record<string, string> = {
       uomo: "Uomo",
       donna: "Donna",
       altro: "Altro",
@@ -53,7 +54,7 @@ export default function Cerca() {
     return labels[gender] || gender;
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name?: string | null) => {
     return name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : '';
   }
 
@@ -159,7 +160,7 @@ export default function Cerca() {
                           whileHover={{ scale: 1.1 }}
                         >
                           <Avatar className="w-16 h-16 bg-gradient-to-br from-primary to-[#ff3366] rounded-full flex items-center justify-center">
-                            <AvatarImage src={user.avatar} alt={user.full_name} className="object-cover" />
+                            <AvatarImage src={user.avatar} alt={user.full_name || 'Avatar'} className="object-cover" />
                             <AvatarFallback className="bg-muted">
                                 {getInitials(user.full_name)}
                             </AvatarFallback>

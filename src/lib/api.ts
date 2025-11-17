@@ -1,7 +1,7 @@
 
 'use client';
 import { mockPosts, mockUsers, mockMessages, mockComments, mockCommentReplies, mockCommentLikes, mockLikes, mockNotifications } from './mock-data';
-import type { LikeEvent, Notification, Post, Transaction, User, Message, Comment, CommentReply, CommentLike } from './types';
+import type { Like, LikeEvent, Notification, Post, Transaction, User, Message, Comment, CommentReply, CommentLike } from './types';
 import {faker} from '@faker-js/faker';
 
 const CURRENT_USER_KEY = 'connect_now_user';
