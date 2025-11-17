@@ -33,13 +33,14 @@ const initializeData = <T>(key: string, initialData: T): T => {
 
 let users: User[] = initializeData(USERS_KEY, mockUsers);
 let posts: Post[] = initializeData(POSTS_KEY, mockPosts);
-let likeEvents: LikeEvent[] = initializeData(LIKE_EVENTS_KEY, mockLikes);
+let likeEvents: LikeEvent[] = initializeData(LIKE_EVENTS_KEY, []);
 let comments: Comment[] = initializeData(COMMENTS_KEY, mockComments);
 let commentReplies: CommentReply[] = initializeData(COMMENT_REPLIES_KEY, mockCommentReplies);
 let commentLikes: CommentLike[] = initializeData(COMMENT_LIKES_KEY, mockCommentLikes);
 let transactions: Transaction[] = initializeData(TRANSACTIONS_KEY, []);
 let messages: Message[] = initializeData(MESSAGES_KEY, mockMessages);
 let notifications: Notification[] = initializeData(NOTIFICATIONS_KEY, mockNotifications);
+let likes: Like[] = initializeData(LIKES_KEY, mockLikes);
 
 
 const saveData = <T>(key: string, data: T) => {
@@ -83,15 +84,22 @@ export const base44 = {
         }
         throw new Error('Invalid credentials');
     },
-    signup: async (data: Omit<User, 'id' | 'full_name' | 'likeBalance' | 'totalLikesReceived' | 'totalLikesSent' | 'walletBalance' | 'createdAt' | 'accountStatus'>): Promise<User> => {
+    signup: async (data: any): Promise<User> => {
         if(users.some(u => u.email === data.email)) {
             throw new Error('User already exists');
         }
         const newUser: User = {
-            ...data,
             id: faker.string.uuid(),
             username: data.nickname,
-            likeBalance: 20,
+            full_name: data.nickname,
+            email: data.email,
+            age: data.age,
+            gender: data.gender,
+            city: data.city,
+            country: data.country,
+            region: data.region,
+            referredBy: data.referred_by || null,
+            likeBalance: 20, // Starting likes
             totalLikesReceived: 0,
             totalLikesSent: 0,
             walletBalance: 0,
@@ -130,26 +138,25 @@ export const base44 = {
     Post: {
       list: async (sort: string, limit?: number): Promise<Post[]> => {
         let sortedPosts = [...posts];
-        if (sort === '-createdAt') {
-          sortedPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        if (sort === '-createdAt' || sort === '-created_date') {
+          sortedPosts.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
         }
         return limit ? sortedPosts.slice(0, limit) : sortedPosts;
       },
       filter: async (filter: Partial<Post>, sort?: string): Promise<Post[]> => {
         let filteredPosts = posts.filter(p => Object.entries(filter).every(([key, value]) => p[key as keyof Post] === value));
-        if (sort === '-createdAt') {
-          filteredPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        if (sort === '-createdAt' || sort === '-created_date') {
+          filteredPosts.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
         }
         return filteredPosts;
       },
-      create: async (data: Omit<Post, 'id' | 'likes'>): Promise<Post> => {
-        const owner = users.find(u => u.id === data.userId);
-        if (!owner) throw new Error('Owner not found');
-        
+      create: async (data: any): Promise<Post> => {
         const newPost: Post = {
           ...data,
           id: faker.string.uuid(),
           likes: 0,
+          likes_count: 0,
+          earnings: 0,
         };
         posts.unshift(newPost);
         saveData(POSTS_KEY, posts);
@@ -159,7 +166,7 @@ export const base44 = {
         let post = posts.find(p => p.id === postId);
         if (!post) throw new Error('Post not found');
 
-        post = { ...post, ...updates };
+        post = { ...post, ...updates, likes_count: (post.likes_count || 0) + 1 };
         posts = posts.map(p => p.id === postId ? post! : p);
         saveData(POSTS_KEY, posts);
         return post;
@@ -219,6 +226,11 @@ export const base44 = {
         return newLikeEvent;
       },
     },
+     Like: {
+      filter: async (filter: Partial<Like>): Promise<Like[]> => {
+        return likes.filter(l => Object.entries(filter).every(([key, value]) => l[key as keyof Like] === value));
+      },
+    },
     Comment: {
        filter: async (filter: Partial<Comment>, sort?: string): Promise<Comment[]> => {
         let filteredComments = comments.filter(c => Object.entries(filter).every(([key, value]) => c[key as keyof Comment] === value));
@@ -270,12 +282,12 @@ export const base44 = {
         if(!user) throw new Error('User not found');
         
         let userTransactions = transactions.filter(t => t.userId === user.id);
-        if (sort === '-createdAt') {
-          userTransactions.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        if (sort === '-createdAt' || sort === '-created_date') {
+          userTransactions.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
         }
         return userTransactions;
       },
-      create: async (data: Omit<Transaction, 'id'| 'createdAt'>): Promise<Transaction> => {
+      create: async (data: any): Promise<Transaction> => {
         const newTransaction: Transaction = {
           ...data,
           id: faker.string.uuid(),

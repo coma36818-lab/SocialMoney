@@ -11,7 +11,7 @@ export type User = {
   totalLikesSent: number;
   createdAt: string; // ISO timestamp
   referralCode: string;
-  referredBy: string | null;
+  referredBy?: string | null;
   accountStatus: 'active' | 'banned' | 'suspended';
   paypalEmail?: string;
 
@@ -28,15 +28,30 @@ export type User = {
   // Mantenuto per retrocompatibilità con la logica esistente, da mappare
   password?: string; // Solo per la creazione, non memorizzato
   full_name?: string; // Derivato da username
+  nickname?: string;
+  likes_available?: number;
+  likes_received?: number;
+  total_earnings?: number;
+  likes_sent?: number;
+  referral_code?: string;
+  created_date?: string;
+  balance?: number;
+
 };
 
 export type Post = {
   id: string; // Firestore document ID
   userId: string; // ID dell'utente che ha creato il post
-  imageUrl: string;
   description: string;
   createdAt: string; // ISO timestamp
   likes: number;
+  media_url?: string;
+  media_type?: 'image' | 'video' | 'text';
+  created_by?: any;
+  owner_id?: any;
+  created_date?: any;
+  likes_count?: any;
+  earnings?: any;
 };
 
 export type LikeEvent = {
@@ -51,10 +66,13 @@ export type LikeEvent = {
 export type Transaction = {
   id: string; // transactionId
   userId: string;
-  type: "purchase" | "withdraw" | "reward" | "like";
+  type: "purchase" | "withdraw" | "reward" | "like" | "like_purchase";
   amount: number;
   status: "pending" | "completed" | "failed";
   createdAt: string; // timestamp
+  user_id?: string;
+  description?: string;
+  created_date?: any;
 };
 
 export type Notification = {
@@ -102,3 +120,10 @@ export type CommentLike = {
   created_date: string;
 };
 
+export type Like = {
+  id: string;
+  post_id: string;
+  post_owner_email: string;
+  like_value: number;
+  created_by: string;
+};

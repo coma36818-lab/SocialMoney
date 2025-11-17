@@ -13,9 +13,9 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
 const likePackages = [
-    { name: 'Base', likes: 100, price: 1.00, icon: Heart, color: 'text-muted-foreground' },
-    { name: 'Spark', likes: 550, price: 5.00, icon: Zap, color: 'text-blue-500', popular: false },
-    { name: 'Superstar', likes: 1200, price: 10.00, icon: Star, color: 'text-yellow-500', popular: true },
+    { name: 'Base', likes: 100, price: 1.99, icon: Heart, color: 'text-muted-foreground' },
+    { name: 'Spark', likes: 300, price: 4.99, icon: Zap, color: 'text-blue-500', popular: false },
+    { name: 'Superstar', likes: 1000, price: 9.99, icon: Star, color: 'text-yellow-500', popular: true },
     { name: 'Legend', likes: 3000, price: 25.00, icon: Crown, color: 'text-primary', popular: false },
 ];
 
@@ -47,20 +47,21 @@ export default function RicaricaPage() {
             await new Promise(resolve => setTimeout(resolve, 1500));
 
             const updatedUser = await base44.auth.updateMe({
-                likes_available: user.likes_available + pkg.likes,
+                likes_available: (user.likes_available || 0) + pkg.likes,
             });
 
             await base44.entities.Transaction.create({
-                user_id: user.id,
+                userId: user.id,
                 type: 'like_purchase',
                 description: `Acquisto pacchetto ${pkg.name}`,
                 amount: -pkg.price,
+                status: 'completed',
             });
 
             return updatedUser;
         },
         onSuccess: (updatedUser) => {
-            setUser(updatedUser);
+            setUser(updatedUser as User);
             queryClient.invalidateQueries({ queryKey: ['user'] });
             toast({
                 title: "Ricarica Effettuata!",
@@ -136,7 +137,7 @@ export default function RicaricaPage() {
                                 <div className="border-t border-border pt-4 mt-4 space-y-2">
                                      <div className="flex justify-between text-lg">
                                         <span>Like attuali:</span>
-                                        <span className="font-semibold">{user.likes_available.toLocaleString('it-IT')}</span>
+                                        <span className="font-semibold">{(user.likes_available || 0).toLocaleString('it-IT')}</span>
                                     </div>
                                     <div className="flex justify-between text-lg text-primary">
                                         <span>Nuovi like:</span>
@@ -144,7 +145,7 @@ export default function RicaricaPage() {
                                     </div>
                                      <div className="flex justify-between text-xl font-bold border-t border-border pt-2 mt-2">
                                         <span>Totale dopo acquisto:</span>
-                                        <span>{(user.likes_available + selectedPackage.likes).toLocaleString('it-IT')}</span>
+                                        <span>{((user.likes_available || 0) + selectedPackage.likes).toLocaleString('it-IT')}</span>
                                     </div>
                                 </div>
                                 <Button 
@@ -162,7 +163,7 @@ export default function RicaricaPage() {
                                         </>
                                     )}
                                 </Button>
-                                <p className="text-xs text-center text-muted-foreground mt-3">Pagamento sicuro con Stripe.</p>
+                                <p className="text-xs text-center text-muted-foreground mt-3">Pagamento sicuro con PayPal.</p>
                             </CardContent>
                         </Card>
                     </motion.div>
