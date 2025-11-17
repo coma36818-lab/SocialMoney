@@ -1,3 +1,34 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "post1",
+      "description": "A person standing on a mountain peak at sunset.",
+      "imageUrl": "https://images.unsplash.com/photo-1618232397405-90bb514c6658?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bW91bnRhaW4lMjBzdW5zZXR8ZW58MHx8fHwxNzYzMzY0MTU2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mountain sunset"
+    },
+    {
+      "id": "post2",
+      "description": "A delicious-looking pizza on a wooden table.",
+      "imageUrl": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmb29kJTIwcGl6emF8ZW58MHx8fHwxNzYzMzY0MTU2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "food pizza"
+    },
+    {
+      "id": "post3",
+      "description": "A cute cat sleeping on a cozy blanket.",
+      "imageUrl": "https://images.unsplash.com/photo-1673867274472-748fc8889d4a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxhbmltYWwlMjBjYXR8ZW58MHx8fHwxNzYzMzY0MTU2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "animal cat"
+    },
+    {
+      "id": "post4",
+      "description": "Abstract neon lights in a dark room.",
+      "imageUrl": "https://images.unsplash.com/photo-1702357430179-16b1ba1f5dd0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxhYnN0cmFjdCUyMG5lb258ZW58MHx8fHwxNzYzMzUzMTQ4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract neon"
+    },
+    {
+      "id": "post5",
+      "description": "A serene beach with waves crashing on the shore.",
+      "imageUrl": "https://images.unsplash.com/photo-1491378630646-3440efa57c3b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxiZWFjaCUyMG9jZWFufGVufDB8fHx8MTc2MzM1Njc5N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beach ocean"
+    }
+  ]
 }
