@@ -1,202 +1,265 @@
 'use client';
+import React, { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { User, Mail, Lock, Trash2, Save, AlertCircle, Moon, Sun, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { createPageUrl } from "@/lib/utils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { motion } from "framer-motion";
+import { Switch } from "@/components/ui/switch";
+import { base44 } from "@/lib/api";
+import type { User as UserType } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import { base44 } from '@/lib/api';
-import { Loader2, User as UserIcon } from 'lucide-react';
-import type { User } from '@/lib/types';
-import { createPageUrl } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import EmojiPicker from '@/components/EmojiPicker';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
-
-const settingsSchema = z.object({
-  nickname: z.string().min(3, 'Il nickname deve avere almeno 3 caratteri'),
-  bio: z.string().max(200, 'La bio non può superare i 200 caratteri').optional(),
-  city: z.string().min(1, 'La città è richiesta'),
-  region: z.string().min(1, 'La regione è richiesta'),
-  avatar: z.any().optional(),
-});
-
-type SettingsFormValues = z.infer<typeof settingsSchema>;
-
-export default function SettingsPage() {
+export default function Impostazioni() {
   const router = useRouter();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [user, setUser] = useState<User | null>(null);
+  const { toast } = useToast();
+  const [user, setUser] = useState<UserType | null>(null);
+  const [formData, setFormData] = useState({
+    full_name: "",
+    bio: "",
+    city: "",
+    region: "",
+    country: "",
+    gender: "",
+    avatar: "",
+  });
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-
-  const form = useForm<SettingsFormValues>({
-    resolver: zodResolver(settingsSchema),
-  });
-
   useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const userData = await base44.auth.me();
-        setUser(userData);
-        form.reset({
-          nickname: userData.nickname,
-          bio: userData.bio || '',
-          city: userData.city,
-          region: userData.region,
-        });
-        if (userData.avatar) {
-          setAvatarPreview(userData.avatar);
-        }
-      } catch (error) {
-        router.push(createPageUrl("login"));
-      }
-    };
     loadUser();
-  }, [router, form]);
+  }, []);
+
+  const loadUser = async () => {
+    try {
+      const userData = await base44.auth.me();
+      setUser(userData);
+      setFormData({
+        full_name: userData.full_name || "",
+        bio: userData.bio || "",
+        city: userData.city || "",
+        region: userData.region || "",
+        country: userData.country || "",
+        gender: userData.gender || "non specificato",
+        avatar: userData.avatar || "",
+      });
+      if (userData.avatar) {
+        setAvatarPreview(userData.avatar);
+      }
+    } catch (error) {
+      router.push(createPageUrl("login"));
+    }
+  };
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
         const reader = new FileReader();
         reader.onloadend = () => {
-            setAvatarPreview(reader.result as string);
+            const result = reader.result as string;
+            setAvatarPreview(result);
+            setFormData(prev => ({...prev, avatar: result}));
         };
         reader.readAsDataURL(file);
     }
   };
 
-
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: SettingsFormValues) => {
-      if (!user) throw new Error("Utente non autenticato.");
-      const updates: Partial<User> = {
-        nickname: data.nickname,
-        full_name: data.nickname, // Keep them in sync
+    mutationFn: async (data: typeof formData) => {
+      await base44.auth.updateMe({
+        full_name: data.full_name,
+        nickname: data.full_name, // Sync nickname
         bio: data.bio,
         city: data.city,
         region: data.region,
-      };
-
-      if (avatarPreview && avatarPreview !== user.avatar) {
-        updates.avatar = avatarPreview;
-      }
-      return await base44.auth.updateMe(updates);
+        country: data.country,
+        gender: data.gender as UserType['gender'],
+        avatar: data.avatar,
+      });
     },
-    onSuccess: (updatedUser) => {
-      setUser(updatedUser);
+    onSuccess: () => {
+      toast({ title: "Successo", description: "Profilo aggiornato con successo!" });
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      queryClient.invalidateQueries({ queryKey: ['userPosts', user?.email] });
-      toast({ title: 'Profilo aggiornato!', description: 'Le tue modifiche sono state salvate.' });
+      loadUser();
     },
     onError: (error: Error) => {
-      toast({ variant: 'destructive', title: 'Errore', description: error.message });
-    },
+      toast({ variant: 'destructive', title: "Errore", description: "Errore nell'aggiornamento del profilo: " + error.message });
+    }
   });
-  
-  const onSubmit = (data: SettingsFormValues) => {
-    updateProfileMutation.mutate(data);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateProfileMutation.mutate(formData);
   };
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="animate-spin h-12 w-12 text-primary" />
+      <div className="min-h-screen bg-[#111111] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="animate-spin h-12 w-12 text-primary mx-auto mb-4" />
+          <p className="text-gray-400">Caricamento...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-2xl"
-      >
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Impostazioni Profilo</CardTitle>
-          <CardDescription>Aggiorna le tue informazioni personali.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <div className="min-h-screen bg-[#111111] p-4 sm:p-8">
+      <div className="max-w-4xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2">
+            <span className="text-primary">Impostazioni</span>
+          </h1>
+          <p className="text-gray-400">Gestisci il tuo account e le preferenze</p>
+        </motion.div>
 
-              <FormField name="avatar" control={form.control} render={({ field }) => (
-                <FormItem className="flex flex-col items-center">
-                    <FormLabel>Immagine Profilo</FormLabel>
-                    <FormControl>
-                        <label htmlFor="avatar-upload" className="cursor-pointer">
-                            <Avatar className="w-32 h-32 border-4 border-primary/50 hover:border-primary transition-colors">
-                                <AvatarImage src={avatarPreview ?? undefined} alt="Avatar" className="object-cover" />
-                                <AvatarFallback className="bg-muted-foreground">
-                                    <UserIcon className="w-16 h-16 text-white" />
-                                </AvatarFallback>
-                            </Avatar>
-                            <Input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
-                        </label>
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-              )} />
+        <div className="space-y-6">
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
+            <Card className="glass-card border-white/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <User className="w-5 h-5 text-primary" />
+                  Informazioni Profilo
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+
+                <div className="flex flex-col items-center space-y-4">
+                    <Label htmlFor="avatar-upload">Immagine Profilo</Label>
+                    <label htmlFor="avatar-upload" className="cursor-pointer">
+                        <Avatar className="w-32 h-32 border-4 border-primary/50 hover:border-primary transition-colors">
+                            <AvatarImage src={avatarPreview ?? undefined} alt="Avatar" className="object-cover" />
+                            <AvatarFallback className="bg-muted-foreground">
+                                <User className="w-16 h-16 text-white" />
+                            </AvatarFallback>
+                        </Avatar>
+                    </label>
+                    <Input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                </div>
 
 
-              <FormField name="nickname" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nickname</FormLabel>
-                  <FormControl><Input placeholder="Il tuo nickname" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="full_name" className="text-gray-300">Nickname</Label>
+                      <Input
+                        id="full_name"
+                        value={formData.full_name}
+                        onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                        className="bg-white/5 border-white/10 text-white mt-2"
+                        placeholder="Il tuo nome"
+                      />
+                    </div>
 
-              <FormField name="bio" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bio</FormLabel>
-                  <div className="relative">
-                    <FormControl><Textarea placeholder="Parlaci un po' di te..." {...field} /></FormControl>
-                    <div className="absolute bottom-1 right-1">
-                      <EmojiPicker onEmojiSelect={(emoji) => field.onChange(field.value + emoji)} />
+                    <div>
+                      <Label htmlFor="gender" className="text-gray-300">Genere</Label>
+                      <Select
+                        value={formData.gender}
+                        onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                      >
+                        <SelectTrigger className="bg-white/5 border-white/10 text-white mt-2">
+                          <SelectValue placeholder="Seleziona" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="uomo">Uomo</SelectItem>
+                            <SelectItem value="donna">Donna</SelectItem>
+                            <SelectItem value="altro">Altro</SelectItem>
+                            <SelectItem value="non specificato">Preferisco non specificare</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              
-              <div className="grid grid-cols-2 gap-4">
-                <FormField name="city" control={form.control} render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Città</FormLabel>
-                    <FormControl><Input placeholder="La tua città" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField name="region" control={form.control} render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Regione</FormLabel>
-                    <FormControl><Input placeholder="La tua regione" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
 
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 neon-glow" disabled={updateProfileMutation.isPending}>
-                {updateProfileMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Salva Modifiche
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-      </motion.div>
+                  <div>
+                    <Label htmlFor="bio" className="text-gray-300">Bio</Label>
+                    <div className="relative">
+                        <Textarea
+                        id="bio"
+                        value={formData.bio}
+                        onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                        className="bg-white/5 border-white/10 text-white mt-2 min-h-[100px]"
+                        placeholder="Racconta qualcosa di te..."
+                        />
+                        <div className="absolute bottom-1 right-1">
+                            <EmojiPicker onEmojiSelect={(emoji) => setFormData(prev => ({...prev, bio: prev.bio + emoji}))} />
+                        </div>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="city" className="text-gray-300">Città</Label>
+                      <Input
+                        id="city"
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        className="bg-white/5 border-white/10 text-white mt-2"
+                        placeholder="Es: Roma"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="region" className="text-gray-300">Regione</Label>
+                      <Input
+                        id="region"
+                        value={formData.region}
+                        onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                        className="bg-white/5 border-white/10 text-white mt-2"
+                        placeholder="Es: Lazio"
+                      />
+                    </div>
+                  </div>
+
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button
+                      type="submit"
+                      disabled={updateProfileMutation.isPending}
+                      className="w-full bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-white neon-glow"
+                    >
+                      {updateProfileMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                      {updateProfileMutation.isPending ? "Salvataggio..." : "Salva Modifiche"}
+                    </Button>
+                  </motion.div>
+                </form>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} >
+            <Card className="glass-card border-red-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-red-400">
+                  <Trash2 className="w-5 h-5" />
+                  Zona Pericolosa
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-gray-400 text-sm">
+                  Una volta eliminato l'account, non c'è modo di tornare indietro. 
+                  Tutti i tuoi dati saranno persi permanentemente.
+                </p>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Elimina Account
+                  </Button>
+                </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </div>
     </div>
   );
 }
