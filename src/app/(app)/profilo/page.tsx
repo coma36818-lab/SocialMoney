@@ -143,12 +143,8 @@ export default function ProfiloPage() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
                             {userPosts.map((post: Post, index: number) => (
                                 <motion.div key={post.id} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: index * 0.05 }} whileHover={{ scale: 1.05 }} className="group relative aspect-square glass-card rounded-xl overflow-hidden cursor-pointer">
-                                    {post.media_type === "text" ? (
-                                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-[#ff3366]/20 p-4 flex items-center justify-center">
-                                            <p className="text-white text-center line-clamp-6 text-sm">{post.description}</p>
-                                        </div>
-                                    ) : post.media_url ? (
-                                        <Image src={post.media_url} alt="Post" fill className="object-cover" />
+                                    {post.media_url ? (
+                                        <Image src={post.media_url} alt={post.description || 'Post'} fill className="object-cover" />
                                     ) : null}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                                         <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-4">

@@ -20,9 +20,12 @@ import { suggestPostCaption } from '@/ai/flows/suggest-post-caption';
 import EmojiPicker from '@/components/EmojiPicker';
 
 const postSchema = z.object({
-  description: z.string().min(1, 'La descrizione è richiesta').max(1000),
-  media_type: z.enum(['text', 'image', 'video']),
-  media_file: z.any().optional(),
+  description: z.string().max(1000).optional(),
+  media_type: z.enum(['image', 'video']),
+  media_file: z.any(),
+}).refine(data => data.media_file, {
+    message: "File multimediale richiesto",
+    path: ['media_file'],
 });
 
 type PostFormValues = z.infer<typeof postSchema>;
@@ -31,7 +34,7 @@ export default function UploadPage() {
   const router = useRouter();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('text');
+  const [activeTab, setActiveTab] = useState('image');
   const [preview, setPreview] = useState<string | null>(null);
   const [isSuggesting, setIsSuggesting] = useState(false);
 
@@ -39,7 +42,7 @@ export default function UploadPage() {
     resolver: zodResolver(postSchema),
     defaultValues: {
       description: '',
-      media_type: 'text',
+      media_type: 'image',
     },
   });
 
@@ -58,11 +61,12 @@ export default function UploadPage() {
   const createPostMutation = useMutation({
     mutationFn: async (data: PostFormValues) => {
       const user = await base44.auth.me();
+      if (!preview) throw new Error("Anteprima media non disponibile");
       return base44.entities.Post.create({
         created_by: user.email,
         description: data.description,
         media_type: data.media_type,
-        media_url: preview || undefined, // In a real app, this would be the URL from blob storage
+        media_url: preview, // In a real app, this would be the URL from blob storage
         created_date: new Date().toISOString(),
       });
     },
@@ -109,21 +113,19 @@ export default function UploadPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <Tabs
-                defaultValue="text"
+                defaultValue="image"
                 className="w-full"
                 onValueChange={(value) => {
                   setActiveTab(value);
-                  form.setValue('media_type', value as 'text' | 'image' | 'video');
+                  form.setValue('media_type', value as 'image' | 'video');
                   setPreview(null);
                   form.setValue('media_file', null);
                 }}
               >
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="text"><Type className="w-4 h-4 mr-2"/>Testo</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="image"><ImageIcon className="w-4 h-4 mr-2"/>Immagine</TabsTrigger>
                   <TabsTrigger value="video"><Video className="w-4 h-4 mr-2"/>Video</TabsTrigger>
                 </TabsList>
-                <TabsContent value="text" className="mt-6" />
                 <TabsContent value="image" className="mt-6">
                   <FormField name="media_file" control={form.control} render={({ field }) => (
                     <FormItem>

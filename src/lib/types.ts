@@ -25,9 +25,9 @@ export type Post = {
   created_by: string; // user email
   owner_id: string;
   created_date: string;
-  description: string;
-  media_url?: string;
-  media_type: 'text' | 'image' | 'video';
+  description?: string;
+  media_url: string;
+  media_type: 'image' | 'video';
   likes_count: number;
   earnings: number;
 };

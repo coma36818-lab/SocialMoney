@@ -55,7 +55,7 @@ const PostCard = ({ post, user, onSendLike, onDelete, isLiking }: PostCardProps)
                         </Button>
                     )}
                 </div>
-                <p className="text-gray-300 mb-4">{post.description}</p>
+                {post.description && <p className="text-gray-300 mb-4">{post.description}</p>}
             </div>
 
             {post.media_type === 'image' && post.media_url && (
@@ -65,11 +65,6 @@ const PostCard = ({ post, user, onSendLike, onDelete, isLiking }: PostCardProps)
             )}
             {post.media_type === 'video' && post.media_url && (
                 <video controls src={post.media_url} className="w-full aspect-video" />
-            )}
-             {post.media_type === 'text' && (
-                <div className="p-4 sm:p-6 border-t border-b border-white/10">
-                    <p className="text-gray-200 text-lg whitespace-pre-wrap">{post.description}</p>
-                </div>
             )}
             
             <div className="p-4 sm:p-6 flex items-center justify-between">
