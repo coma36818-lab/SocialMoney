@@ -1,7 +1,7 @@
 'use client';
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Crown, TrendingUp, User as UserIcon } from "lucide-react";
+import { Crown, TrendingUp, User as UserIcon, Trophy } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/lib/api";
 import type { Post, User } from "@/lib/types";
