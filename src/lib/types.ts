@@ -145,4 +145,12 @@ export type Like = {
   created_by: string;
 };
 
+export type Payout = {
+    id: string;
+    userId: string;
+    amount: number;
+    paypal_email: string;
+    status: "pending" | "approved" | "rejected";
+    requestedAt: string; // ISO timestamp
+};
     

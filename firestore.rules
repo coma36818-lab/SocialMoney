@@ -37,6 +37,12 @@ service cloud.firestore {
       allow write: if false; // Must be created by a secure backend
     }
 
+    match /payouts/{payoutId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false; // Status changes handled by backend
+    }
+
     match /posts/{postId}/comments/{commentId} {
       allow read: if true;
       allow create: if request.auth != null;
