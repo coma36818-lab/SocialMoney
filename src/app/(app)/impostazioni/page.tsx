@@ -17,6 +17,7 @@ import { Loader2 } from 'lucide-react';
 import type { User } from '@/lib/types';
 import { createPageUrl } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import EmojiPicker from '@/components/EmojiPicker';
 
 const settingsSchema = z.object({
   nickname: z.string().min(3, 'Il nickname deve avere almeno 3 caratteri'),
@@ -114,7 +115,12 @@ export default function SettingsPage() {
               <FormField name="bio" control={form.control} render={({ field }) => (
                 <FormItem>
                   <FormLabel>Bio</FormLabel>
-                  <FormControl><Textarea placeholder="Parlaci un po' di te..." {...field} /></FormControl>
+                  <div className="relative">
+                    <FormControl><Textarea placeholder="Parlaci un po' di te..." {...field} /></FormControl>
+                    <div className="absolute bottom-1 right-1">
+                      <EmojiPicker onEmojiSelect={(emoji) => field.onChange(field.value + emoji)} />
+                    </div>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )} />

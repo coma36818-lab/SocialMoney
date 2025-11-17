@@ -11,6 +11,7 @@ import { createPageUrl } from "@/lib/utils";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import type { User as UserType, Message } from "@/lib/types";
+import EmojiPicker from "@/components/EmojiPicker";
 
 export default function Messaggi() {
   const router = useRouter();
@@ -305,7 +306,8 @@ export default function Messaggi() {
                   </CardContent>
 
                   <div className="border-t border-white/5 p-4">
-                    <form onSubmit={handleSendMessage} className="flex gap-2">
+                    <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                      <EmojiPicker onEmojiSelect={(emoji) => setMessageText(prev => prev + emoji)} />
                       <Input
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}

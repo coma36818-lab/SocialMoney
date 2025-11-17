@@ -17,6 +17,7 @@ import { base44 } from '@/lib/api';
 import { Loader2, Image as ImageIcon, Video, Type, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { suggestPostCaption } from '@/ai/flows/suggest-post-caption';
+import EmojiPicker from '@/components/EmojiPicker';
 
 const postSchema = z.object({
   description: z.string().min(1, 'La descrizione è richiesta').max(1000),
@@ -153,19 +154,22 @@ export default function UploadPage() {
                         <FormMessage />
                     </FormItem>
                 )} />
-                {activeTab === 'image' && preview && (
-                    <Button 
-                        type="button" 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={handleSuggestCaption} 
-                        disabled={isSuggesting}
-                        className="absolute bottom-10 right-2 flex items-center gap-1 text-xs text-primary hover:text-primary/80"
-                    >
-                         {isSuggesting ? <Loader2 className="h-3 w-3 animate-spin"/> : <Sparkles className="h-3 w-3" />}
-                         Suggerisci
-                    </Button>
-                )}
+                <div className="absolute bottom-1 right-1 flex items-center">
+                    {activeTab === 'image' && preview && (
+                        <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={handleSuggestCaption} 
+                            disabled={isSuggesting}
+                            className="flex items-center gap-1 text-xs text-primary hover:text-primary/80"
+                        >
+                            {isSuggesting ? <Loader2 className="h-3 w-3 animate-spin"/> : <Sparkles className="h-3 w-3" />}
+                            Suggerisci
+                        </Button>
+                    )}
+                    <EmojiPicker onEmojiSelect={(emoji) => form.setValue('description', form.getValues('description') + emoji)} />
+                </div>
               </div>
 
               <Button type="submit" className="w-full bg-primary hover:bg-primary/90 neon-glow" disabled={createPostMutation.isPending}>
