@@ -18,7 +18,6 @@ import type { User } from '@/lib/types';
 import { createPageUrl } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import EmojiPicker from '@/components/EmojiPicker';
-import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 
