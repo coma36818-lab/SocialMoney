@@ -2,6 +2,7 @@
 
 
 
+
 export type User = {
   id: string; // Firestore document ID
   username: string;
@@ -44,6 +45,7 @@ export type User = {
 export type Post = {
   id: string; // Firestore document ID
   userId: string; // ID dell'utente che ha creato il post
+  imageUrl: string;
   description: string;
   createdAt: string; // ISO timestamp
   likes: number;

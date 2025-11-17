@@ -53,6 +53,11 @@ const saveData = <T>(key: string, data: T) => {
   }
 };
 
+const updateUser = (userId: string, updates: Partial<User>) => {
+    users = users.map(u => u.id === userId ? { ...u, ...updates } : u);
+    saveData(USERS_KEY, users);
+};
+
 export const base44 = {
   auth: {
     me: async (): Promise<User> => {
@@ -77,6 +82,9 @@ export const base44 = {
     login: async (email: string, password_unused: string): Promise<User> => {
         const user = users.find(u => u.email === email);
         if (user) {
+            if (user.accountStatus !== 'active') {
+                throw new Error(`Account is currently ${user.accountStatus}. Please contact support.`);
+            }
             if (typeof window !== 'undefined') {
                 localStorage.setItem(CURRENT_USER_KEY, user.email);
             }
@@ -198,29 +206,63 @@ export const base44 = {
         return likeEvents.filter(l => Object.entries(filter).every(([key, value]) => l[key as keyof LikeEvent] === value));
       },
       create: async (data: Omit<LikeEvent, 'id' | 'timestamp'>): Promise<LikeEvent> => {
+        const now = new Date();
+        const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+        const tenSecondsAgo = new Date(now.getTime() - 10 * 1000).toISOString();
+
+        const fromUser = users.find(u => u.id === data.fromUser);
+        if (!fromUser) throw new Error("Liker not found.");
+        if (fromUser.accountStatus !== 'active') throw new Error(`Your account is ${fromUser.accountStatus}.`);
+
+        // E. Protezione bot: se 10 like in meno di 10 secondi → sospensione
+        const recentLikes = likeEvents.filter(e => e.fromUser === data.fromUser && e.timestamp > tenSecondsAgo);
+        if (recentLikes.length >= 10) {
+            updateUser(fromUser.id, { accountStatus: 'suspended' });
+            throw new Error("Suspicious activity detected. Your account has been suspended.");
+        }
+        
+        // A. Account fake: max 100 like inviati al giorno
+        const dailyLikes = likeEvents.filter(e => e.fromUser === data.fromUser && e.timestamp > twentyFourHoursAgo);
+        if (dailyLikes.length >= 100) {
+            throw new Error("You have reached your daily limit of 100 likes.");
+        }
+
+        // A. Account fake: max 30 like ricevuti dal medesimo utente
+        const likesToSameUser = likeEvents.filter(e => e.fromUser === data.fromUser && e.toUser === data.toUser);
+        if (likesToSameUser.length >= 30) {
+            throw new Error("You cannot like this creator anymore.");
+        }
+        
+        // C. Like farm: se due utenti si scambiano 20+ like tra loro → blocco
+        const likesToLiker = likeEvents.filter(e => e.fromUser === data.toUser && e.toUser === data.fromUser);
+        if(likesToSameUser.length > 20 && likesToLiker.length > 20) {
+             updateUser(fromUser.id, { accountStatus: 'banned' });
+             const toUser = users.find(u => u.id === data.toUser);
+             if(toUser) updateUser(toUser.id, { accountStatus: 'banned' });
+             throw new Error("Like farming detected. Accounts have been banned.");
+        }
+
+
         const newLikeEvent: LikeEvent = {
             ...data,
             id: faker.string.uuid(),
-            timestamp: new Date().toISOString()
+            timestamp: now.toISOString()
         };
         likeEvents.push(newLikeEvent);
         saveData(LIKE_EVENTS_KEY, likeEvents);
         
         // Update user's totalLikesSent count
-        let fromUser = users.find(u => u.id === data.fromUser);
-        if(fromUser){
-            fromUser.totalLikesSent = (fromUser.totalLikesSent || 0) + 1;
-            fromUser.likeBalance = (fromUser.likeBalance || 0) - 1;
-            users = users.map(u => u.id === fromUser!.id ? fromUser! : u);
-            saveData(USERS_KEY, users);
-        }
+        updateUser(fromUser.id, { 
+            totalLikesSent: (fromUser.totalLikesSent || 0) + 1,
+            likeBalance: (fromUser.likeBalance || 0) - 1,
+        });
         
         let toUser = users.find(u => u.id === data.toUser);
         if(toUser){
-            toUser.totalLikesReceived = (toUser.totalLikesReceived || 0) + 1;
-            toUser.walletBalance = (toUser.walletBalance || 0) + data.value;
-            users = users.map(u => u.id === toUser!.id ? toUser! : u);
-            saveData(USERS_KEY, users);
+            updateUser(toUser.id, {
+                 totalLikesReceived: (toUser.totalLikesReceived || 0) + 1,
+                 walletBalance: (toUser.walletBalance || 0) + data.value,
+            });
         }
         
         return newLikeEvent;
