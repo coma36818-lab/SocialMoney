@@ -50,7 +50,7 @@ export type Notification = {
     id: string;
     user_id: string;
     created_by_name: string;
-    type: 'like' | 'system';
+    type: 'like' | 'follow' | 'earning' | 'system';
     message: string;
     created_date: string;
     is_read: boolean;
