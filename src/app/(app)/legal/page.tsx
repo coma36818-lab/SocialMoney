@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { FileText, Shield, CreditCard, Info } from "lucide-react";
+import { FileText, Shield, CreditCard, Info, AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const LegalContent = ({ title, children, icon: Icon, iconClass }: { title: string, children: React.ReactNode, icon: React.ElementType, iconClass: string }) => (
@@ -43,11 +43,12 @@ export default function LegalPage() {
                 </motion.div>
 
                 <Tabs defaultValue={defaultTab} className="w-full">
-                     <TabsList className="grid w-full grid-cols-4 mb-8 bg-muted text-muted-foreground">
+                     <TabsList className="grid w-full grid-cols-5 mb-8 bg-muted text-muted-foreground">
                         <TabsTrigger value="terms" className="data-[state=active]:bg-card data-[state=active]:text-foreground">Termini</TabsTrigger>
                         <TabsTrigger value="privacy" className="data-[state=active]:bg-card data-[state=active]:text-foreground">Privacy</TabsTrigger>
                         <TabsTrigger value="payment" className="data-[state=active]:bg-card data-[state=active]:text-foreground">Pagamenti</TabsTrigger>
                         <TabsTrigger value="rules" className="data-[state=active]:bg-card data-[state=active]:text-foreground">Regole</TabsTrigger>
+                        <TabsTrigger value="risks" className="data-[state=active]:bg-card data-[state=active]:text-foreground">Rischi</TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="terms">
@@ -148,13 +149,12 @@ export default function LegalPage() {
                             <h3>1. Acquisto Like</h3>
                             <p>
                               Gli utenti possono acquistare pacchetti di "like" da utilizzare sulla piattaforma. 
-                              I prezzi sono chiaramente indicati prima dell'acquisto.
+                              I prezzi sono chiaramente indicati prima dell'acquisto. I like acquistati non sono rimborsabili e servono esclusivamente per supportare i creator; non hanno valore monetario convertibile.
                             </p>
 
-                            <h3>2. Valore dei Like</h3>
+                            <h3>2. Valore dei Like Ricevuti</h3>
                             <p>
-                              Ogni like inviato ha un valore di €0.01 che viene accreditato al creator 
-                              che riceve il like.
+                              Ogni like ricevuto da un altro utente ha un valore di €0.01, che viene accreditato al saldo prelevabile (wallet) del creator.
                             </p>
 
                             <h3>3. Prelievi</h3>
@@ -164,23 +164,16 @@ export default function LegalPage() {
                             </p>
                             <ul className="list-disc list-inside space-y-2 ml-4">
                               <li>Saldo minimo: €10.00</li>
-                              <li>Account PayPal verificato</li>
-                              <li>Tempi di elaborazione: 3-5 giorni lavorativi</li>
+                              <li>Account PayPal valido specificato nelle impostazioni</li>
+                              <li>È possibile richiedere un solo prelievo ogni 7 giorni.</li>
                             </ul>
 
                             <h3>4. Commissioni</h3>
                             <p>
-                              Social Money applica una commissione del 10% su tutti i guadagni per coprire 
-                              i costi della piattaforma e dei servizi di pagamento.
+                              Social Money applica una commissione del 10% su tutti i prelievi per coprire i costi operativi e di transazione. Il nostro modello di business si basa anche su un margine applicato alla vendita dei pacchetti di like.
                             </p>
 
-                            <h3>5. Rimborsi</h3>
-                            <p>
-                              I like acquistati non sono rimborsabili una volta completata la transazione. 
-                              In caso di problemi tecnici, contatta il supporto.
-                            </p>
-
-                            <h3>6. Frodi e Abusi</h3>
+                            <h3>5. Frodi e Abusi</h3>
                             <p>
                               È vietato utilizzare bot, account falsi o altri metodi fraudolenti. 
                               Violazioni comportano la sospensione permanente dell'account e il congelamento dei fondi.
@@ -210,7 +203,7 @@ export default function LegalPage() {
                               <li>Rispetta gli altri utenti</li>
                               <li>Non molestare o minacciare</li>
                               <li>Non creare account multipli per abusare del sistema</li>
-                              <li>Non acquistare like con metodi fraudolenti</li>
+                              <li>Non acquistare o scambiare like con metodi fraudolenti</li>
                             </ul>
 
                             <h3>Sanzioni</h3>
@@ -230,8 +223,60 @@ export default function LegalPage() {
                             </p>
                         </LegalContent>
                     </TabsContent>
+                    <TabsContent value="risks">
+                        <LegalContent title="Rischi e Contromisure" icon={AlertTriangle} iconClass="text-yellow-500">
+                            <h3>1. Abusi e Frodi (Auto-Like, Multi-Account, Like Farming)</h3>
+                            <p>
+                                <strong>Rischio:</strong> Utenti malintenzionati potrebbero tentare di manipolare il sistema per guadagnare ingiustamente, ad esempio tramite bot, account falsi o scambi di like concordati.
+                            </p>
+                            <p>
+                                <strong>Contromisure:</strong> Abbiamo implementato una serie di controlli automatici, tra cui:
+                            </p>
+                            <ul className="list-disc list-inside space-y-2 ml-4">
+                                <li>Limite di like giornalieri inviabili per utente.</li>
+                                <li>Limite di like che un utente può dare a un singolo creator.</li>
+                                <li>Rilevamento di scambi di like anomali e reciproci tra due account.</li>
+                                <li>Sistema di sospensione automatica per attività simili a bot (es. troppi like in un breve lasso di tempo).</li>
+                                <li>Monitoraggio (simulato) degli indirizzi IP per flaggare possibili abusi di account multipli.</li>
+                            </ul>
+
+                            <h3>2. Costi Operativi (PayPal)</h3>
+                             <p>
+                                <strong>Rischio:</strong> Le transazioni di pagamento, sia in entrata (acquisti) che in uscita (prelievi), hanno dei costi imposti dal provider (es. PayPal).
+                            </p>
+                            <p>
+                                <strong>Contromisure:</strong> Il nostro modello di business è progettato per coprire questi costi. La commissione del 10% applicata ai prelievi dei creator e il margine sui pacchetti di like acquistati sono calcolati per garantire la sostenibilità della piattaforma.
+                            </p>
+
+                            <h3>3. Regolamentazione e Aspetti Legali</h3>
+                             <p>
+                                <strong>Rischio:</strong> Le normative su valute virtuali, pagamenti online e gestione dei dati (GDPR) sono complesse e in continua evoluzione.
+                            </p>
+                            <p>
+                                <strong>Contromisure:</strong> La piattaforma opera in conformità con le leggi vigenti. La separazione netta tra "like acquistati" (non convertibili) e "saldo guadagnato" (convertibile) è una misura di progettazione chiave per mitigare i rischi normativi. Ci affidiamo a consulenti legali per rimanere aggiornati.
+                            </p>
+                            
+                            <h3>4. Necessità di Liquidità</h3>
+                             <p>
+                                <strong>Rischio:</strong> È necessario disporre di fondi sufficienti per pagare i prelievi richiesti dai creator in modo tempestivo.
+                            </p>
+                            <p>
+                                <strong>Contromisure:</strong> I requisiti di prelievo (saldo minimo di 10€ e un prelievo ogni 7 giorni) aiutano a gestire il flusso di cassa. I tempi di elaborazione dei pagamenti (3-5 giorni lavorativi) forniscono un ulteriore buffer per la gestione della liquidità.
+                            </p>
+
+                             <h3>5. Concorrenza</h3>
+                             <p>
+                                <strong>Rischio:</strong> Il mercato dei social media è altamente competitivo.
+                            </p>
+                            <p>
+                                <strong>Contromisure:</strong> Il nostro modello di monetizzazione diretta per i creator è un fattore differenziante chiave. L'obiettivo è costruire una community forte e fedele, offrendo un modo trasparente e immediato per supportare i propri creator preferiti.
+                            </p>
+                        </LegalContent>
+                    </TabsContent>
                 </Tabs>
             </div>
         </div>
     );
 }
+
+    
