@@ -12,10 +12,12 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isOwner(userId);
       allow update: if isOwner(userId)
-        && request.resource.data.walletBalance == resource.data.walletBalance
-        && request.resource.data.likeBalance == resource.data.likeBalance
-        && request.resource.data.totalLikesReceived == resource.data.totalLikesReceived
-        && request.resource.data.totalLikesSent == resource.data.totalLikesSent;
+        && request.resource.data.balance == resource.data.balance
+        && request.resource.data.likes_received == resource.data.likes_received
+        && request.resource.data.total_earnings == resource.data.total_earnings
+        && request.resource.data.is_banned == resource.data.is_banned
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.verified == resource.data.verified;
       allow delete: if false;
     }
 

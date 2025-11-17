@@ -3,11 +3,22 @@ export type User = {
   id: string; // Firestore document ID
   username: string;
   email: string;
+  photoURL?: string;
+  createdAt: string; // ISO timestamp
+  verified?: boolean;
+  likes_available?: number;
+  likes_received?: number;
+  balance?: number;
+  total_earnings?: number;
+  paypal_email?: string;
+  plan?: "free" | "creator" | "pro";
+  is_banned?: boolean;
+
+
   walletBalance: number;
   likeBalance: number;
   totalLikesReceived: number;
   totalLikesSent: number;
-  createdAt: string; // ISO timestamp
   referralCode: string;
   referredBy?: string | null;
   accountStatus: 'active' | 'banned' | 'suspended';
@@ -27,13 +38,8 @@ export type User = {
   password?: string; // Solo per la creazione, non memorizzato
   full_name?: string; // Derivato da username
   nickname?: string;
-  likes_available?: number;
-  likes_received?: number;
-  total_earnings?: number;
-  likes_sent?: number;
   referral_code?: string;
   created_date?: string;
-  balance?: number;
   role?: string;
 
 };
