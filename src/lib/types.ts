@@ -49,8 +49,18 @@ export type Notification = {
     id: string;
     user_id: string;
     created_by_name: string;
-    type: 'like';
+    type: 'like' | 'system';
     message: string;
     created_date: string;
     is_read: boolean;
+    related_id?: string;
+};
+
+export type Message = {
+  id: string;
+  from_user_email: string;
+  to_user_email: string;
+  message: string;
+  created_date: string;
+  read: boolean;
 };

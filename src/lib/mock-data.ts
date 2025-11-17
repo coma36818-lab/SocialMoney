@@ -1,4 +1,4 @@
-import type { Post, User } from './types';
+import type { Post, User, Message } from './types';
 import {faker} from '@faker-js/faker';
 
 const createMockUser = (email: string, nickname: string): User => ({
@@ -86,3 +86,30 @@ for (let i = 0; i < 6; i++) {
         earnings: faker.number.float({ min: 0.1, max: 1, precision: 0.01 }),
     });
 }
+
+export const mockMessages: Message[] = [
+    {
+        id: faker.string.uuid(),
+        from_user_email: 'mario.rossi@email.com',
+        to_user_email: 'user@test.com',
+        message: 'Ciao! Come stai?',
+        created_date: faker.date.recent({ days: 1 }).toISOString(),
+        read: false,
+    },
+    {
+        id: faker.string.uuid(),
+        from_user_email: 'user@test.com',
+        to_user_email: 'mario.rossi@email.com',
+        message: 'Tutto bene, grazie! E tu?',
+        created_date: faker.date.recent({ days: 1, refDate: new Date(Date.now() + 1000 * 60) }).toISOString(),
+        read: false,
+    },
+    {
+        id: faker.string.uuid(),
+        from_user_email: 'anna.verdi@email.com',
+        to_user_email: 'user@test.com',
+        message: 'Ho visto il tuo ultimo post, bellissimo!',
+        created_date: faker.date.recent({ days: 2 }).toISOString(),
+        read: true,
+    }
+];

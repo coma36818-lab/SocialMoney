@@ -1,12 +1,13 @@
 'use client';
-import { mockPosts, mockUsers } from './mock-data';
-import type { Like, Notification, Post, Transaction, User } from './types';
+import { mockPosts, mockUsers, mockMessages } from './mock-data';
+import type { Like, Notification, Post, Transaction, User, Message } from './types';
 import { faker } from '@faker-js/faker';
 
 const CURRENT_USER_KEY = 'connect_now_user';
 const USERS_KEY = 'connect_now_users';
 const POSTS_KEY = 'connect_now_posts';
 const TRANSACTIONS_KEY = 'connect_now_transactions';
+const MESSAGES_KEY = 'connect_now_messages';
 
 const initializeData = <T>(key: string, initialData: T): T => {
   try {
@@ -27,6 +28,7 @@ const initializeData = <T>(key: string, initialData: T): T => {
 let users: User[] = initializeData(USERS_KEY, mockUsers);
 let posts: Post[] = initializeData(POSTS_KEY, mockPosts);
 let transactions: Transaction[] = initializeData(TRANSACTIONS_KEY, []);
+let messages: Message[] = initializeData(MESSAGES_KEY, mockMessages);
 
 const saveData = <T>(key: string, data: T) => {
   try {
@@ -158,6 +160,9 @@ export const base44 = {
       },
     },
     User: {
+      list: async (): Promise<User[]> => {
+        return users;
+      },
       filter: async (filter: Partial<User>): Promise<User[]> => {
         return users.filter(u => Object.entries(filter).every(([key, value]) => u[key as keyof User] === value));
       },
@@ -225,5 +230,33 @@ export const base44 = {
         return newNotification;
       },
     },
+    Message: {
+      list: async (sort: string): Promise<Message[]> => {
+        let sortedMessages = [...messages];
+        if (sort === '-created_date') {
+          sortedMessages.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
+        }
+        return sortedMessages;
+      },
+      create: async (data: Omit<Message, 'id' | 'created_date'>): Promise<Message> => {
+        const newMessage: Message = {
+          ...data,
+          id: faker.string.uuid(),
+          created_date: new Date().toISOString(),
+        };
+        messages.push(newMessage);
+        saveData(MESSAGES_KEY, messages);
+        return newMessage;
+      },
+      update: async (messageId: string, updates: Partial<Message>): Promise<Message> => {
+        let message = messages.find(m => m.id === messageId);
+        if (!message) throw new Error('Message not found');
+
+        message = { ...message, ...updates };
+        messages = messages.map(m => m.id === messageId ? message! : m);
+        saveData(MESSAGES_KEY, messages);
+        return message;
+      },
+    }
   },
 };
