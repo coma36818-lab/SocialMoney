@@ -65,3 +65,19 @@ export type Message = {
   created_date: string;
   read: boolean;
 };
+
+export type Comment = {
+  id: string;
+  post_id: string;
+  user_email: string;
+  user_name: string;
+  comment_text: string;
+  created_date: string;
+};
+
+export type CommentReply = {
+  comment_id: string;
+  reply_text: string;
+  user_email: string;
+  user_name?: string;
+};
