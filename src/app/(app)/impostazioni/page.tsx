@@ -17,6 +17,7 @@ import { base44 } from "@/lib/api";
 import type { User as UserType } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import EmojiPicker from "@/components/EmojiPicker";
 
 export default function Impostazioni() {
   const router = useRouter();
