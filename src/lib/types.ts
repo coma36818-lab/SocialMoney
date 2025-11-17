@@ -47,13 +47,12 @@ export type Like = {
 };
 
 export type Transaction = {
-  id: string;
-  user_id: string;
-  created_date: string;
-  type: 'like_received' | 'like_purchase' | 'conversion' | 'payout' | 'referral_bonus';
-  description: string;
+  id: string; // transactionId
+  userId: string;
+  type: "purchase" | "withdraw" | "reward" | "like";
   amount: number;
-  related_id?: string;
+  status: "pending" | "completed" | "failed";
+  createdAt: string; // timestamp
 };
 
 export type Notification = {
@@ -100,4 +99,3 @@ export type CommentLike = {
   user_name?: string;
   created_date: string;
 };
-
