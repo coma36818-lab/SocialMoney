@@ -66,9 +66,9 @@ export default function ProfiloPage() {
     };
 
     const stats = [
-        { label: "Like Ricevuti", value: user.likes_received || 0, icon: Heart, color: "text-primary" },
-        { label: "Post", value: userPosts?.length || 0, icon: TrendingUp, color: "text-accent" },
-        { label: "Guadagni", value: `€${user.total_earnings?.toFixed(2) || "0.00"}`, icon: Wallet, color: "text-[#3D9DF7]" }
+        { label: "Guadagni", value: `€${user.total_earnings?.toFixed(2) || "0.00"}`, icon: Wallet, color: "text-accent", gradient: "from-accent to-[#FFA500]" },
+        { label: "Like Ricevuti", value: user.likes_received || 0, icon: Heart, color: "text-primary", gradient: "from-primary to-[#ff3366]" },
+        { label: "Post", value: userPosts?.length || 0, icon: TrendingUp, color: "text-[#3D9DF7]", gradient: "from-[#3D9DF7] to-[#5ba8f7]" },
     ];
 
     const getInitials = (name: string) => {
@@ -118,7 +118,7 @@ export default function ProfiloPage() {
                                 <div className="grid grid-cols-3 gap-4 mt-6">
                                     {stats.map((stat, index) => (
                                         <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} whileHover={{ scale: 1.05 }} className="glass-card rounded-xl p-4 text-center" >
-                                            <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-primary to-[#ff3366] mb-3`}>
+                                            <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br ${stat.gradient} mb-3`}>
                                                 <stat.icon className="w-6 h-6 text-white" />
                                             </div>
                                             <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
@@ -192,3 +192,5 @@ export default function ProfiloPage() {
         </div>
     );
 }
+
+    
