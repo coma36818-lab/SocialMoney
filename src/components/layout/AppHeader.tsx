@@ -94,7 +94,7 @@ export function AppHeader({ user: initialUser }: { user: UserType }) {
         <nav className="hidden md:block fixed top-0 left-0 right-0 z-50 glass-card border-b border-border">
           <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-12">
+              <div className="flex items-center gap-16">
                   <Link href={createPageUrl("feed")} className="flex items-center gap-3 group">
                       <Image src={logo} alt="Social Money" width={40} height={40} className="rounded-xl neon-glow" />
                       <h1 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
