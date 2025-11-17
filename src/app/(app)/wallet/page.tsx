@@ -42,14 +42,14 @@ export default function WalletPage() {
         mutationFn: async () => {
             if (!user) throw new Error("Utente non autenticato");
             if (!user.paypalEmail) throw new Error("Per prelevare, imposta prima il tuo indirizzo email PayPal nelle impostazioni del profilo.");
-            if ((user.balance || 0) < 10) throw new Error("Il saldo minimo per il prelievo è di 10€.");
+            if ((user.walletBalance || 0) < 10) throw new Error("Il saldo minimo per il prelievo è di 10€.");
 
             const lastPayout = transactions?.find(t => t.type === 'payout');
             if (lastPayout && new Date(lastPayout.created_date) > subDays(new Date(), 7)) {
                 throw new Error("Puoi richiedere un solo prelievo ogni 7 giorni.");
             }
 
-            const amountToWithdraw = user.balance!;
+            const amountToWithdraw = user.walletBalance!;
             const fee = amountToWithdraw * 0.10; // 10% fee
             const finalAmount = amountToWithdraw - fee;
 
@@ -59,7 +59,7 @@ export default function WalletPage() {
 
             // Update user balance
             await base44.auth.updateMe({
-                balance: 0, // Reset balance after payout
+                walletBalance: 0,
             });
 
             // Create transaction record
@@ -93,7 +93,7 @@ export default function WalletPage() {
     const getTransactionIcon = (type: Transaction['type']) => {
         switch (type) {
             case "like": return <Heart className="w-4 h-4" />;
-            case "like_purchase": return <TrendingDown className="w-4 h-4" />;
+            case "purchase": return <TrendingDown className="w-4 h-4" />;
             case "reward": return <TrendingUp className="w-4 h-4" />;
             case "payout": return <Download className="w-4 h-4" />;
             default: return <DollarSign className="w-4 h-4" />;
@@ -105,7 +105,7 @@ export default function WalletPage() {
             case "like":
             case "reward":
                 return "text-green-500";
-            case "like_purchase":
+            case "purchase":
             case "payout":
                 return "text-red-500";
             default:
@@ -146,9 +146,9 @@ export default function WalletPage() {
                                     <div>
                                         <p className="text-muted-foreground text-sm mb-2">Saldo Disponibile</p>
                                         <motion.h2 animate={{ scale: [1, 1.02, 1] }} transition={{ duration: 2, repeat: Infinity }} className="text-5xl font-bold text-foreground mb-4">
-                                            <span className="text-accent">€</span> {user.balance?.toFixed(2) || "0.00"}
+                                            <span className="text-accent">€</span> {user.walletBalance?.toFixed(2) || "0.00"}
                                         </motion.h2>
-                                        <p className="text-sm text-muted-foreground">Guadagni totali: <span className="text-accent font-semibold">€{user.total_earnings?.toFixed(2) || "0.00"}</span></p>
+                                        <p className="text-sm text-muted-foreground">Guadagni totali: <span className="text-accent font-semibold">€{user.totalLikesReceived ? (user.totalLikesReceived * 0.01).toFixed(2) : "0.00"}</span></p>
                                     </div>
                                     <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }} className="w-20 h-20 bg-gradient-to-br from-accent to-yellow-500 rounded-2xl flex items-center justify-center gold-glow">
                                         <Wallet className="w-10 h-10 text-accent-foreground" />
@@ -157,7 +157,7 @@ export default function WalletPage() {
                                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                                     <Button 
                                         onClick={() => requestPayoutMutation.mutate()}
-                                        disabled={requestPayoutMutation.isPending || (user.balance || 0) < 10}
+                                        disabled={requestPayoutMutation.isPending || (user.walletBalance || 0) < 10}
                                         className="w-full bg-gradient-to-r from-accent to-yellow-500 hover:opacity-90 text-accent-foreground font-bold text-lg py-6 gold-glow" 
                                         size="lg"
                                     >
@@ -217,7 +217,7 @@ export default function WalletPage() {
                                                 <div className={`w-10 h-10 ${getTransactionColor(transaction.type)} bg-muted/50 rounded-xl flex items-center justify-center`}>{getTransactionIcon(transaction.type)}</div>
                                                 <div>
                                                     <p className="font-medium text-foreground capitalize">{transaction.description || transaction.type.replace(/_/g, ' ')}</p>
-                                                    <p className="text-xs text-muted-foreground">{format(new Date(transaction.created_date), "d MMM yyyy 'alle' HH:mm", { locale: it })}</p>
+                                                    <p className="text-xs text-muted-foreground">{format(new Date(transaction.createdAt), "d MMM yyyy 'alle' HH:mm", { locale: it })}</p>
                                                 </div>
                                             </div>
                                             <motion.p initial={{ scale: 0 }} animate={{ scale: 1 }} className={`font-bold ${getTransactionColor(transaction.type)}`}>
