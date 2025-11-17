@@ -9,7 +9,7 @@ import PostCard from "@/components/feed/PostCard";
 import TopCreators from "@/components/feed/TopCreators";
 import UserStats from "@/components/feed/UserStats";
 import { base44 } from "@/lib/api";
-import type { User } from "@/lib/types";
+import type { Post, User } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
 export default function FeedPage() {
@@ -33,38 +33,52 @@ export default function FeedPage() {
 
     const { data: posts, isLoading: isLoadingPosts } = useQuery({
         queryKey: ['posts'],
-        queryFn: () => base44.entities.Post.list('-created_date'),
+        queryFn: () => base44.entities.Post.list('-createdAt'),
     });
 
     const sendLikeMutation = useMutation({
-        mutationFn: async ({ postId, postOwner }: { postId: string, postOwner: string }) => {
+        mutationFn: async ({ post }: { post: Post }) => {
             if (!user) throw new Error("Utente non autenticato");
-            if (user.likes_available <= 0) {
+            if (user.likeBalance <= 0) {
                 throw new Error("Non hai like disponibili. Ricarica!");
             }
-            await base44.entities.Like.create({ post_id: postId, post_owner_email: postOwner, like_value: 0.01 });
+            if (post.userId === user.id) {
+                throw new Error("Non puoi mettere like ai tuoi post.");
+            }
 
-            const post = posts?.find(p => p.id === postId);
-            if (!post) throw new Error("Post not found");
+            const existingLikes = await base44.entities.LikeEvent.filter({ fromUser: user.id, postId: post.id });
+            if (existingLikes.length > 0) {
+                throw new Error("Hai già messo like a questo post.");
+            }
+
+            // 1. Create LikeEvent
+            await base44.entities.LikeEvent.create({ 
+                fromUser: user.id, 
+                toUser: post.userId, 
+                postId: post.id, 
+                value: 0.01 
+            });
+
+            // 2. Update post likes
+            await base44.entities.Post.update(post.id, { likes: (post.likes || 0) + 1 });
             
-            await base44.entities.Post.update(postId, { likes_count: (post.likes_count || 0) + 1, earnings: (post.earnings || 0) + 0.01 });
-            await base44.auth.updateMe({ likes_available: user.likes_available - 1 });
+            // 3. Create transaction for the receiver
+            await base44.entities.Transaction.create({
+                userId: post.userId,
+                type: 'like',
+                amount: 0.01,
+                status: 'completed',
+            });
 
-            const ownerData = await base44.entities.User.filter({ email: postOwner });
+            // 4. Create notification
+            const ownerData = await base44.entities.User.filter({ id: post.userId });
             if (ownerData.length > 0) {
-                const owner = ownerData[0];
-                await base44.entities.User.update(owner.id, { 
-                    likes_received: (owner.likes_received || 0) + 1, 
-                    balance: (owner.balance || 0) + 0.01, 
-                    total_earnings: (owner.total_earnings || 0) + 0.01 
-                });
-                await base44.entities.Notification.create({ created_by: postOwner, type: "like", message: `${user.full_name} ha inviato un like al tuo post! +0.01€` });
-                await base44.entities.Transaction.create({ user_id: owner.id, type: "like_received", description: `Like da ${user.full_name}`, amount: 0.01 });
+                await base44.entities.Notification.create({ created_by: ownerData[0].email, type: "like", message: `${user.username} ha inviato un like al tuo post! +0.01€` });
             }
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['posts'] });
-            loadUser();
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['posts'] });
+            await loadUser(); // Refetch user to update likeBalance
         },
         onError: (error: Error) => {
             toast({ variant: 'destructive', title: 'Errore', description: error.message });
@@ -130,7 +144,7 @@ export default function FeedPage() {
                                     <PostCard 
                                         key={post.id} 
                                         post={post} 
-                                        onSendLike={() => sendLikeMutation.mutate({ postId: post.id, postOwner: post.created_by })} 
+                                        onSendLike={() => sendLikeMutation.mutate({ post })} 
                                         onDelete={() => {
                                             if (confirm("Sei sicuro di voler eliminare questo post?")) {
                                                 deletePostMutation.mutate(post.id);

@@ -1,12 +1,13 @@
 'use client';
 import { mockPosts, mockUsers, mockMessages, mockComments, mockCommentReplies, mockCommentLikes, mockLikes, mockNotifications } from './mock-data';
-import type { Like, Notification, Post, Transaction, User, Message, Comment, CommentReply, CommentLike } from './types';
-import { faker } from '@faker-js/faker';
+import type { LikeEvent, Notification, Post, Transaction, User, Message, Comment, CommentReply, CommentLike } from './types';
+import {faker} from '@faker-js/faker';
 
 const CURRENT_USER_KEY = 'connect_now_user';
 const USERS_KEY = 'connect_now_users';
 const POSTS_KEY = 'connect_now_posts';
 const LIKES_KEY = 'connect_now_likes';
+const LIKE_EVENTS_KEY = 'connect_now_like_events';
 const COMMENTS_KEY = 'connect_now_comments';
 const COMMENT_REPLIES_KEY = 'connect_now_comment_replies';
 const COMMENT_LIKES_KEY = 'connect_now_comment_likes';
@@ -32,7 +33,7 @@ const initializeData = <T>(key: string, initialData: T): T => {
 
 let users: User[] = initializeData(USERS_KEY, mockUsers);
 let posts: Post[] = initializeData(POSTS_KEY, mockPosts);
-let likes: Like[] = initializeData(LIKES_KEY, mockLikes);
+let likeEvents: LikeEvent[] = initializeData(LIKE_EVENTS_KEY, mockLikes);
 let comments: Comment[] = initializeData(COMMENTS_KEY, mockComments);
 let commentReplies: CommentReply[] = initializeData(COMMENT_REPLIES_KEY, mockCommentReplies);
 let commentLikes: CommentLike[] = initializeData(COMMENT_LIKES_KEY, mockCommentLikes);
@@ -82,21 +83,21 @@ export const base44 = {
         }
         throw new Error('Invalid credentials');
     },
-    signup: async (data: Omit<User, 'id' | 'full_name' | 'likes_available' | 'likes_received' | 'likes_sent' | 'balance' | 'total_earnings' | 'created_date'>): Promise<User> => {
+    signup: async (data: Omit<User, 'id' | 'full_name' | 'likeBalance' | 'totalLikesReceived' | 'totalLikesSent' | 'walletBalance' | 'createdAt' | 'accountStatus'>): Promise<User> => {
         if(users.some(u => u.email === data.email)) {
             throw new Error('User already exists');
         }
         const newUser: User = {
             ...data,
             id: faker.string.uuid(),
-            full_name: data.nickname,
-            likes_available: 20,
-            likes_received: 0,
-            likes_sent: 0,
-            balance: 0,
-            total_earnings: 0,
-            created_date: new Date().toISOString(),
-            referral_code: faker.string.alphanumeric(8),
+            username: data.nickname,
+            likeBalance: 20,
+            totalLikesReceived: 0,
+            totalLikesSent: 0,
+            walletBalance: 0,
+            createdAt: new Date().toISOString(),
+            referralCode: faker.string.alphanumeric(8),
+            accountStatus: 'active',
         };
         users.push(newUser);
         saveData(USERS_KEY, users);
@@ -129,28 +130,26 @@ export const base44 = {
     Post: {
       list: async (sort: string, limit?: number): Promise<Post[]> => {
         let sortedPosts = [...posts];
-        if (sort === '-created_date') {
-          sortedPosts.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
+        if (sort === '-createdAt') {
+          sortedPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         }
         return limit ? sortedPosts.slice(0, limit) : sortedPosts;
       },
       filter: async (filter: Partial<Post>, sort?: string): Promise<Post[]> => {
         let filteredPosts = posts.filter(p => Object.entries(filter).every(([key, value]) => p[key as keyof Post] === value));
-        if (sort === '-created_date') {
-          filteredPosts.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
+        if (sort === '-createdAt') {
+          filteredPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         }
         return filteredPosts;
       },
-      create: async (data: Omit<Post, 'id' | 'owner_id' | 'likes_count' | 'earnings'>): Promise<Post> => {
-        const owner = users.find(u => u.email === data.created_by);
+      create: async (data: Omit<Post, 'id' | 'likes'>): Promise<Post> => {
+        const owner = users.find(u => u.id === data.userId);
         if (!owner) throw new Error('Owner not found');
         
         const newPost: Post = {
           ...data,
           id: faker.string.uuid(),
-          owner_id: owner.id,
-          likes_count: 0,
-          earnings: 0,
+          likes: 0,
         };
         posts.unshift(newPost);
         saveData(POSTS_KEY, posts);
@@ -187,32 +186,37 @@ export const base44 = {
         return user;
       },
     },
-    Like: {
-      filter: async (filter: Partial<Like>): Promise<Like[]> => {
-        return likes.filter(l => Object.entries(filter).every(([key, value]) => l[key as keyof Like] === value));
+    LikeEvent: {
+      filter: async (filter: Partial<LikeEvent>): Promise<LikeEvent[]> => {
+        return likeEvents.filter(l => Object.entries(filter).every(([key, value]) => l[key as keyof LikeEvent] === value));
       },
-      create: async (data: Pick<Like, 'post_id' | 'post_owner_email' | 'like_value'>): Promise<Like> => {
-        const userEmail = localStorage.getItem(CURRENT_USER_KEY);
-        if(!userEmail) throw new Error('Not authenticated');
-
-        const newLike: Like = {
+      create: async (data: Omit<LikeEvent, 'id' | 'timestamp'>): Promise<LikeEvent> => {
+        const newLikeEvent: LikeEvent = {
+            ...data,
             id: faker.string.uuid(),
-            post_id: data.post_id,
-            post_owner_email: data.post_owner_email,
-            like_value: data.like_value,
-            created_by: userEmail
+            timestamp: new Date().toISOString()
         };
-        likes.push(newLike);
-        saveData(LIKES_KEY, likes);
+        likeEvents.push(newLikeEvent);
+        saveData(LIKE_EVENTS_KEY, likeEvents);
         
-        // Update user's likes_sent count
-        const currentUser = users.find(u => u.email === userEmail);
-        if (currentUser) {
-            currentUser.likes_sent = (currentUser.likes_sent || 0) + 1;
+        // Update user's totalLikesSent count
+        let fromUser = users.find(u => u.id === data.fromUser);
+        if(fromUser){
+            fromUser.totalLikesSent = (fromUser.totalLikesSent || 0) + 1;
+            fromUser.likeBalance = (fromUser.likeBalance || 0) - 1;
+            users = users.map(u => u.id === fromUser!.id ? fromUser! : u);
             saveData(USERS_KEY, users);
         }
-
-        return newLike;
+        
+        let toUser = users.find(u => u.id === data.toUser);
+        if(toUser){
+            toUser.totalLikesReceived = (toUser.totalLikesReceived || 0) + 1;
+            toUser.walletBalance = (toUser.walletBalance || 0) + data.value;
+            users = users.map(u => u.id === toUser!.id ? toUser! : u);
+            saveData(USERS_KEY, users);
+        }
+        
+        return newLikeEvent;
       },
     },
     Comment: {
@@ -265,17 +269,17 @@ export const base44 = {
         const user = users.find(u => u.email === userEmail);
         if(!user) throw new Error('User not found');
         
-        let userTransactions = transactions.filter(t => t.user_id === user.id);
-        if (sort === '-created_date') {
-          userTransactions.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
+        let userTransactions = transactions.filter(t => t.userId === user.id);
+        if (sort === '-createdAt') {
+          userTransactions.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         }
         return userTransactions;
       },
-      create: async (data: Omit<Transaction, 'id'| 'created_date'>): Promise<Transaction> => {
+      create: async (data: Omit<Transaction, 'id'| 'createdAt'>): Promise<Transaction> => {
         const newTransaction: Transaction = {
           ...data,
           id: faker.string.uuid(),
-          created_date: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
         };
         transactions.unshift(newTransaction);
         saveData(TRANSACTIONS_KEY, transactions);
