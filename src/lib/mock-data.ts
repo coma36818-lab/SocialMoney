@@ -1,4 +1,4 @@
-import type { Post, User, Message, Comment, CommentReply, CommentLike, Like } from './types';
+import type { Post, User, Message, Comment, CommentReply, CommentLike, Like, Notification } from './types';
 import {faker} from '@faker-js/faker';
 
 const createMockUser = (email: string, nickname: string, avatar?: string): User => ({
@@ -18,7 +18,6 @@ const createMockUser = (email: string, nickname: string, avatar?: string): User 
     likes_received: faker.number.int({ min: 100, max: 5000 }),
     balance: faker.number.float({ min: 10, max: 1000, precision: 0.01 }),
     total_earnings: faker.number.float({ min: 100, max: 10000, precision: 0.01 }),
-    created_date: faker.date.past().toISOString(),
 });
 
 export const mockUsers: User[] = [
@@ -147,4 +146,30 @@ export const mockLikes: Like[] = [
     }
 ];
 
+export const mockNotifications: Notification[] = [
+    {
+        id: faker.string.uuid(),
+        created_by: 'user@test.com',
+        message: 'Anna Verdi ha messo like al tuo post.',
+        type: 'like',
+        read: false,
+        created_date: faker.date.recent({days: 1}).toISOString()
+    },
+     {
+        id: faker.string.uuid(),
+        created_by: 'user@test.com',
+        message: 'Hai guadagnato 0.50€ dal tuo ultimo post.',
+        type: 'earning',
+        read: false,
+        created_date: faker.date.recent({days: 2}).toISOString()
+    },
+    {
+        id: faker.string.uuid(),
+        created_by: 'user@test.com',
+        message: 'Luca Bianchi ha iniziato a seguirti.',
+        type: 'follow',
+        read: true,
+        created_date: faker.date.recent({days: 3}).toISOString()
+    }
+];
     

@@ -51,14 +51,13 @@ export type Transaction = {
 };
 
 export type Notification = {
-  id: string;
-  user_id: string;
-  created_by_name: string;
-  type: 'like' | 'follow' | 'earning' | 'system';
-  message: string;
-  created_date: string;
-  is_read: boolean;
-  related_id?: string;
+    id: string;
+    created_by: string; // user email of the person who triggered the notification
+    message: string;
+    type: "like" | "follow" | "earning" | "system";
+    read: boolean;
+    related_id?: string;
+    created_date: string;
 };
 
 export type Message = {

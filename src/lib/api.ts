@@ -1,5 +1,5 @@
 'use client';
-import { mockPosts, mockUsers, mockMessages, mockComments, mockCommentReplies, mockCommentLikes, mockLikes } from './mock-data';
+import { mockPosts, mockUsers, mockMessages, mockComments, mockCommentReplies, mockCommentLikes, mockLikes, mockNotifications } from './mock-data';
 import type { Like, Notification, Post, Transaction, User, Message, Comment, CommentReply, CommentLike } from './types';
 import { faker } from '@faker-js/faker';
 
@@ -12,6 +12,7 @@ const COMMENT_REPLIES_KEY = 'connect_now_comment_replies';
 const COMMENT_LIKES_KEY = 'connect_now_comment_likes';
 const TRANSACTIONS_KEY = 'connect_now_transactions';
 const MESSAGES_KEY = 'connect_now_messages';
+const NOTIFICATIONS_KEY = 'connect_now_notifications';
 
 const initializeData = <T>(key: string, initialData: T): T => {
   try {
@@ -37,6 +38,8 @@ let commentReplies: CommentReply[] = initializeData(COMMENT_REPLIES_KEY, mockCom
 let commentLikes: CommentLike[] = initializeData(COMMENT_LIKES_KEY, mockCommentLikes);
 let transactions: Transaction[] = initializeData(TRANSACTIONS_KEY, []);
 let messages: Message[] = initializeData(MESSAGES_KEY, mockMessages);
+let notifications: Notification[] = initializeData(NOTIFICATIONS_KEY, mockNotifications);
+
 
 const saveData = <T>(key: string, data: T) => {
   try {
@@ -268,19 +271,39 @@ export const base44 = {
       },
     },
     Notification: {
-      create: async (data: any): Promise<Notification> => {
-        console.log("Notification created:", data.message);
-        // Mock notification creation
-        const newNotification: Notification = {
-          id: faker.string.uuid(),
-          user_id: data.created_by,
-          created_by_name: data.message.split(' ')[0],
-          type: 'like',
-          message: data.message,
-          created_date: new Date().toISOString(),
-          is_read: false
+      list: async (sort: string): Promise<Notification[]> => {
+        const userEmail = localStorage.getItem(CURRENT_USER_KEY);
+        if(!userEmail) throw new Error('Not authenticated');
+
+        let userNotifications = notifications.filter(n => n.created_by === userEmail);
+        if (sort === '-created_date') {
+          userNotifications.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
         }
+        return userNotifications;
+      },
+      create: async (data: Omit<Notification, 'id' | 'read' | 'created_date'>): Promise<Notification> => {
+        const newNotification: Notification = {
+          ...data,
+          id: faker.string.uuid(),
+          read: false,
+          created_date: new Date().toISOString(),
+        };
+        notifications.unshift(newNotification);
+        saveData(NOTIFICATIONS_KEY, notifications);
         return newNotification;
+      },
+      update: async (notificationId: string, updates: Partial<Notification>): Promise<Notification> => {
+        let notification = notifications.find(n => n.id === notificationId);
+        if (!notification) throw new Error('Notification not found');
+
+        notification = { ...notification, ...updates };
+        notifications = notifications.map(n => n.id === notificationId ? notification! : n);
+        saveData(NOTIFICATIONS_KEY, notifications);
+        return notification;
+      },
+      delete: async (notificationId: string): Promise<void> => {
+        notifications = notifications.filter(p => p.id !== notificationId);
+        saveData(NOTIFICATIONS_KEY, notifications);
       },
     },
     Message: {
@@ -290,6 +313,9 @@ export const base44 = {
           sortedMessages.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
         }
         return sortedMessages;
+      },
+       filter: async (filter: Partial<Message>): Promise<Message[]> => {
+        return messages.filter(m => Object.entries(filter).every(([key, value]) => m[key as keyof Message] === value));
       },
       create: async (data: Omit<Message, 'id' | 'created_date'>): Promise<Message> => {
         const newMessage: Message = {
