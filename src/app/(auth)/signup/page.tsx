@@ -60,7 +60,7 @@ export default function SignupPage() {
       await base44.auth.signup(data);
       toast({
         title: 'Registrazione completata',
-        description: 'Benvenuto in ConnectNow!',
+        description: 'Benvenuto in Social Money!',
       });
       router.push('/feed');
     } catch (error) {
@@ -78,7 +78,7 @@ export default function SignupPage() {
     <Card className="glass-card">
       <CardHeader className="text-center">
         <CardTitle className="text-3xl font-bold text-white">Crea un Account</CardTitle>
-        <CardDescription>Unisciti a ConnectNow e inizia a guadagnare</CardDescription>
+        <CardDescription>Unisciti a Social Money e inizia a guadagnare</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>

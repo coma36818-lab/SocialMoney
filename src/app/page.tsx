@@ -23,7 +23,7 @@ export default function Home() {
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
         <Loader2 className="animate-spin text-primary h-12 w-12 mx-auto mb-4" />
-        <p className="text-muted-foreground">Loading ConnectNow...</p>
+        <p className="text-muted-foreground">Loading Social Money...</p>
       </div>
     </div>
   );

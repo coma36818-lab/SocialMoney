@@ -37,14 +37,14 @@ export default function LegalPage() {
                     
                     <TabsContent value="terms">
                         <LegalContent title="Termini di Servizio">
-                            <p>Benvenuto in ConnectNow. Utilizzando la nostra piattaforma, accetti di rispettare i seguenti termini e condizioni. È vietato pubblicare contenuti illegali, offensivi o che violino i diritti di terzi.</p>
+                            <p>Benvenuto in Social Money. Utilizzando la nostra piattaforma, accetti di rispettare i seguenti termini e condizioni. È vietato pubblicare contenuti illegali, offensivi o che violino i diritti di terzi.</p>
                             <p>L'account è personale e non può essere ceduto. Ci riserviamo il diritto di sospendere o chiudere gli account che violano le nostre politiche senza preavviso.</p>
                         </LegalContent>
                     </TabsContent>
                     <TabsContent value="payment">
                         <LegalContent title="Informativa Pagamenti">
                             <p>I guadagni derivano dai 'Like' ricevuti dagli altri utenti. Ogni Like ha un valore monetario di €0.01. Il saldo è visibile nel Wallet.</p>
-                            <p>I pagamenti possono essere richiesti al raggiungimento di una soglia minima di €10.00 e vengono elaborati tramite PayPal. ConnectNow trattiene una commissione del 10% su ogni transazione di pagamento per coprire i costi operativi.</p>
+                            <p>I pagamenti possono essere richiesti al raggiungimento di una soglia minima di €10.00 e vengono elaborati tramite PayPal. Social Money trattiene una commissione del 10% su ogni transazione di pagamento per coprire i costi operativi.</p>
                         </LegalContent>
                     </TabsContent>
                     <TabsContent value="privacy">

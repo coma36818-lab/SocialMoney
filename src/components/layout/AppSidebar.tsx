@@ -34,7 +34,7 @@ export function AppSidebar({ user }: { user: User }) {
     <aside className="fixed left-0 top-0 hidden h-full w-64 flex-col border-r border-white/10 bg-background md:flex">
       <div className="flex h-20 items-center justify-center border-b border-white/10 px-6">
         <Link href="/feed" className="text-2xl font-bold text-white">
-          Connect<span className="text-primary">Now</span>
+          Social<span className="text-primary">Money</span>
         </Link>
       </div>
       <nav className="flex-1 space-y-2 p-4">

@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'ConnectNow',
+  title: 'Social Money',
   description: 'Share and earn with your content.',
 };
 
