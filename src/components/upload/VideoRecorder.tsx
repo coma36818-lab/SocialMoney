@@ -1,7 +1,8 @@
+
 'use client';
 import React, { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, Record, StopCircle, Upload, Loader2, Video as VideoIcon } from 'lucide-react';
+import { Camera, Record, StopCircle, Upload, Loader2, Video as VideoIcon, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { auth, storage } from '@/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
@@ -34,7 +35,7 @@ export default function VideoRecorder() {
   }, []);
 
   const getCameraPermission = async () => {
-    if (typeof navigator.mediaDevices === 'undefined') {
+    if (typeof navigator.mediaDevices === 'undefined' || !navigator.mediaDevices.getUserMedia) {
         setHasCameraPermission(false);
         toast({
           variant: 'destructive',
@@ -99,7 +100,7 @@ export default function VideoRecorder() {
       return;
     }
     const user = auth.currentUser;
-    if (!user) {
+    if (!user || !user.email) {
       toast({ variant: 'destructive', title: 'Autenticazione richiesta' });
       return;
     }
@@ -124,7 +125,7 @@ export default function VideoRecorder() {
         try {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
           await base44.entities.Post.create({
-            created_by: user.email,
+            created_by: user.email!,
             media_url: downloadURL,
             media_type: 'video',
             description: 'Video registrato dall\'app!',
@@ -168,7 +169,7 @@ export default function VideoRecorder() {
   if (hasCameraPermission === null) {
       return (
           <div className="text-center">
-              <Button onClick={getCameraPermission} size="lg">
+              <Button onClick={getCameraPermission} size="lg" className="bg-gradient-to-r from-primary to-[#ff3366] hover:opacity-90 text-primary-foreground">
                   <Camera className="mr-2" /> Attiva Fotocamera
               </Button>
           </div>
@@ -178,11 +179,14 @@ export default function VideoRecorder() {
 
   return (
     <div className="space-y-6">
-      <div className="relative w-full aspect-video bg-muted rounded-2xl overflow-hidden">
+      <div className="relative w-full aspect-video bg-muted rounded-2xl overflow-hidden glass-card">
         <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
-        {recordedBlob && (
+        {recordedBlob && !isRecording && (
            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-               <VideoIcon className="w-16 h-16 text-white" />
+               <div className="text-center text-white">
+                  <VideoIcon className="w-16 h-16 mx-auto" />
+                  <p className="mt-2 font-semibold">Video pronto per l'upload</p>
+               </div>
            </div>
         )}
       </div>
@@ -190,7 +194,10 @@ export default function VideoRecorder() {
       {isUploading ? (
         <div className="space-y-2">
           <div className="flex justify-between items-center text-sm">
-            <p className="text-muted-foreground font-medium">Caricamento in corso...</p>
+            <p className="text-muted-foreground font-medium flex items-center gap-2">
+              <Loader2 className="animate-spin w-4 h-4"/>
+              Caricamento in corso...
+            </p>
             <p className="font-semibold text-primary">{uploadProgress}%</p>
           </div>
           <Progress value={uploadProgress} className="w-full" />
@@ -198,24 +205,29 @@ export default function VideoRecorder() {
       ) : recordedBlob ? (
         <div className="grid grid-cols-2 gap-4">
           <Button onClick={reset} variant="outline" size="lg">
-            Registra di nuovo
+            <RotateCcw className="mr-2" /> Registra di nuovo
           </Button>
-          <Button onClick={handleUpload} size="lg" className="bg-gradient-to-r from-primary to-[#ff3366] text-primary-foreground">
+          <Button onClick={handleUpload} size="lg" className="bg-gradient-to-r from-primary to-[#ff3366] text-primary-foreground neon-glow">
             <Upload className="mr-2" /> Pubblica Video
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="flex justify-center">
           <Button
-            onClick={startRecording}
-            disabled={isRecording}
+            onClick={isRecording ? stopRecording : startRecording}
             size="lg"
-            className="bg-green-600 hover:bg-green-700 text-white"
+            variant={isRecording ? "destructive" : "default"}
+            className="w-full max-w-sm"
           >
-            <Record className="mr-2" /> Inizia a registrare
-          </Button>
-          <Button onClick={stopRecording} disabled={!isRecording} size="lg" variant="destructive">
-            <StopCircle className="mr-2" /> Ferma registrazione
+            {isRecording ? (
+                <>
+                    <StopCircle className="mr-2" /> Ferma registrazione
+                </>
+            ) : (
+                <>
+                    <Record className="mr-2" /> Inizia a registrare
+                </>
+            )}
           </Button>
         </div>
       )}
