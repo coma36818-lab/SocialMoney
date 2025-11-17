@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, User as UserIcon, Wallet, PlusSquare, Settings, LogOut, Sparkles } from 'lucide-react';
+import { Home, User as UserIcon, Wallet, PlusSquare, Settings, LogOut, Search, MessageSquare, Trophy, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -11,9 +11,13 @@ import type { User } from '@/lib/types';
 
 const navItems = [
   { href: '/feed', label: 'Feed', icon: Home },
+  { href: '/search', label: 'Cerca', icon: Search },
+  { href: '/upload', label: 'Upload', icon: PlusSquare },
+  { href: '/messages', label: 'Messaggi', icon: MessageSquare },
+  { href: '/leaderboard', label: 'Classifica', icon: Trophy },
+  { href: '/notifications', label: 'Notifiche', icon: Bell },
   { href: '/profilo', label: 'Profilo', icon: UserIcon },
   { href: '/wallet', label: 'Wallet', icon: Wallet },
-  { href: '/ricarica', label: 'Ricarica', icon: Sparkles },
   { href: '/impostazioni', label: 'Impostazioni', icon: Settings },
 ];
 
@@ -38,12 +42,6 @@ export function AppSidebar({ user }: { user: User }) {
         </Link>
       </div>
       <nav className="flex-1 space-y-2 p-4">
-        <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 neon-glow mb-4">
-          <Link href="/upload">
-            <PlusSquare className="mr-2 h-5 w-5" />
-            Pubblica Contenuto
-          </Link>
-        </Button>
         {navItems.map((item) => (
           <Link
             href={item.href}
