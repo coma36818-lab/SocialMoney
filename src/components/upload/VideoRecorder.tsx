@@ -1,17 +1,12 @@
 
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { firebaseConfig } from "@/firebase/config";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "@/firebase";
 import { Button } from "@/components/ui/button";
 import { Camera, Video, Mic, Upload, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "../ui/alert";
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const storage = getStorage(app);
 
 interface VideoRecorderProps {
   onUploadComplete: (downloadUrl: string) => void;
