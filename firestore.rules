@@ -48,5 +48,9 @@ service cloud.firestore {
       allow create: if request.auth != null;
       allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
+
+    match /daily_stats/{date} {
+      allow read, write: if false; // Should only be written by a trusted backend
+    }
   }
 }

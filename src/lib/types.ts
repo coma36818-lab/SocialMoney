@@ -153,4 +153,13 @@ export type Payout = {
     status: "pending" | "approved" | "rejected";
     requestedAt: string; // ISO timestamp
 };
+
+export type DailyStats = {
+  date: string; // YYYY-MM-DD
+  total_users: number;
+  total_posts: number;
+  total_likes: number;
+  total_payouts: number;
+  revenue: number;
+};
     
