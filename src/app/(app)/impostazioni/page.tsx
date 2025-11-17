@@ -30,14 +30,27 @@ export default function Impostazioni() {
     city: "",
     region: "",
     country: "",
-    gender: "",
+    gender: "non specificato",
     avatar: "",
   });
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
+    setDarkMode(localStorage.getItem('theme') !== 'light');
     loadUser();
   }, []);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
+
 
   const loadUser = async () => {
     try {
@@ -85,6 +98,9 @@ export default function Impostazioni() {
         gender: data.gender as UserType['gender'],
         avatar: data.avatar,
       });
+      const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
+      audio.volume = 0.3;
+      audio.play();
     },
     onSuccess: () => {
       toast({ title: "Successo", description: "Profilo aggiornato con successo!" });
@@ -114,7 +130,7 @@ export default function Impostazioni() {
 
   return (
     <div className="min-h-screen bg-[#111111] p-4 sm:p-8">
-      <div className="max-w-4xl mx-auto">
+       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
             <span className="text-primary">Impostazioni</span>
@@ -123,6 +139,30 @@ export default function Impostazioni() {
         </motion.div>
 
         <div className="space-y-6">
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+                <Card className="glass-card border-white/5">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-white">
+                    {darkMode ? <Moon className="w-5 h-5 text-[#3D9DF7]" /> : <Sun className="w-5 h-5 text-[#FFD700]" />}
+                    Aspetto
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex items-center justify-between">
+                    <div>
+                        <p className="font-medium text-white">Tema Scuro</p>
+                        <p className="text-sm text-gray-400">Attiva/disattiva il tema scuro</p>
+                    </div>
+                    <Switch
+                        checked={darkMode}
+                        onCheckedChange={setDarkMode}
+                        className="data-[state=checked]:bg-[#FF0055]"
+                    />
+                    </div>
+                </CardContent>
+                </Card>
+            </motion.div>
+
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
             <Card className="glass-card border-white/5">
               <CardHeader>
@@ -194,7 +234,7 @@ export default function Impostazioni() {
                         </div>
                     </div>
                   </div>
-
+                  
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="city" className="text-gray-300">Città</Label>
@@ -219,6 +259,17 @@ export default function Impostazioni() {
                     </div>
                   </div>
 
+                   <div>
+                      <Label htmlFor="country" className="text-gray-300">Paese</Label>
+                      <Input
+                        id="country"
+                        value={formData.country}
+                        onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                        className="bg-white/5 border-white/10 text-white mt-2"
+                        placeholder="Es: Italia"
+                      />
+                    </div>
+
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                       type="submit"
@@ -230,6 +281,61 @@ export default function Impostazioni() {
                     </Button>
                   </motion.div>
                 </form>
+              </CardContent>
+            </Card>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card className="glass-card border-white/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Mail className="w-5 h-5 text-[#3D9DF7]" />
+                  Informazioni Account
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className="text-gray-400 text-sm">Email</Label>
+                  <p className="text-white font-medium mt-1">{user.email}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-400 text-sm">Membro da</Label>
+                  <p className="text-white font-medium mt-1">
+                    {new Date(user.created_date || Date.now()).toLocaleDateString('it-IT')}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card className="glass-card border-white/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Lock className="w-5 h-5 text-[#FFD700]" />
+                  Sicurezza
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-gray-400 text-sm mb-4">
+                  Gestisci password e sicurezza del tuo account
+                </p>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    className="w-full border-white/10 text-white hover:bg-white/5 bg-[#1a1a1a] border"
+                  >
+                    <Lock className="w-4 h-4 mr-2" />
+                    Cambia Password
+                  </Button>
+                </motion.div>
               </CardContent>
             </Card>
           </motion.div>
@@ -264,3 +370,5 @@ export default function Impostazioni() {
     </div>
   );
 }
+
+    
