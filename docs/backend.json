@@ -1,0 +1,359 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user profile in the ConnectNow application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "nickname": {
+          "type": "string",
+          "description": "The user's chosen nickname or username."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "age": {
+          "type": "number",
+          "description": "The user's age. Must be 18 or older.",
+          "format": "number"
+        },
+        "gender": {
+          "type": "string",
+          "description": "The user's gender."
+        },
+        "city": {
+          "type": "string",
+          "description": "The user's city of residence."
+        },
+        "country": {
+          "type": "string",
+          "description": "The user's country of residence."
+        },
+        "region": {
+          "type": "string",
+          "description": "The user's region of residence."
+        },
+        "full_name": {
+          "type": "string",
+          "description": "The user's full name."
+        },
+        "bio": {
+          "type": "string",
+          "description": "The user's biography or short description."
+        },
+        "likes_received": {
+          "type": "number",
+          "description": "The number of likes the user has received on their posts."
+        },
+        "likes_available": {
+          "type": "number",
+          "description": "The number of likes the user has available to give."
+        },
+        "balance": {
+          "type": "number",
+          "description": "The user's current balance."
+        },
+        "total_earnings": {
+          "type": "number",
+          "description": "The user's total earnings."
+        }
+      },
+      "required": [
+        "id",
+        "nickname",
+        "email",
+        "age",
+        "gender",
+        "city",
+        "country",
+        "region",
+        "full_name"
+      ]
+    },
+    "Post": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Post",
+      "type": "object",
+      "description": "Represents a post created by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Post entity."
+        },
+        "created_by": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Post)"
+        },
+        "created_date": {
+          "type": "string",
+          "description": "The date and time when the post was created.",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string",
+          "description": "The text content of the post."
+        },
+        "media_url": {
+          "type": "string",
+          "description": "URL of the media (image, video) associated with the post.",
+          "format": "uri"
+        },
+        "media_type": {
+          "type": "string",
+          "description": "The type of media (image, video, text) associated with the post."
+        },
+        "likes_count": {
+          "type": "number",
+          "description": "The number of likes the post has received."
+        },
+        "earnings": {
+          "type": "number",
+          "description": "The amount of earnings the post has generated."
+        }
+      },
+      "required": [
+        "id",
+        "created_by",
+        "created_date",
+        "description",
+        "media_type"
+      ]
+    },
+    "Like": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Like",
+      "type": "object",
+      "description": "Represents a like given by a user to a post.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Like entity."
+        },
+        "post_id": {
+          "type": "string",
+          "description": "Reference to Post. (Relationship: Post 1:N Like)"
+        },
+        "post_owner_email": {
+          "type": "string",
+          "description": "Reference to User (email of the post owner). (Relationship: User 1:N Like)"
+        },
+        "like_value": {
+          "type": "number",
+          "description": "The value associated with the like (e.g., 0.01)."
+        },
+        "created_date": {
+          "type": "string",
+          "description": "The date and time when the like was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "post_id",
+        "post_owner_email",
+        "like_value"
+      ]
+    },
+    "Transaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Transaction",
+      "type": "object",
+      "description": "Represents a financial transaction.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Transaction entity."
+        },
+        "user_id": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Transaction)"
+        },
+        "amount": {
+          "type": "number",
+          "description": "The amount of the transaction."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of transaction (e.g., like_received, like_purchase, conversion, payout)."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the transaction."
+        },
+        "created_date": {
+          "type": "string",
+          "description": "The date and time when the transaction occurred.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "user_id",
+        "amount",
+        "type",
+        "created_date"
+      ]
+    },
+    "Notification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Notification",
+      "type": "object",
+      "description": "Represents a notification to a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Notification entity."
+        },
+        "created_by": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Notification). The email of the user who triggered the notification."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of notification (e.g., like)."
+        },
+        "message": {
+          "type": "string",
+          "description": "The content of the notification."
+        },
+        "created_date": {
+          "type": "string",
+          "description": "The date and time when the notification was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "created_by",
+        "type",
+        "message"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. This collection uses path-based ownership for private user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, corresponding to their Firebase Auth UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/posts/{postId}",
+        "definition": {
+          "entityName": "Post",
+          "schema": {
+            "$ref": "#/backend/entities/Post"
+          },
+          "description": "Stores posts created by users. This collection uses path-based ownership for private user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, corresponding to their Firebase Auth UID."
+            },
+            {
+              "name": "postId",
+              "description": "The unique identifier for the post."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/transactions/{transactionId}",
+        "definition": {
+          "entityName": "Transaction",
+          "schema": {
+            "$ref": "#/backend/entities/Transaction"
+          },
+          "description": "Stores transaction records for users. This collection uses path-based ownership for private user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, corresponding to their Firebase Auth UID."
+            },
+            {
+              "name": "transactionId",
+              "description": "The unique identifier for the transaction."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/notifications/{notificationId}",
+        "definition": {
+          "entityName": "Notification",
+          "schema": {
+            "$ref": "#/backend/entities/Notification"
+          },
+          "description": "Stores notification records for users. This collection uses path-based ownership for private user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, corresponding to their Firebase Auth UID."
+            },
+            {
+              "name": "notificationId",
+              "description": "The unique identifier for the notification."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/likes/{likeId}",
+        "definition": {
+          "entityName": "Like",
+          "schema": {
+            "$ref": "#/backend/entities/Like"
+          },
+          "description": "Stores like information. Includes denormalized 'post_owner_email' for authorization independence.",
+          "params": [
+            {
+              "name": "likeId",
+              "description": "The unique identifier for the like."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Indicates admin privileges for a user. Existence of the document grants admin access.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, corresponding to their Firebase Auth UID."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to ensure Authorization Independence, Clarity of Intent, and support secure list operations (QAPs). Authorization Independence is achieved through denormalization. For example, `Like` documents include the `post_owner_email`, eliminating the need to fetch the Post document for authorization.\n\nStructural Segregation is applied by storing user-specific data (posts, transactions, notifications) under the `/users/{userId}` path, ensuring homogeneous security requirements within each collection. Collaborative data patterns are managed through path-based ownership for user-owned data like posts and membership-based ownership is used for global roles (admin).\n\nQAPs are supported through structural segregation, enabling efficient and secure `list` operations. Path-based ownership ensures that listing posts under a user is secure, as the rule only needs to check the user's ID.\n\nExplicit state modeling uses fields like `likes_count` and `earnings` in posts to directly represent the state of those entities.\n\nThis structure enables secure and scalable data management while adhering to the core design principles."
+  }
+}

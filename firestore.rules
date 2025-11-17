@@ -1,61 +1,169 @@
+/**
+ * @file Firebase Security Rules for ConnectNow Application
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for personal data and a role-based model for admin access. It prioritizes authorization independence to avoid costly `get()` calls and to optimize performance.
+ *
+ * Data Structure:
+ * - User profiles are stored under `/users/{userId}`.
+ * - User-generated content (posts, transactions, notifications) is nested under their respective `/users/{userId}` subcollections.
+ * - Likes are stored in a top-level `/likes/{likeId}` collection, denormalizing the post owner's email for efficient authorization.
+ * - Administrative roles are managed through the presence of a document in the `/roles_admin/{userId}` collection.
+ *
+ * Key Security Decisions:
+ * - User listing is generally disallowed for privacy.
+ * - Read-only collections are not used in this data model.
+ * - The default security posture for ambiguous relationships is strict owner-only access.
+ * - Data validation is relaxed to allow for prototyping, but critical ownership and relationship fields are validated.
+ *
+ * Denormalization for Authorization:
+ * - The `/likes/{likeId}` collection denormalizes the `post_owner_email` to avoid having to fetch the `Post` document during authorization checks.
+ *
+ * Structural Segregation:
+ * - User-specific data (posts, transactions, notifications) is stored under the `/users/{userId}` path to ensure consistent security requirements.
+ */
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // USERS
+    /**
+     * @description Checks if the request is authenticated.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Verified Identity
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user's UID matches the provided userId.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Ownership
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the authenticated user's UID matches the provided userId and that the resource exists.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Ownership and Existence
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user is an admin.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Role-based Access Control
+     */
+    function isAdmin() {
+        return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    /**
+     * @description Rules for user profiles.
+     * @path /users/{userId}
+     * @allow (create) - User creates their own profile with matching UID.
+     * @allow (get, update, delete) - User accesses their own profile.
+     * @deny (create) - User tries to create a profile with a mismatched UID.
+     * @principle Enforces document ownership, validates relational integrity.
+     */
     match /users/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow get: if isOwner(userId);
+      allow list: if false; // Listing all users is generally disallowed for privacy.
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id; // Enforce immutability of userId
+      allow delete: if isExistingOwner(userId);
     }
 
-    // POSTS
-    match /posts/{postId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-      allow delete: if resource.data.userId == request.auth.uid;
+    /**
+     * @description Rules for user posts.
+     * @path /users/{userId}/posts/{postId}
+     * @allow (create) - User creates a post under their own profile.
+     * @allow (get, list, update, delete) - User accesses their own posts.
+     * @deny (create) - User tries to create a post under another user's profile.
+     * @principle Enforces document ownership, restricts access to a user's own data tree.
+     */
+    match /users/{userId}/posts/{postId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
 
-    // LIKES
+    /**
+     * @description Rules for user transactions.
+     * @path /users/{userId}/transactions/{transactionId}
+     * @allow (create) - User creates a transaction under their own profile.
+     * @allow (get, list, update, delete) - User accesses their own transactions.
+     * @deny (create) - User tries to create a transaction under another user's profile.
+     * @principle Enforces document ownership, restricts access to a user's own data tree.
+     */
+    match /users/{userId}/transactions/{transactionId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for user notifications.
+     * @path /users/{userId}/notifications/{notificationId}
+     * @allow (create) - User creates a notification under their own profile.
+     * @allow (get, list, update, delete) - User accesses their own notifications.
+     * @deny (create) - User tries to create a notification under another user's profile.
+     * @principle Enforces document ownership, restricts access to a user's own data tree.
+     */
+    match /users/{userId}/notifications/{notificationId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for likes.
+     * @path /likes/{likeId}
+     * @allow (get, list) - Public access to likes.
+     * @allow (create) - Only allowed if the `post_owner_email` matches the authenticated user's email.
+     * @allow (update, delete) - Only the owner of the post can update/delete the like.
+     * @deny (create) - If the `post_owner_email` does not match the authenticated user's email.
+     * @principle Uses denormalized `post_owner_email` for efficient authorization, allows public reads.
+     */
     match /likes/{likeId} {
-      allow read: if true;
-      allow create: if request.auth != null;
-      allow delete: if false; // No unlikes
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.post_owner_email == request.auth.token.email;
+      allow update: if isSignedIn() && resource.data.post_owner_email == request.auth.token.email;
+      allow delete: if isSignedIn() && resource.data.post_owner_email == request.auth.token.email;
     }
 
-    // TRANSACTIONS
-    match /transactions/{txnId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update: if false;
-    }
-
-    // PAYOUT REQUESTS
-    match /payout_requests/{id} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update: if false;
-    }
-    
-    match /likeEvents/{eventId} {
-      allow write: if false; // Must be handled by a secure backend (Cloud Function)
-      allow read: if true; 
-    }
-
-    match /payouts/{payoutId} {
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false; // Status changes handled by backend
-    }
-
-    match /posts/{postId}/comments/{commentId} {
-      allow read: if true;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-    }
-
-    match /daily_stats/{date} {
-      allow read, write: if false; // Should only be written by a trusted backend
+    /**
+     * @description Rules for admin roles.
+     * @path /roles_admin/{userId}
+     * @allow (get, create, update, delete) - Only an admin can manage other admins.
+     * @allow (list) - No one can list admin roles.
+     * @deny (create, update, delete) - If the user is not an admin.
+     * @principle Enforces role-based access control for admin management.
+     */
+    match /roles_admin/{userId} {
+      allow get: if isAdmin();
+      allow list: if false;
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
   }
 }
