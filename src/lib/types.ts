@@ -1,6 +1,7 @@
 
 
 
+
 export type User = {
   id: string; // Firestore document ID
   username: string;
@@ -36,6 +37,7 @@ export type User = {
   referral_code?: string;
   created_date?: string;
   balance?: number;
+  role?: string;
 
 };
 
@@ -66,7 +68,7 @@ export type LikeEvent = {
 export type Transaction = {
   id: string; // transactionId
   userId: string;
-  type: "purchase" | "withdraw" | "reward" | "like" | "like_purchase";
+  type: "purchase" | "withdraw" | "reward" | "like" | "like_purchase" | "payout";
   amount: number;
   status: "pending" | "completed" | "failed";
   createdAt: string; // timestamp

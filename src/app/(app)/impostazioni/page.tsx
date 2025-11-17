@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Mail, Lock, Trash2, Save, Moon, Sun, Loader2 } from "lucide-react";
+import { User, Mail, Lock, Trash2, Save, Moon, Sun, Loader2, AtSign } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -32,6 +32,7 @@ export default function Impostazioni() {
     gender: "non specificato",
     relationship_status: "",
     avatar: "",
+    paypalEmail: "",
   });
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [darkMode, setDarkMode] = useState(false);
@@ -69,6 +70,7 @@ export default function Impostazioni() {
         gender: userData.gender || "non specificato",
         relationship_status: userData.relationship_status || "",
         avatar: userData.avatar || "",
+        paypalEmail: userData.paypalEmail || "",
       });
       if (userData.avatar) {
         setAvatarPreview(userData.avatar);
@@ -103,6 +105,7 @@ export default function Impostazioni() {
         gender: data.gender as UserType['gender'],
         relationship_status: data.relationship_status,
         avatar: data.avatar,
+        paypalEmail: data.paypalEmail,
       });
       const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
       audio.volume = 0.3;
@@ -323,6 +326,19 @@ export default function Impostazioni() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                 <div>
+                    <Label htmlFor="paypalEmail" className="text-muted-foreground">Email PayPal per Prelievi</Label>
+                    <div className="relative">
+                        <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                            id="paypalEmail"
+                            value={formData.paypalEmail}
+                            onChange={(e) => setFormData({ ...formData, paypalEmail: e.target.value })}
+                            className="bg-muted/30 border-border text-foreground mt-2 pl-10"
+                            placeholder="paypal@esempio.com"
+                        />
+                    </div>
+                  </div>
                 <div>
                   <Label className="text-muted-foreground text-sm">Email</Label>
                   <p className="text-foreground font-medium mt-1">{user.email}</p>

@@ -1,19 +1,22 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wallet, TrendingUp, TrendingDown, DollarSign, Download, Heart, FileText, Shield, CreditCard, Info, Loader2 } from "lucide-react";
-import { format } from "date-fns";
+import { format, subDays } from "date-fns";
 import { it } from "date-fns/locale";
 import { useRouter } from "next/navigation";
 import { createPageUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
 import type { User, Transaction } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 export default function WalletPage() {
     const router = useRouter();
+    const { toast } = useToast();
+    const queryClient = useQueryClient();
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
@@ -35,11 +38,63 @@ export default function WalletPage() {
         enabled: !!user,
     });
 
+    const requestPayoutMutation = useMutation({
+        mutationFn: async () => {
+            if (!user) throw new Error("Utente non autenticato");
+            if (!user.paypalEmail) throw new Error("Per prelevare, imposta prima il tuo indirizzo email PayPal nelle impostazioni del profilo.");
+            if ((user.balance || 0) < 10) throw new Error("Il saldo minimo per il prelievo è di 10€.");
+
+            const lastPayout = transactions?.find(t => t.type === 'payout');
+            if (lastPayout && new Date(lastPayout.created_date) > subDays(new Date(), 7)) {
+                throw new Error("Puoi richiedere un solo prelievo ogni 7 giorni.");
+            }
+
+            const amountToWithdraw = user.balance!;
+            const fee = amountToWithdraw * 0.10; // 10% fee
+            const finalAmount = amountToWithdraw - fee;
+
+            // Simulate Cloud Function call to PayPal
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log(`Simulating PayPal Payout of ${finalAmount.toFixed(2)}€ to ${user.paypalEmail}`);
+
+            // Update user balance
+            await base44.auth.updateMe({
+                balance: 0, // Reset balance after payout
+            });
+
+            // Create transaction record
+            await base44.entities.Transaction.create({
+                userId: user.id,
+                type: 'payout',
+                description: `Prelievo di ${finalAmount.toFixed(2)}€ (lordo ${amountToWithdraw.toFixed(2)}€ - 10% fee)`,
+                amount: -amountToWithdraw,
+                status: 'completed',
+            });
+
+            return finalAmount;
+        },
+        onSuccess: (finalAmount) => {
+            toast({
+                title: "Prelievo in corso!",
+                description: `Il tuo pagamento di ${finalAmount.toFixed(2)}€ è stato inviato a ${user?.paypalEmail}. Riceverai una conferma a breve.`,
+            });
+            queryClient.invalidateQueries({ queryKey: ['transactions', user?.id] });
+            loadUser(); // Refetch user to update balance
+        },
+        onError: (error: Error) => {
+            toast({
+                variant: 'destructive',
+                title: "Errore Prelievo",
+                description: error.message,
+            });
+        }
+    });
+
     const getTransactionIcon = (type: Transaction['type']) => {
         switch (type) {
-            case "like_received": return <Heart className="w-4 h-4" />;
+            case "like": return <Heart className="w-4 h-4" />;
             case "like_purchase": return <TrendingDown className="w-4 h-4" />;
-            case "referral_bonus": return <TrendingUp className="w-4 h-4" />;
+            case "reward": return <TrendingUp className="w-4 h-4" />;
             case "payout": return <Download className="w-4 h-4" />;
             default: return <DollarSign className="w-4 h-4" />;
         }
@@ -47,8 +102,8 @@ export default function WalletPage() {
 
     const getTransactionColor = (type: Transaction['type']) => {
         switch (type) {
-            case "like_received":
-            case "referral_bonus":
+            case "like":
+            case "reward":
                 return "text-green-500";
             case "like_purchase":
             case "payout":
@@ -100,11 +155,17 @@ export default function WalletPage() {
                                     </motion.div>
                                 </div>
                                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                                    <Button className="w-full bg-gradient-to-r from-accent to-yellow-500 hover:opacity-90 text-accent-foreground font-bold text-lg py-6 gold-glow" size="lg">
-                                        <Download className="w-5 h-5 mr-2" /> Richiedi Pagamento PayPal
+                                    <Button 
+                                        onClick={() => requestPayoutMutation.mutate()}
+                                        disabled={requestPayoutMutation.isPending || (user.balance || 0) < 10}
+                                        className="w-full bg-gradient-to-r from-accent to-yellow-500 hover:opacity-90 text-accent-foreground font-bold text-lg py-6 gold-glow" 
+                                        size="lg"
+                                    >
+                                        {requestPayoutMutation.isPending ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Download className="w-5 h-5 mr-2" />}
+                                        {requestPayoutMutation.isPending ? "Elaborazione..." : "Richiedi Pagamento PayPal"}
                                     </Button>
                                 </motion.div>
-                                <p className="text-xs text-muted-foreground text-center mt-3">Pagamenti disponibili da €10.00 tramite PayPal</p>
+                                <p className="text-xs text-muted-foreground text-center mt-3">Pagamenti disponibili da 10€. Commissione del 10%.</p>
                             </CardContent>
                         </div>
                     </Card>
