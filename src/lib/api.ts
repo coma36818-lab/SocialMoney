@@ -189,13 +189,15 @@ export const base44 = {
       filter: async (filter: Partial<Like>): Promise<Like[]> => {
         return likes.filter(l => Object.entries(filter).every(([key, value]) => l[key as keyof Like] === value));
       },
-      create: async (data: Omit<Like, 'id' | 'created_by'>): Promise<Like> => {
+      create: async (data: Pick<Like, 'post_id' | 'post_owner_email' | 'like_value'>): Promise<Like> => {
         const userEmail = localStorage.getItem(CURRENT_USER_KEY);
         if(!userEmail) throw new Error('Not authenticated');
 
         const newLike: Like = {
-            ...data,
             id: faker.string.uuid(),
+            post_id: data.post_id,
+            post_owner_email: data.post_owner_email,
+            like_value: data.like_value,
             created_by: userEmail
         };
         likes.push(newLike);
@@ -247,7 +249,7 @@ export const base44 = {
       },
     },
     Transaction: {
-      list: async (sort: string, limit: number): Promise<Transaction[]> => {
+      list: async (sort: string): Promise<Transaction[]> => {
         const userEmail = localStorage.getItem(CURRENT_USER_KEY);
         if(!userEmail) throw new Error('Not authenticated');
         const user = users.find(u => u.email === userEmail);
@@ -257,7 +259,7 @@ export const base44 = {
         if (sort === '-created_date') {
           userTransactions.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
         }
-        return userTransactions.slice(0, limit);
+        return userTransactions;
       },
       create: async (data: Omit<Transaction, 'id'| 'created_date'>): Promise<Transaction> => {
         const newTransaction: Transaction = {
