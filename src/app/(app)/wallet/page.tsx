@@ -30,7 +30,7 @@ export default function WalletPage() {
     };
 
     const { data: transactions, isLoading } = useQuery({
-        queryKey: ['transactions', user?.id],
+        queryKey: ['transactions', user?.email],
         queryFn: () => base44.entities.Transaction.list('-created_date'),
         enabled: !!user,
     });
