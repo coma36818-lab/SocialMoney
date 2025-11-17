@@ -6,10 +6,10 @@ export type User = {
   photoURL?: string;
   createdAt: string; // ISO timestamp
   verified?: boolean;
-  likes_available?: number;
-  likes_received?: number;
-  balance?: number;
-  total_earnings?: number;
+  likes_available: number;
+  likes_received: number;
+  balance: number;
+  total_earnings: number;
   paypal_email?: string;
   plan?: "free" | "creator" | "pro";
   is_banned?: boolean;
@@ -45,19 +45,27 @@ export type User = {
 };
 
 export type Post = {
-  id: string; // Firestore document ID
-  userId: string; // ID dell'utente che ha creato il post
-  imageUrl: string;
-  description: string;
+  id: string;
+  userId: string;
+  text: string;
+  mediaType: "image" | "video" | "text";
+  mediaURL: string;
+  thumbnailURL?: string;
+  likeCount: number;
   createdAt: string; // ISO timestamp
-  likes: number;
+  status: "visible" | "removed";
+  earnings?: number;
+  
+  // Fields for backward compatibility in mock data
+  imageUrl?: string;
+  description?: string;
+  likes?: number;
   media_url?: string;
   media_type?: 'image' | 'video' | 'text';
   created_by?: any;
   owner_id?: any;
   created_date?: any;
   likes_count?: any;
-  earnings?: any;
 };
 
 export type LikeEvent = {
