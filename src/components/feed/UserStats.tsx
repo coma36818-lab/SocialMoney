@@ -1,3 +1,4 @@
+
 'use client';
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,21 +14,21 @@ export default function UserStats({ user }: { user: User }) {
   const stats = [
     {
       label: "Saldo",
-      value: `${user.balance?.toFixed(2) || "0.00"}€`,
+      value: `${user.walletBalance?.toFixed(2) || "0.00"}€`,
       icon: Wallet,
       color: "text-accent",
       bg: "bg-accent/10"
     },
     {
       label: "Like Ricevuti",
-      value: user.likes_received || 0,
+      value: user.totalLikesReceived || 0,
       icon: Heart,
       color: "text-primary",
       bg: "bg-primary/10"
     },
     {
       label: "Like Disponibili",
-      value: user.likes_available || 0,
+      value: user.likeBalance || 0,
       icon: TrendingUp,
       color: "text-blue-500",
       bg: "bg-blue-500/10"

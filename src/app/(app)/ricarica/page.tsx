@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/lib/api";
@@ -47,12 +48,12 @@ export default function RicaricaPage() {
             await new Promise(resolve => setTimeout(resolve, 1500));
 
             const updatedUser = await base44.auth.updateMe({
-                likeBalance: (user.likeBalance || 0) + pkg.likes,
+                likes_available: (user.likes_available || 0) + pkg.likes,
             });
 
             await base44.entities.Transaction.create({
                 userId: user.id,
-                type: 'purchase',
+                type: 'like_purchase',
                 description: `Acquisto pacchetto ${pkg.name}`,
                 amount: -pkg.price,
                 status: 'completed',
@@ -137,7 +138,7 @@ export default function RicaricaPage() {
                                 <div className="border-t border-border pt-4 mt-4 space-y-2">
                                      <div className="flex justify-between text-lg">
                                         <span>Like attuali:</span>
-                                        <span className="font-semibold">{(user.likeBalance || 0).toLocaleString('it-IT')}</span>
+                                        <span className="font-semibold">{(user.likes_available || 0).toLocaleString('it-IT')}</span>
                                     </div>
                                     <div className="flex justify-between text-lg text-primary">
                                         <span>Nuovi like:</span>
@@ -145,7 +146,7 @@ export default function RicaricaPage() {
                                     </div>
                                      <div className="flex justify-between text-xl font-bold border-t border-border pt-2 mt-2">
                                         <span>Totale dopo acquisto:</span>
-                                        <span>{((user.likeBalance || 0) + selectedPackage.likes).toLocaleString('it-IT')}</span>
+                                        <span>{((user.likes_available || 0) + selectedPackage.likes).toLocaleString('it-IT')}</span>
                                     </div>
                                 </div>
                                 <Button 

@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/lib/api";
@@ -68,16 +69,16 @@ export default function ProfiloUtentePage() {
                 whileHover={{ scale: 1.05 }}
               >
                 <Avatar className="w-32 h-32 border-4 border-primary neon-glow">
-                    <AvatarImage src={targetUser.avatar} alt={targetUser.full_name} className="object-cover" />
+                    <AvatarImage src={targetUser.avatar} alt={targetUser.username} className="object-cover" />
                     <AvatarFallback className="bg-muted text-4xl">
-                        {getInitials(targetUser.full_name)}
+                        {getInitials(targetUser.username)}
                     </AvatarFallback>
                 </Avatar>
               </motion.div>
 
               {/* Info */}
               <div className="flex-1 text-center md:text-left">
-                <h1 className="text-3xl font-bold text-foreground mb-2">{targetUser.full_name}</h1>
+                <h1 className="text-3xl font-bold text-foreground mb-2">{targetUser.username}</h1>
                 <p className="text-muted-foreground mb-4">@{targetUser.email.split('@')[0]}</p>
                 
                 {targetUser.bio && (
@@ -96,10 +97,10 @@ export default function ProfiloUtentePage() {
                       {[targetUser.city, targetUser.region, targetUser.country].filter(Boolean).join(', ')}
                     </span>
                   )}
-                  {targetUser.created_date && (
+                  {targetUser.createdAt && (
                     <span className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        Iscritto il {new Date(targetUser.created_date).toLocaleDateString('it-IT')}
+                        Iscritto il {new Date(targetUser.createdAt).toLocaleDateString('it-IT')}
                     </span>
                   )}
                 </div>
@@ -112,7 +113,7 @@ export default function ProfiloUtentePage() {
                     </div>
                     <p className="text-xs text-muted-foreground mb-1">Like Ricevuti</p>
                     <p className="text-2xl font-bold text-primary">
-                      {targetUser.likes_received || 0}
+                      {targetUser.totalLikesReceived || 0}
                     </p>
                   </div>
 
@@ -132,7 +133,7 @@ export default function ProfiloUtentePage() {
                     </div>
                     <p className="text-xs text-muted-foreground mb-1">Guadagni</p>
                     <p className="text-2xl font-bold text-blue-500">
-                      €{targetUser.total_earnings?.toFixed(2) || "0.00"}
+                      €{targetUser.walletBalance?.toFixed(2) || "0.00"}
                     </p>
                   </div>
                 </div>
@@ -148,7 +149,7 @@ export default function ProfiloUtentePage() {
           transition={{ delay: 0.3 }}
         >
           <div className="mb-4">
-            <h2 className="text-2xl font-bold text-foreground mb-2">Post di {targetUser.full_name}</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Post di {targetUser.username}</h2>
             <p className="text-muted-foreground">{userPosts.length} contenuti</p>
           </div>
 

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -124,8 +125,8 @@ export function AppHeader({ user: initialUser }: { user: UserType }) {
                 {user && (
                     <div className="flex items-center gap-3 pl-3 border-l border-border">
                     <div className="text-right hidden xl:block">
-                        <p className="text-sm font-semibold text-foreground">{user.full_name}</p>
-                        <p className="text-xs text-accent font-bold">{user.balance?.toFixed(2) || "0.00"}€</p>
+                        <p className="text-sm font-semibold text-foreground">{user.username}</p>
+                        <p className="text-xs text-accent font-bold">{user.walletBalance?.toFixed(2) || "0.00"}€</p>
                     </div>
                     <Button
                         variant="ghost"
@@ -193,8 +194,8 @@ export function AppHeader({ user: initialUser }: { user: UserType }) {
                     <div className="pt-4 border-t border-border">
                     <div className="flex items-center justify-between px-4 py-2">
                         <div>
-                        <p className="text-sm font-semibold text-foreground">{user.full_name}</p>
-                        <p className="text-xs text-accent font-bold">{user.balance?.toFixed(2) || "0.00"}€</p>
+                        <p className="text-sm font-semibold text-foreground">{user.username}</p>
+                        <p className="text-xs text-accent font-bold">{user.walletBalance?.toFixed(2) || "0.00"}€</p>
                         </div>
                         <Button
                         variant="ghost"

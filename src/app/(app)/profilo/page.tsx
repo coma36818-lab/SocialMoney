@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/lib/api";
@@ -66,14 +67,14 @@ export default function ProfiloPage() {
     };
 
     const stats = [
-        { label: "Guadagni", value: `€${user.total_earnings?.toFixed(2) || "0.00"}`, icon: Wallet, color: "text-accent", gradient: "from-accent to-yellow-500" },
-        { label: "Like Ricevuti", value: user.likes_received || 0, icon: Heart, color: "text-primary", gradient: "from-primary to-[#ff3366]" },
+        { label: "Guadagni", value: `€${user.walletBalance?.toFixed(2) || "0.00"}`, icon: Wallet, color: "text-accent", gradient: "from-accent to-yellow-500" },
+        { label: "Like Ricevuti", value: user.totalLikesReceived || 0, icon: Heart, color: "text-primary", gradient: "from-primary to-[#ff3366]" },
         { label: "Post", value: userPosts?.length || 0, icon: TrendingUp, color: "text-blue-500", gradient: "from-blue-500 to-sky-400" },
     ];
     
     const secondaryStats = [
-        {label: "Like Inviati", value: user.likes_sent || 0, icon: Heart},
-        {label: "Referral Code", value: user.referral_code || "N/A", icon: Users},
+        {label: "Like Inviati", value: user.totalLikesSent || 0, icon: Heart},
+        {label: "Referral Code", value: user.referralCode || "N/A", icon: Users},
     ];
 
     const getInitials = (name: string) => {
@@ -89,9 +90,9 @@ export default function ProfiloPage() {
                             <div className="relative">
                                 <motion.div whileHover={{ scale: 1.05, rotate: 5 }} >
                                      <Avatar className="w-32 h-32 border-4 border-primary neon-glow">
-                                        <AvatarImage src={user.avatar} alt={user.full_name} className="object-cover" />
+                                        <AvatarImage src={user.avatar} alt={user.username} className="object-cover" />
                                         <AvatarFallback className="bg-muted text-4xl">
-                                            {getInitials(user.full_name)}
+                                            {getInitials(user.username)}
                                         </AvatarFallback>
                                     </Avatar>
                                 </motion.div>
@@ -100,7 +101,7 @@ export default function ProfiloPage() {
                                 </motion.button>
                             </div>
                             <div className="flex-1 text-center md:text-left">
-                                <h1 className="text-3xl font-bold text-foreground mb-2">{user.full_name}</h1>
+                                <h1 className="text-3xl font-bold text-foreground mb-2">{user.username}</h1>
                                 <p className="text-muted-foreground mb-4">@{user.email.split('@')[0]}</p>
                                 {user.bio && (<p className="mb-6">{user.bio}</p>)}
                                 
@@ -116,7 +117,7 @@ export default function ProfiloPage() {
                                   )}
                                   <span className="flex items-center gap-1">
                                     <Calendar className="w-4 h-4" />
-                                    Iscritto il {new Date(user.created_date!).toLocaleDateString('it-IT')}
+                                    Iscritto il {new Date(user.createdAt!).toLocaleDateString('it-IT')}
                                   </span>
                                 </div>
                                 

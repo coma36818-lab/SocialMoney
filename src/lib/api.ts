@@ -1,3 +1,4 @@
+
 'use client';
 import { mockPosts, mockUsers, mockMessages, mockComments, mockCommentReplies, mockCommentLikes, mockLikes, mockNotifications } from './mock-data';
 import type { LikeEvent, Notification, Post, Transaction, User, Message, Comment, CommentReply, CommentLike } from './types';
@@ -100,17 +101,14 @@ export const base44 = {
         let startingLikes = 20; // Default starting likes
         
         // Referral logic
-        if (data.referred_by) {
-            const referrer = users.find(u => u.referralCode === data.referred_by);
+        if (data.referredBy) {
+            const referrer = users.find(u => u.referralCode === data.referredBy);
             if (referrer) {
-                // Bonus for new user
                 startingLikes += 10;
                 
-                // Bonus for referrer
                 const updatedReferrer: User = {
                     ...referrer,
                     likeBalance: (referrer.likeBalance || 0) + 50,
-                    likes_available: (referrer.likes_available || 0) + 50,
                 };
                 users = users.map(u => u.id === referrer.id ? updatedReferrer : u);
             }
@@ -118,17 +116,16 @@ export const base44 = {
         
         const newUser: User = {
             id: faker.string.uuid(),
-            username: data.nickname,
-            full_name: data.nickname,
+            username: data.username,
+            full_name: data.username,
             email: data.email,
             age: data.age,
             gender: data.gender,
             city: data.city,
             country: data.country,
             region: data.region,
-            referredBy: data.referred_by || null,
+            referredBy: data.referredBy || null,
             likeBalance: startingLikes,
-            likes_available: startingLikes,
             totalLikesReceived: 0,
             totalLikesSent: 0,
             walletBalance: 0,
@@ -189,6 +186,7 @@ export const base44 = {
           likes: 0,
           likes_count: 0,
           earnings: 0,
+          userId: users.find(u => u.email === data.created_by)?.id,
         };
         posts.unshift(newPost);
         saveData(POSTS_KEY, posts);
@@ -238,26 +236,22 @@ export const base44 = {
         if (!fromUser) throw new Error("Liker not found.");
         if (fromUser.accountStatus !== 'active') throw new Error(`Your account is ${fromUser.accountStatus}.`);
 
-        // E. Protezione bot: se 10 like in meno di 10 secondi → sospensione
         const recentLikes = likeEvents.filter(e => e.fromUser === data.fromUser && e.timestamp > tenSecondsAgo);
         if (recentLikes.length >= 10) {
             updateUser(fromUser.id, { accountStatus: 'suspended' });
             throw new Error("Suspicious activity detected. Your account has been suspended.");
         }
         
-        // A. Account fake: max 100 like inviati al giorno
         const dailyLikes = likeEvents.filter(e => e.fromUser === data.fromUser && e.timestamp > twentyFourHoursAgo);
         if (dailyLikes.length >= 100) {
             throw new Error("You have reached your daily limit of 100 likes.");
         }
 
-        // A. Account fake: max 30 like ricevuti dal medesimo utente
         const likesToSameUser = likeEvents.filter(e => e.fromUser === data.fromUser && e.toUser === data.toUser);
         if (likesToSameUser.length >= 30) {
             throw new Error("You cannot like this creator anymore.");
         }
         
-        // C. Like farm: se due utenti si scambiano 20+ like tra loro → blocco
         const likesToLiker = likeEvents.filter(e => e.fromUser === data.toUser && e.toUser === data.fromUser);
         if(likesToSameUser.length > 20 && likesToLiker.length > 20) {
              updateUser(fromUser.id, { accountStatus: 'banned' });
@@ -275,11 +269,9 @@ export const base44 = {
         likeEvents.push(newLikeEvent);
         saveData(LIKE_EVENTS_KEY, likeEvents);
         
-        // Update user's totalLikesSent count
         updateUser(fromUser.id, { 
             totalLikesSent: (fromUser.totalLikesSent || 0) + 1,
             likeBalance: (fromUser.likeBalance || 0) - 1,
-            likes_available: (fromUser.likes_available || 1) - 1,
         });
         
         let toUser = users.find(u => u.id === data.toUser);
@@ -287,9 +279,6 @@ export const base44 = {
             updateUser(toUser.id, {
                  totalLikesReceived: (toUser.totalLikesReceived || 0) + 1,
                  walletBalance: (toUser.walletBalance || 0) + data.value,
-                 balance: (toUser.balance || 0) + data.value,
-                 likes_received: (toUser.likes_received || 0) + 1,
-                 total_earnings: (toUser.total_earnings || 0) + data.value,
             });
         }
         
@@ -438,5 +427,3 @@ export const base44 = {
     }
   },
 }
-
-    

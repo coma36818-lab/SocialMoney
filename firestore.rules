@@ -4,58 +4,37 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Funzione per verificare se l'utente è il proprietario del documento
     function isOwner(userId) {
       return request.auth != null && request.auth.uid == userId;
     }
 
-    // Regole per la collezione "users"
     match /users/{userId} {
-      // Chiunque può leggere i dati del profilo di un utente
       allow read: if true;
-      // Un utente può creare il proprio profilo (es. durante la registrazione)
       allow create: if isOwner(userId);
-      // Un utente può aggiornare solo il proprio profilo...
       allow update: if isOwner(userId)
-        // ...e non può modificare direttamente i campi sensibili
         && request.resource.data.walletBalance == resource.data.walletBalance
         && request.resource.data.likeBalance == resource.data.likeBalance
         && request.resource.data.totalLikesReceived == resource.data.totalLikesReceived
         && request.resource.data.totalLikesSent == resource.data.totalLikesSent;
-      // Nessuno può cancellare un profilo utente direttamente dal client
       allow delete: if false;
     }
 
-    // Regole per la collezione "posts"
     match /posts/{postId} {
-      // Chiunque può leggere i post
       allow read: if true;
-      // Solo gli utenti autenticati possono creare post
       allow create: if request.auth != null;
-      // Un post può essere aggiornato o cancellato solo dal suo creatore
       allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
-    // Regole per la collezione "likeEvents"
-    // La logica dei "like" deve essere gestita da un backend sicuro (es. Cloud Function)
-    // per prevenire frodi e garantire che il valore venga trasferito correttamente.
     match /likeEvents/{eventId} {
-      // Nessuna operazione di scrittura permessa dal client
-      allow write: if false;
-      allow read: if true; // Permetti la lettura per contare i like, se necessario
+      allow write: if false; // Must be handled by a secure backend (Cloud Function)
+      allow read: if true; 
     }
 
-    // Regole per la collezione "transactions"
     match /transactions/{transactionId} {
-      // Un utente può leggere solo le proprie transazioni
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      // Le transazioni devono essere create solo dal backend per sicurezza
-      allow write: if false;
+      allow write: if false; // Must be created by a secure backend
     }
 
-    // Regole per commenti, notifiche, messaggi, etc.
-    // Queste possono essere aggiunte qui con logiche simili.
-    // Esempio per i commenti:
     match /posts/{postId}/comments/{commentId} {
       allow read: if true;
       allow create: if request.auth != null;

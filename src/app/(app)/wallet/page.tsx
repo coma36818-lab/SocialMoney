@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/lib/api";
@@ -53,16 +54,12 @@ export default function WalletPage() {
             const fee = amountToWithdraw * 0.10; // 10% fee
             const finalAmount = amountToWithdraw - fee;
 
-            // Simulate Cloud Function call to PayPal
             await new Promise(resolve => setTimeout(resolve, 2000));
-            console.log(`Simulating PayPal Payout of ${finalAmount.toFixed(2)}€ to ${user.paypalEmail}`);
 
-            // Update user balance
             await base44.auth.updateMe({
                 walletBalance: 0,
             });
 
-            // Create transaction record
             await base44.entities.Transaction.create({
                 userId: user.id,
                 type: 'payout',
@@ -93,7 +90,9 @@ export default function WalletPage() {
     const getTransactionIcon = (type: Transaction['type']) => {
         switch (type) {
             case "like": return <Heart className="w-4 h-4" />;
-            case "purchase": return <TrendingDown className="w-4 h-4" />;
+            case "purchase":
+            case "like_purchase":
+                 return <TrendingDown className="w-4 h-4" />;
             case "reward": return <TrendingUp className="w-4 h-4" />;
             case "payout": return <Download className="w-4 h-4" />;
             default: return <DollarSign className="w-4 h-4" />;
@@ -106,6 +105,7 @@ export default function WalletPage() {
             case "reward":
                 return "text-green-500";
             case "purchase":
+            case "like_purchase":
             case "payout":
                 return "text-red-500";
             default:

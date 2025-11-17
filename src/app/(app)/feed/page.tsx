@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -51,7 +52,6 @@ export default function FeedPage() {
                 throw new Error("Hai già messo like a questo post.");
             }
 
-            // 1. Create LikeEvent
             await base44.entities.LikeEvent.create({ 
                 fromUser: user.id, 
                 toUser: post.userId, 
@@ -59,18 +59,16 @@ export default function FeedPage() {
                 value: 0.01 
             });
 
-            // 2. Update post likes
-            await base44.entities.Post.update(post.id, { likes: (post.likes || 0) + 1 });
+            await base44.entities.Post.update(post.id, { likes: (post.likes || 0) + 1, earnings: (post.earnings || 0) + 0.01 });
             
-            // 3. Create transaction for the receiver
             await base44.entities.Transaction.create({
                 userId: post.userId,
                 type: 'like',
                 amount: 0.01,
                 status: 'completed',
+                description: `Hai ricevuto un like da ${user.username}`
             });
 
-            // 4. Create notification
             const ownerData = await base44.entities.User.filter({ id: post.userId });
             if (ownerData.length > 0) {
                 await base44.entities.Notification.create({ created_by: ownerData[0].email, type: "like", message: `${user.username} ha inviato un like al tuo post! +0.01€` });
@@ -88,7 +86,7 @@ export default function FeedPage() {
     const deletePostMutation = useMutation({
         mutationFn: async (postId: string) => {
             await base44.entities.Post.delete(postId);
-            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
+            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwOUKfk7rdiFAY4kdXzzHosBSl+zPLaizsKHGS/7+OaSwcNUKXh8LhjGgU7k9n1x3YtBSh+zfPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7lNf0y3YsBSh+zPPaizsKHGS/7+OaSwcNUKXh8LhjGgU7');
             audio.volume = 0.3;
             audio.play();
         },

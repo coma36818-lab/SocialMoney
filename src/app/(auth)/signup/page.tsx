@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -23,7 +24,7 @@ import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 
 const signupSchema = z.object({
-  nickname: z.string().min(3, 'Il nickname deve avere almeno 3 caratteri'),
+  username: z.string().min(3, 'Il nome utente deve avere almeno 3 caratteri'),
   email: z.string().email('Email non valida'),
   password: z.string().min(8, 'La password deve avere almeno 8 caratteri'),
   age: z.coerce.number().min(18, 'Devi avere almeno 18 anni'),
@@ -31,7 +32,7 @@ const signupSchema = z.object({
   city: z.string().min(1, 'La città è richiesta'),
   country: z.string().min(1, 'Il paese è richiesto'),
   region: z.string().min(1, 'La regione è richiesta'),
-  referred_by: z.string().optional(),
+  referredBy: z.string().optional(),
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
@@ -44,7 +45,7 @@ export default function SignupPage() {
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      nickname: '',
+      username: '',
       email: '',
       password: '',
       age: 18,
@@ -52,7 +53,7 @@ export default function SignupPage() {
       city: '',
       country: 'Italia',
       region: '',
-      referred_by: ''
+      referredBy: ''
     },
   });
 
@@ -86,8 +87,8 @@ export default function SignupPage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <FormField name="nickname" control={form.control} render={({ field }) => (
-                <FormItem><FormLabel>Nickname</FormLabel><FormControl><Input placeholder="Tuo Nickname" {...field} /></FormControl><FormMessage /></FormItem>
+              <FormField name="username" control={form.control} render={({ field }) => (
+                <FormItem><FormLabel>Username</FormLabel><FormControl><Input placeholder="Tuo Username" {...field} /></FormControl><FormMessage /></FormItem>
               )} />
               <FormField name="age" control={form.control} render={({ field }) => (
                 <FormItem><FormLabel>Età</FormLabel><FormControl><Input type="number" placeholder="18" {...field} /></FormControl><FormMessage /></FormItem>
@@ -121,7 +122,7 @@ export default function SignupPage() {
                 <FormItem><FormLabel>Paese</FormLabel><FormControl><Input placeholder="Italia" {...field} /></FormControl><FormMessage /></FormItem>
               )} />
             </div>
-             <FormField name="referred_by" control={form.control} render={({ field }) => (
+             <FormField name="referredBy" control={form.control} render={({ field }) => (
                 <FormItem>
                   <FormLabel>Codice Referral (Opzionale)</FormLabel>
                   <FormControl><Input placeholder="Codice amico" {...field} /></FormControl>
