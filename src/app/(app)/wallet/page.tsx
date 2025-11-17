@@ -37,18 +37,18 @@ export default function WalletPage() {
 
     const getTransactionIcon = (type: Transaction['type']) => {
         switch (type) {
-            case "like_ricevuto": return <Heart className="w-4 h-4" />;
-            case "acquisto_like": return <TrendingDown className="w-4 h-4" />;
-            case "conversione": return <TrendingUp className="w-4 h-4" />;
-            case "pagamento": return <Download className="w-4 h-4" />;
+            case "like_received": return <Heart className="w-4 h-4" />;
+            case "like_purchase": return <TrendingDown className="w-4 h-4" />;
+            case "conversion": return <TrendingUp className="w-4 h-4" />;
+            case "payout": return <Download className="w-4 h-4" />;
             default: return <DollarSign className="w-4 h-4" />;
         }
     };
 
     const getTransactionColor = (type: Transaction['type']) => {
         switch (type) {
-            case "like_ricevuto": case "conversione": return "text-green-400";
-            case "acquisto_like": case "pagamento": return "text-red-400";
+            case "like_received": case "conversion": return "text-green-400";
+            case "like_purchase": case "payout": return "text-red-400";
             default: return "text-gray-400";
         }
     };

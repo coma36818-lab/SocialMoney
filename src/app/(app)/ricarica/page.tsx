@@ -52,7 +52,7 @@ export default function RicaricaPage() {
 
             await base44.entities.Transaction.create({
                 user_id: user.id,
-                type: 'acquisto_like',
+                type: 'like_purchase',
                 description: `Acquisto pacchetto ${pkg.name}`,
                 amount: -pkg.price,
             });

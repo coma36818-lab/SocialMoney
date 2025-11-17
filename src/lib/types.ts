@@ -41,9 +41,10 @@ export type Transaction = {
   id: string;
   user_id: string;
   created_date: string;
-  type: 'like_ricevuto' | 'acquisto_like' | 'conversione' | 'pagamento';
+  type: 'like_received' | 'like_purchase' | 'conversion' | 'payout';
   description: string;
   amount: number;
+  related_id?: string;
 };
 
 export type Notification = {
