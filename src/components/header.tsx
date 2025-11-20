@@ -1,6 +1,7 @@
 
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -17,9 +18,7 @@ export function AppHeader() {
       <div className="container flex h-20 items-center justify-between max-w-[1400px] mx-auto">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-4" onClick={() => setIsSheetOpen(false)}>
-            <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center font-black text-2xl md:text-3xl text-primary-foreground shadow-lg animate-[pulse_3s_ease-in-out_infinite]">
-              CG
-            </div>
+            <Image src="/logo-removebg-preview copia.png" alt="MyDatinGame Logo" width={64} height={64} className="md:w-14 md:h-14" />
             <div>
               <h1 className="text-xl md:text-2xl font-bold font-headline bg-gradient-to-r from-primary via-yellow-300 to-accent bg-clip-text text-transparent">
                 MyDatinGame
