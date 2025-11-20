@@ -5,24 +5,6 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 const products = [
-    {
-        name: 'Professional Ring Light',
-        description: 'Perfect for TikTok and creator shoots.',
-        imageUrl: 'https://images.unsplash.com/photo-1605465223839-a9c12a7a7a58?q=80&w=1287&auto=format&fit=crop',
-        link: 'https://www.amazon.it/dp/B08B5X5V2X?_encoding=UTF8&psc=1&linkCode=li2&tag=mydatingame-21&linkId=3b49eb12f5a8c2f1f0a1d6365b68b752&ref_=as_li_ss_il',
-    },
-    {
-        name: 'USB Creator Microphone',
-        description: 'Crystal clear audio for podcasts and videos.',
-        imageUrl: 'https://m.media-amazon.com/images/I/71v9Bn0ZLXL._AC_SX522_.jpg',
-        link: 'https://www.amazon.it/dp/B07N2WRH2W?_encoding=UTF8&psc=1&linkCode=li2&tag=mydatingame-21&linkId=8573138b369c3a3721d9652a9254d3cd&ref_=as_li_ss_il',
-    },
-    {
-        name: 'Creator Photography Set',
-        description: 'Complete kit for professional photos and videos.',
-        imageUrl: 'https://m.media-amazon.com/images/I/51tCq0XaLXL._AC_.jpg',
-        link: 'https://www.amazon.it/dp/B07G31G51C?_encoding=UTF8&psc=1&linkCode=li2&tag=mydatingame-21&linkId=b92780e0c90c763d3957f884f1837685&ref_=as_li_ss_il',
-    },
 ];
 
 export default function ShopPage() {
@@ -36,25 +18,7 @@ export default function ShopPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {products.map((product) => (
-          <div key={product.name} className="border border-border/50 p-4 rounded-xl text-center bg-card/50 flex flex-col">
-            <div className="relative w-full aspect-square mb-4">
-                <Image
-                    src={product.imageUrl}
-                    alt={product.name}
-                    fill
-                    className="object-cover rounded-lg"
-                />
-            </div>
-            <h3 className="font-bold text-lg">{product.name}</h3>
-            <p className="text-muted-foreground text-sm flex-grow mb-4">{product.description}</p>
-            <Button asChild className="w-full mt-auto">
-              <Link href={product.link} target="_blank" rel="noopener noreferrer">
-                Buy on Amazon →
-              </Link>
-            </Button>
-          </div>
-        ))}
+        
       </div>
 
       <p className="mt-12 text-center text-sm text-muted-foreground">
