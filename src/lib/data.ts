@@ -30,6 +30,7 @@ export const navLinks = [
       { href: '/#handmade', label: 'Handmade' },
     ],
   },
+  { href: '/shop', label: 'Shop Page' },
   { href: '/#join-creators', label: 'Join' },
   { href: '/library', label: 'Explore Games' },
 ];
