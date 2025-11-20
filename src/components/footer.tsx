@@ -13,7 +13,7 @@ const footerSections = {
       { href: '/privacy', label: 'Privacy Policy' },
       { href: '/terms', label: 'Terms of Service' },
       { href: '/cookies', label: 'Cookie Policy' },
-      { href: 'mailto:mydatingame@gmail.com', label: 'Contact Us' },
+      { href: '/contact-us', label: 'Contact Us' },
     ],
   },
 };
