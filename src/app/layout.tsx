@@ -12,8 +12,8 @@ const siteConfig = {
   name: 'MyDatinGame',
   url: 'https://mydatingame.com',
   ogImage: 'https://mydatingame.com/preview.jpg',
-  description: 'MyDatinGame – Gossip, lifestyle, influencer, cinema, gaming, ricette e trend virali. La tua rivista digitale sempre aggiornata.',
-  keywords: "gossip, influencer, cinema, ricette, lifestyle, gaming, news, tendenze 2025"
+  description: 'MyDatinGame – Gossip, lifestyle, influencers, cinema, gaming, recipes, and viral trends. Your always-updated digital magazine.',
+  keywords: "gossip, influencers, cinema, recipes, lifestyle, gaming, news, 2025 trends"
 };
 
 export const metadata: Metadata = {
@@ -25,10 +25,10 @@ export const metadata: Metadata = {
   creator: 'MyDatinGame',
   openGraph: {
     type: 'website',
-    locale: 'it_IT',
+    locale: 'en_US',
     url: siteConfig.url,
     title: 'MyDatinGame – Trends, Gossip & Lifestyle',
-    description: 'Le notizie e i trend più virali del 2025.',
+    description: 'The most viral news and trends of 2025.',
     siteName: siteConfig.name,
     images: [
       {
@@ -41,8 +41,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MyDatinGame – Gossip e Trend',
-    description: 'Tutto ciò che è virale nel 2025.',
+    title: 'MyDatinGame – Gossip and Trends',
+    description: 'Everything viral in 2025.',
     images: [siteConfig.ogImage],
   },
   icons: {
@@ -79,7 +79,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it" className="dark" style={{scrollBehavior: 'smooth'}}>
+    <html lang="en" className="dark" style={{scrollBehavior: 'smooth'}}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
