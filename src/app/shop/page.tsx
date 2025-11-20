@@ -5,6 +5,15 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 const products = [
+  {
+    id: 1,
+    name: 'Elgato Key Light Mini',
+    description: 'Portable, powerful LED light for professional-quality streaming and content creation. Compact and rechargeable.',
+    price: '€99.99',
+    imageUrl: 'https://m.media-amazon.com/images/I/71VjYpL+e1L._AC_SL1500_.jpg',
+    imageHint: 'LED light',
+    link: 'https://www.amazon.it/dp/B09L725S3D',
+  }
 ];
 
 export default function ShopPage() {
@@ -18,7 +27,31 @@ export default function ShopPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        
+        {products.map((product) => (
+          <Card key={product.id} className="bg-card/30 border-border overflow-hidden transition-all duration-300 group hover:border-primary/50 hover:shadow-2xl hover:-translate-y-1 flex flex-col">
+            <CardHeader>
+              <div className="relative w-full aspect-square overflow-hidden rounded-lg">
+                <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    data-ai-hint={product.imageHint}
+                />
+              </div>
+            </CardHeader>
+            <CardContent className="flex flex-col flex-grow">
+              <CardTitle className="text-xl mb-2">{product.name}</CardTitle>
+              <CardDescription className="flex-grow text-muted-foreground">{product.description}</CardDescription>
+            </CardContent>
+            <CardFooter className="flex justify-between items-center mt-4">
+              <span className="text-2xl font-bold text-primary">{product.price}</span>
+              <Button asChild className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-primary/40">
+                <Link href={product.link} target="_blank" rel="noopener noreferrer">Buy Now</Link>
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
 
       <p className="mt-12 text-center text-sm text-muted-foreground">
