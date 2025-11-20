@@ -9,6 +9,11 @@ import { Menu, ChevronDown } from 'lucide-react';
 import { navLinks } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 
 export function AppHeader() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -18,7 +23,7 @@ export function AppHeader() {
       <div className="container flex h-20 items-center justify-between max-w-[1400px] mx-auto">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-4" onClick={() => setIsSheetOpen(false)}>
-            <Image src="/logo.png" alt="MyDatinGame Logo" width={64} height={64} className="md:w-14 md:h-14" />
+            <img src="/logo.png" alt="MyDatinGame Logo" className="h-16 w-16 md:h-14 md:w-14" />
             <div>
               <h1 className="text-xl md:text-2xl font-bold font-headline bg-gradient-to-r from-primary via-yellow-300 to-accent bg-clip-text text-transparent">
                 MyDatinGame
@@ -83,14 +88,21 @@ export function AppHeader() {
               <nav className="flex flex-col gap-4 mt-8">
                 {navLinks.map((link) => (
                    link.isDropdown && link.items ? (
-                    <div key={link.label} className="flex flex-col gap-2">
-                        <h4 className="font-bold text-lg px-4">{link.label}</h4>
+                    <Collapsible key={link.label} className="flex flex-col gap-2">
+                      <CollapsibleTrigger>
+                        <div className="flex items-center justify-between font-bold text-lg px-4 py-2">
+                          {link.label}
+                          <ChevronDown className="h-4 w-4" />
+                        </div>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
                         {link.items.map(subLink => (
                             <Button variant="ghost" asChild key={subLink.href} className="justify-start text-base pl-8">
                                 <Link href={subLink.href} onClick={() => setIsSheetOpen(false)}>{subLink.label}</Link>
                             </Button>
                         ))}
-                    </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                 ) : (
                   <Button variant="ghost" asChild key={link.href} className="justify-start text-lg">
                     <Link href={link.href!} onClick={() => setIsSheetOpen(false)}>{link.label}</Link>

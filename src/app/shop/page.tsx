@@ -7,11 +7,43 @@ import Link from 'next/link';
 const products = [
   {
     id: 1,
-    name: 'Elgato Key Light Mini',
-    description: 'Elgato Key Light Air Professional LED Panel with 1400 Lumens, Multi-layer Diffusion Technology, with App Support, Adjustable Color Temperature for Mac/Windows/iPhone/Android, Black',
-    imageUrl: 'https://m.media-amazon.com/images/I/71wV2b-0g+L._AC_UF1000,1000_QL80_.jpg',
-    imageHint: 'professional LED light',
-    link: 'https://amzn.to/49qkSeh',
+    name: 'Elgato Key Light Air Pannello LED Professionale con 1400 Lumen',
+    description: 'Elgato Key Light Air Pannello LED Professionale con 1400 Lumen, Tecnologia di Diffusione a Più Strati, con Supporto App, Temperatura del Colore Regolabile per Mac/Windows/iPhone/Android, Nero',
+    imageUrl: '/profili_emryn_corretto.jpg',
+    imageHint: 'LED light',
+    link: 'https://amzn.to/4rfBBYg',
+  },
+  {
+    id: 2,
+    name: 'Elgato Key Light Pannello LED Professionale da Studio',
+    description: 'Elgato Key Light Pannello LED Professionale da Studio con 2800 Lumen, Regolabile a Colori, Abilitato per le App, per PC e Mac, Supporto da Tavolo in Metallo',
+    imageUrl: '/712QsKLnK5L._AC_SL1500_.jpg',
+    imageHint: '/712QsKLnK5L._AC_SL1500_.jpg',
+    link: 'https://amzn.to/49ZaiuU',
+  },
+  {
+    id: 3,
+    name: 'Elgato Key Light Mini – Pannello LED portatile per streaming',
+    description: 'Elgato Key Light Mini – Pannello LED portatile per streaming, videoconferenze, gaming, 800 lumen, batteria ricaricabile, TikTok, Instagram, YouTube, Zoom, Microsoft Teams, PC/Mac/iPhone/Android',
+    imageUrl: '/71clOXmW3GL._AC_SL1500_.jpg',
+    imageHint: 'Pannello LED portatile',
+    link: 'https://amzn.to/47Rp5Xh',
+  },
+  {
+    id: 4,
+    name: 'Logitech for Creators Litra Glow Luce LED Streaming Premium',
+    description: 'Logitech for Creators Litra Glow Luce LED Streaming Premium - Illuminazione per Computer per Videoconferenze, Riunioni Zoom, con Supporto Regolabile e Controllo da App per PC / Mac - Grafite',
+    imageUrl: '/41-fZ3ICQ8L._AC_SL1500_.jpg',
+    imageHint: 'Pannello LED portatile',
+    link: 'https://amzn.to/48o3965',
+  },
+  {
+    id: 5,
+    name: 'Logitech Litra Glow + StreamCam',
+    description: 'Logitech Litra Glow + StreamCam, La soluzione definitiva per un aspetto ottimo nei video, velocemente, Nero',
+    imageUrl: '/71gMBankWHL._AC_SL1500_.jpg',
+    imageHint: 'Pannello LED portatile',
+    link: 'https://amzn.to/3XFHZKy',
   }
 ];
 
@@ -43,7 +75,8 @@ export default function ShopPage() {
               <CardTitle className="text-xl mb-2">{product.name}</CardTitle>
               <CardDescription className="flex-grow text-muted-foreground">{product.description}</CardDescription>
             </CardContent>
-            <CardFooter className="flex justify-end items-center mt-4">
+            <CardFooter className={`flex ${product.price ? 'justify-between' : 'justify-end'} items-center mt-4`}>
+              {product.price && <span className="text-2xl font-bold text-primary">{product.price}</span>}
               <Button asChild className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-primary/40">
                 <Link href={product.link} target="_blank" rel="noopener noreferrer">Buy Now</Link>
               </Button>

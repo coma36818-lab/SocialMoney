@@ -2,6 +2,9 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
   "/sitemap.xml/route": "app/sitemap.xml/route.js",
+  "/about/page": "app/about/page.js",
+  "/contact-us/page": "app/contact-us/page.js",
+  "/cookies/page": "app/cookies/page.js",
   "/gamehub/page": "app/gamehub/page.js",
   "/gossip/le-coppie-vip/page": "app/gossip/le-coppie-vip/page.js",
   "/library/page": "app/library/page.js",
@@ -9,8 +12,5 @@
   "/privacy/page": "app/privacy/page.js",
   "/shop/page": "app/shop/page.js",
   "/sponsor/page": "app/sponsor/page.js",
-  "/cookies/page": "app/cookies/page.js",
-  "/about/page": "app/about/page.js",
-  "/contact-us/page": "app/contact-us/page.js",
   "/terms/page": "app/terms/page.js"
 }
