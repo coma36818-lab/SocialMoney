@@ -16,14 +16,14 @@ function RecommendedProducts() {
     <section id="recommended-products" className="py-12 md:py-20">
       <Card className="bg-gradient-to-br from-primary/10 to-accent/10 text-center p-8 md:p-12 border-primary/20 shadow-lg">
         <CardHeader>
-          <CardTitle className="text-3xl md:text-4xl font-black text-foreground">🔥 Prodotti Consigliati per Creator</CardTitle>
+          <CardTitle className="text-3xl md:text-4xl font-black text-foreground">🔥 Recommended Products for Creators</CardTitle>
           <CardDescription className="text-lg text-muted-foreground mt-2">
-            Oggetti utili per foto, video, streaming e social media.
+            Useful items for photos, videos, streaming, and social media.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button asChild size="lg" className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-primary/40">
-            <Link href="/shop">Vai allo Shop →</Link>
+            <Link href="/shop">Go to Shop →</Link>
           </Button>
         </CardContent>
       </Card>
