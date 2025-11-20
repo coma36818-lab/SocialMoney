@@ -1,3 +1,4 @@
+
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { AppHeader } from '@/components/header';
@@ -11,8 +12,8 @@ const siteConfig = {
   name: 'MyDatinGame',
   url: 'https://mydatingame.com',
   ogImage: 'https://mydatingame.com/preview.jpg',
-  description: 'Trends, Gossip, Lifestyle & Monetize. Your digital magazine for celebrity news, fashion, beauty, gaming, and influencer strategies for 2025.',
-  keywords: "dating, notizie, video, RSS, ANSA, Vogue, GialloZafferano, ComingSoon, People, celebrity gossip, fashion trends 2025, beauty tips, gaming news, TV series, influencer marketing, affiliate programs, lifestyle magazine, trending news, gift ideas"
+  description: 'MyDatinGame – Gossip, lifestyle, influencer, cinema, gaming, ricette e trend virali. La tua rivista digitale sempre aggiornata.',
+  keywords: "gossip, influencer, cinema, ricette, lifestyle, gaming, news, tendenze 2025"
 };
 
 export const metadata: Metadata = {
@@ -26,8 +27,8 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'it_IT',
     url: siteConfig.url,
-    title: siteConfig.name,
-    description: siteConfig.description,
+    title: 'MyDatinGame – Trends, Gossip & Lifestyle',
+    description: 'Le notizie e i trend più virali del 2025.',
     siteName: siteConfig.name,
     images: [
       {
@@ -40,12 +41,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: siteConfig.name,
-    description: siteConfig.description,
+    title: 'MyDatinGame – Gossip e Trend',
+    description: 'Tutto ciò che è virale nel 2025.',
     images: [siteConfig.ogImage],
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.png',
     apple: '/favicon-192.png',
   },
   alternates: {
