@@ -2,8 +2,15 @@
   "/_not-found/page": "/_not-found",
   "/favicon.ico/route": "/favicon.ico",
   "/sitemap.xml/route": "/sitemap.xml",
-  "/gossip/le-coppie-vip/page": "/gossip/le-coppie-vip",
   "/gamehub/page": "/gamehub",
+  "/gossip/le-coppie-vip/page": "/gossip/le-coppie-vip",
   "/library/page": "/library",
-  "/page": "/"
+  "/page": "/",
+  "/privacy/page": "/privacy",
+  "/shop/page": "/shop",
+  "/sponsor/page": "/sponsor",
+  "/cookies/page": "/cookies",
+  "/about/page": "/about",
+  "/contact-us/page": "/contact-us",
+  "/terms/page": "/terms"
 }

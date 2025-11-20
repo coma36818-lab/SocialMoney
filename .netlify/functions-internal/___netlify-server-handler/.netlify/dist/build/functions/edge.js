@@ -534,7 +534,7 @@ var copyHandlerDependenciesForNodeMiddleware = async (ctx) => {
   const parts = [shim];
   const entry = "server/middleware.js";
   const nft = `${entry}.nft.json`;
-  const nftFilesPath = join(process.cwd(), ctx.distDir, nft);
+  const nftFilesPath = join(ctx.publishDir, nft);
   const nftManifest = JSON.parse(await readFile(nftFilesPath, "utf8"));
   const files = nftManifest.files.map((file) => join("server", file));
   files.push(entry);

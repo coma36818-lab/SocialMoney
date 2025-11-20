@@ -8,7 +8,7 @@ const products = [
     {
         name: 'Professional Ring Light',
         description: 'Perfect for TikTok and creator shoots.',
-        imageUrl: 'https://m.media-amazon.com/images/I/81b8VgJqC9L._AC_SX522_.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1605465223839-a9c12a7a7a58?q=80&w=1287&auto=format&fit=crop',
         link: 'https://www.amazon.it/dp/B08B5X5V2X?_encoding=UTF8&psc=1&linkCode=li2&tag=mydatingame-21&linkId=3b49eb12f5a8c2f1f0a1d6365b68b752&ref_=as_li_ss_il',
     },
     {
