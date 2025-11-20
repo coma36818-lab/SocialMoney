@@ -3,35 +3,35 @@ export default function TermsOfServicePage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="prose prose-invert mx-auto max-w-3xl text-left">
-        <h1 className="text-4xl font-bold text-white mb-4 text-center">Termini di Servizio</h1>
+        <h1 className="text-4xl font-bold text-white mb-4 text-center">Terms of Service</h1>
 
         <p>
-          Accedendo al sito mydatingame.com accetti i seguenti termini:
+          By accessing the mydatingame.com website, you agree to the following terms:
         </p>
 
-        <h2 className="text-2xl font-bold text-white mt-8 mb-4">1. Uso consentito</h2>
+        <h2 className="text-2xl font-bold text-white mt-8 mb-4">1. Permitted Use</h2>
         <p>
-          Il sito può essere usato solo per consultare notizie, contenuti e articoli informativi.
+          The site may only be used to consult news, content, and informational articles.
         </p>
 
-        <h2 className="text-2xl font-bold text-white mt-8 mb-4">2. Contenuti</h2>
+        <h2 className="text-2xl font-bold text-white mt-8 mb-4">2. Content</h2>
         <p>
-          Gran parte dei contenuti è originale, mentre alcuni link rimandano ai siti ufficiali sorgente.
-          Non vengono copiati testi o media proprietari.
+          Much of the content is original, while some links redirect to the official source sites.
+          No proprietary text or media is copied.
         </p>
 
-        <h2 className="text-2xl font-bold text-white mt-8 mb-4">3. Affiliazioni</h2>
+        <h2 className="text-2xl font-bold text-white mt-8 mb-4">3. Affiliations</h2>
         <p>
-          Il sito include link affiliati verso Amazon, Awin, Etsy, Fiverr, Booking.
-          Effettuando un acquisto potremmo ricevere una commissione senza costi aggiuntivi per te.
+          The site includes affiliate links to Amazon, Awin, Etsy, Fiverr, Booking.
+          By making a purchase, we may receive a commission at no additional cost to you.
         </p>
 
-        <h2 className="text-2xl font-bold text-white mt-8 mb-4">4. Limitazione di responsabilità</h2>
+        <h2 className="text-2xl font-bold text-white mt-8 mb-4">4. Limitation of Liability</h2>
         <p>
-          Non siamo responsabili per danni derivanti dall'impossibilità temporanea di accedere al sito.
+          We are not responsible for damages resulting from the temporary inability to access the site.
         </p>
 
-        <h2 className="text-2xl font-bold text-white mt-8 mb-4">5. Contatti</h2>
+        <h2 className="text-2xl font-bold text-white mt-8 mb-4">5. Contacts</h2>
         <p>mydatingame@gmail.com</p>
       </div>
     </div>

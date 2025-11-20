@@ -6,20 +6,20 @@ export default function CookiePolicyPage() {
         <h1 className="text-4xl font-bold text-white mb-4 text-center">Cookie Policy</h1>
 
         <p>
-          mydatingame.com utilizza esclusivamente cookie:
+          mydatingame.com exclusively uses:
         </p>
 
         <ul className="list-disc list-inside">
-            <li><strong>tecnici</strong> – necessari al funzionamento del sito</li>
-            <li><strong>funzionali</strong> – per salvare preferenze basilari</li>
+            <li><strong>Technical cookies</strong> – necessary for the site to function</li>
+            <li><strong>Functional cookies</strong> – to save basic preferences</li>
         </ul>
 
         <p>
-          Non utilizziamo cookie di profilazione o sistemi di tracciamento pubblicitario.
+          We do not use profiling cookies or advertising tracking systems.
         </p>
 
         <p>
-          Se hai domande: <strong>mydatingame@gmail.com</strong>
+          If you have any questions: <strong>mydatingame@gmail.com</strong>
         </p>
       </div>
     </div>

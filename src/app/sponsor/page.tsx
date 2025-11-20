@@ -7,17 +7,17 @@ const plans = [
   {
     name: 'Starter',
     price: '€20 / post',
-    features: ['1 articolo dedicato', 'Link al sito', 'Inserimento nel feed'],
+    features: ['1 dedicated article', 'Link to your site', 'Inclusion in the feed'],
   },
   {
     name: 'Pro',
-    price: '€50 / settimana',
-    features: ['3 post a settimana', 'Promozione sulla homepage', 'Inserimento nella newsletter'],
+    price: '€50 / week',
+    features: ['3 posts per week', 'Homepage promotion', 'Newsletter inclusion'],
   },
   {
     name: 'Premium',
-    price: '€120 / mese',
-    features: ['Visibilità totale', 'Banner + articoli sponsorizzati', 'Post social dedicati'],
+    price: '€120 / month',
+    features: ['Total visibility', 'Banner + sponsored articles', 'Dedicated social posts'],
   },
 ];
 
@@ -25,9 +25,9 @@ export default function SponsorPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-white mb-4">🤝 Diventa Sponsor di MyDatinGame</h1>
+        <h1 className="text-4xl font-bold text-white mb-4">🤝 Become a Sponsor of MyDatinGame</h1>
         <p className="text-lg text-slate-300 max-w-3xl mx-auto">
-          Promuovi il tuo brand su una rivista digitale moderna con migliaia di lettori mensili.
+          Promote your brand on a modern digital magazine with thousands of monthly readers.
         </p>
       </div>
 
@@ -47,14 +47,14 @@ export default function SponsorPage() {
               </ul>
             </div>
             <Button asChild className="w-full mt-auto bg-foreground text-background hover:bg-foreground/80">
-                <Link href="mailto:mydatingame@gmail.com">Richiedi</Link>
+                <Link href="mailto:mydatingame@gmail.com">Request</Link>
             </Button>
           </div>
         ))}
       </div>
 
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-white mb-4">📧 Contatti Sponsorizzazioni</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">📧 Sponsorship Contacts</h2>
         <p className="text-lg text-slate-300">
           Email: <strong className="text-primary">mydatingame@gmail.com</strong>
         </p>

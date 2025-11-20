@@ -24,16 +24,16 @@ export function ContentSubmission() {
         <div className="relative z-10">
           <h2 className="text-3xl md:text-5xl font-black !leading-tight mb-4">
             <span className="bg-gradient-to-r from-primary to-yellow-300 bg-clip-text text-transparent">
-              🌟 Partecipa Anche Tu alla Megazine di MyDatinGame!
+              🌟 Join the MyDatinGame Magazine!
             </span>
           </h2>
           <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-8">
-            Sei un <strong className="text-yellow-300">creator</strong>, <strong className="text-yellow-300">influencer</strong>, <strong className="text-yellow-300">YouTuber</strong> o <strong className="text-yellow-300">content creator</strong>? Invia i tuoi video, articoli e contenuti per essere pubblicato sulla nostra piattaforma!
+            Are you a <strong className="text-yellow-300">creator</strong>, <strong className="text-yellow-300">influencer</strong>, <strong className="text-yellow-300">YouTuber</strong>, or <strong className="text-yellow-300">content creator</strong>? Submit your videos, articles, and content to be featured on our platform!
           </p>
 
           <Card className="max-w-2xl mx-auto bg-card/60 backdrop-blur-sm border-border mb-8">
               <CardHeader>
-                  <CardTitle className="text-2xl text-foreground">📧 Invia i Tuoi Contenuti</CardTitle>
+                  <CardTitle className="text-2xl text-foreground">📧 Submit Your Content</CardTitle>
               </CardHeader>
               <CardContent>
                   <div className="flex items-center justify-center gap-4 flex-wrap mb-4">
@@ -42,7 +42,7 @@ export function ContentSubmission() {
                         mydatingame@gmail.com
                       </a>
                   </div>
-                  <p className="text-sm text-muted-foreground">Accettiamo: Video YouTube/TikTok, Articoli, Tutorial, Recensioni, Ricette, Guide e molto altro!</p>
+                  <p className="text-sm text-muted-foreground">We accept: YouTube/TikTok Videos, Articles, Tutorials, Reviews, Recipes, Guides, and much more!</p>
               </CardContent>
           </Card>
 
@@ -57,7 +57,7 @@ export function ContentSubmission() {
           </div>
 
           <Button asChild size="lg" className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-primary/40 transition-shadow transform hover:-translate-y-1 text-base">
-            <Link href="mailto:mydatingame@gmail.com?subject=Partecipazione MyDatingame Magazine&body=Ciao, vorrei partecipare alla vostra magazine con i miei contenuti!">📩 Invia Ora i Tuoi Contenuti</Link>
+            <Link href="mailto:mydatingame@gmail.com?subject=MyDatingame Magazine Submission&body=Hi, I would like to submit my content to your magazine!">📩 Submit Your Content Now</Link>
           </Button>
         </div>
       </div>

@@ -70,7 +70,7 @@ export function AppFooter() {
         <div className="mt-12 pt-8 border-t border-border text-center text-muted-foreground text-sm">
           <p>© {new Date().getFullYear()} MyDatinGame. All rights reserved. Made with ❤️ for creators worldwide.</p>
           <p className="mt-2">
-            Collabora con noi: <a href="mailto:mydatingame@gmail.com" className="text-primary hover:underline">mydatingame@gmail.com</a>
+            Collaborate with us: <a href="mailto:mydatingame@gmail.com" className="text-primary hover:underline">mydatingame@gmail.com</a>
           </p>
         </div>
       </div>
