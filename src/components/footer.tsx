@@ -10,6 +10,7 @@ const footerSections = {
   legal: {
     title: 'Legal',
     links: [
+      { href: '/about', label: 'About' },
       { href: '/privacy', label: 'Privacy Policy' },
       { href: '/terms', label: 'Terms of Service' },
       { href: '/cookies', label: 'Cookie Policy' },
