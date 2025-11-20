@@ -1,0 +1,250 @@
+{
+  "placeholderImages": [
+    {
+      "id": "creator-participation-bg",
+      "description": "Background for creator participation section",
+      "imageUrl": "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=1200&q=80",
+      "imageHint": "social media"
+    },
+    {
+      "id": "breaking-news",
+      "description": "Breaking news article image",
+      "imageUrl": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80",
+      "imageHint": "news broadcast"
+    },
+    {
+      "id": "tech-news",
+      "description": "Technology news article image",
+      "imageUrl": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=600&q=80",
+      "imageHint": "tech news"
+    },
+    {
+      "id": "business-news",
+      "description": "Business news article image",
+      "imageUrl": "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=600&q=80",
+      "imageHint": "money growth"
+    },
+    {
+      "id": "celebrity-gossip",
+      "description": "Celebrity gossip article image",
+      "imageUrl": "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=600&q=80",
+      "imageHint": "social media"
+    },
+    {
+      "id": "red-carpet",
+      "description": "Red carpet fashion article image",
+      "imageUrl": "https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=600&q=80",
+      "imageHint": "celebrity fashion"
+    },
+    {
+      "id": "celebrity-drama",
+      "description": "Celebrity drama article image",
+      "imageUrl": "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600&q=80",
+      "imageHint": "celebrity argument"
+    },
+    {
+      "id": "instagram-influencer",
+      "description": "Instagram influencer post image",
+      "imageUrl": "https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=600&q=80",
+      "imageHint": "influencer selfie"
+    },
+    {
+      "id": "tiktok-trends",
+      "description": "TikTok trends article image",
+      "imageUrl": "https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=600&q=80",
+      "imageHint": "phone screen"
+    },
+    {
+      "id": "youtube-creators",
+      "description": "YouTube creators article image",
+      "imageUrl": "https://images.unsplash.com/photo-1611162618479-ee3d24aaef0b?w=600&q=80",
+      "imageHint": "youtube creator"
+    },
+    {
+      "id": "ricette-veloci",
+      "description": "Fast recipes article image",
+      "imageUrl": "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&q=80",
+      "imageHint": "fast cooking"
+    },
+    {
+      "id": "cucina-salutare",
+      "description": "Healthy cooking article image",
+      "imageUrl": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80",
+      "imageHint": "healthy food"
+    },
+    {
+      "id": "ricette-virali",
+      "description": "Viral recipes article image",
+      "imageUrl": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80",
+      "imageHint": "viral food"
+    },
+    {
+      "id": "nuovi-film",
+      "description": "New movies article image",
+      "imageUrl": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&q=80",
+      "imageHint": "movie theater"
+    },
+    {
+      "id": "serie-tv",
+      "description": "TV series article image",
+      "imageUrl": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=600&q=80",
+      "imageHint": "watching tv"
+    },
+    {
+      "id": "recensioni-film",
+      "description": "Movie reviews article image",
+      "imageUrl": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80",
+      "imageHint": "cinema seats"
+    },
+    {
+      "id": "nuovi-giochi",
+      "description": "New games article image",
+      "imageUrl": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&q=80",
+      "imageHint": "gaming competition"
+    },
+    {
+      "id": "gaming-setup",
+      "description": "Gaming setup article image",
+      "imageUrl": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80",
+      "imageHint": "retro gaming"
+    },
+    {
+      "id": "esports",
+      "description": "Esports article image",
+      "imageUrl": "https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=600&q=80",
+      "imageHint": "esports team"
+    },
+    {
+      "id": "diy-projects",
+      "description": "DIY projects article image",
+      "imageUrl": "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=600&q=80",
+      "imageHint": "crafting tools"
+    },
+    {
+      "id": "handmade-crafts",
+      "description": "Handmade crafts article image",
+      "imageUrl": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&q=80",
+      "imageHint": "handmade art"
+    },
+    {
+      "id": "home-decor-diy",
+      "description": "DIY home decor article image",
+      "imageUrl": "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&q=80",
+      "imageHint": "modern kitchen"
+    },
+    {
+      "id": "monetizzazione",
+      "description": "Monetization article image",
+      "imageUrl": "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=600&q=80",
+      "imageHint": "money growth"
+    },
+    {
+      "id": "youtube-earnings",
+      "description": "YouTube earnings article image",
+      "imageUrl": "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600&q=80",
+      "imageHint": "youtube logo"
+    },
+    {
+      "id": "affiliate-marketing",
+      "description": "Affiliate marketing article image",
+      "imageUrl": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
+      "imageHint": "business chart"
+    },
+    {
+      "id": "creator-economy",
+      "description": "Creator economy tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1556155092-490a1ba16284?w=600&q=80",
+      "imageHint": "person working"
+    },
+    {
+      "id": "tiktok-money",
+      "description": "TikTok monetization tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&q=80",
+      "imageHint": "social media"
+    },
+    {
+      "id": "digital-products",
+      "description": "Digital products selling tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+      "imageHint": "analytics chart"
+    },
+    {
+      "id": "micro-vlogs",
+      "description": "Micro vlogs tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80",
+      "imageHint": "person vlogging"
+    },
+    {
+      "id": "collaboration",
+      "description": "Collaboration tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=600&q=80",
+      "imageHint": "team collaboration"
+    },
+    {
+      "id": "hashtags",
+      "description": "Hashtags strategy tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1611926653458-09294b3142bf?w=600&q=80",
+      "imageHint": "social media"
+    },
+    {
+      "id": "timing",
+      "description": "Post timing tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1501139083538-0139583c060f?w=600&q=80",
+      "imageHint": "clock time"
+    },
+    {
+      "id": "behind-the-scenes",
+      "description": "Behind the scenes content tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80",
+      "imageHint": "team working"
+    },
+    {
+      "id": "analytics",
+      "description": "Data analytics tips image",
+      "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+      "imageHint": "data chart"
+    },
+    {
+      "id": "miele",
+      "description": "Honey jar for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=600&q=80",
+      "imageHint": "honey jar"
+    },
+    {
+      "id": "africa",
+      "description": "Map of Africa for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=600&q=80",
+      "imageHint": "africa map"
+    },
+    {
+      "id": "cinema-trivia",
+      "description": "Cinema for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=600&q=80",
+      "imageHint": "cinema screen"
+    },
+    {
+      "id": "minecraft",
+      "description": "Minecraft game for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&q=80",
+      "imageHint": "video game"
+    },
+    {
+      "id": "pizza-trivia",
+      "description": "Pizza for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&q=80",
+      "imageHint": "pizza slice"
+    },
+    {
+      "id": "iphone-trivia",
+      "description": "iPhone for fun fact",
+      "imageUrl": "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=600&q=80",
+      "imageHint": "iphone screen"
+    },
+    {
+      "id": "posting-times-bg",
+      "description": "Background for best posting times section",
+      "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1400&q=80",
+      "imageHint": "data analytics"
+    }
+  ]
+}

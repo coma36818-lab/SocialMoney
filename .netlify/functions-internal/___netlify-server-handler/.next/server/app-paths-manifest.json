@@ -1,0 +1,9 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/sitemap.xml/route": "app/sitemap.xml/route.js",
+  "/gossip/le-coppie-vip/page": "app/gossip/le-coppie-vip/page.js",
+  "/gamehub/page": "app/gamehub/page.js",
+  "/library/page": "app/library/page.js",
+  "/page": "app/page.js"
+}

@@ -10,7 +10,7 @@
             </p>
             <div className="flex justify-center">
               <Image
-                src="/Schermata13.14.35.png"
+                src="/Schermata  13.14.35.png"
                 alt="Immagine coppie VIP"
                 width={800}
                 height={600}

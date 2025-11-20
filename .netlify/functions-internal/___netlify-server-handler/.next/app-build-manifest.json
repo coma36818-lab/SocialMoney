@@ -1,0 +1,60 @@
+{
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-6aad2f4b43cc9e46.js",
+      "static/chunks/4bd1b696-d7963358908d2327.js",
+      "static/chunks/684-7b785b13a72b6763.js",
+      "static/chunks/main-app-9f4f66c0efa5e0b9.js",
+      "static/chunks/app/_not-found/page-04138c7fe0455be2.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-6aad2f4b43cc9e46.js",
+      "static/chunks/4bd1b696-d7963358908d2327.js",
+      "static/chunks/684-7b785b13a72b6763.js",
+      "static/chunks/main-app-9f4f66c0efa5e0b9.js",
+      "static/css/3a75c5a0080fb6c4.css",
+      "static/chunks/556-4703bae96f7ca91a.js",
+      "static/chunks/511-896d2e4354d06e14.js",
+      "static/chunks/app/layout-47b4033863b3dced.js"
+    ],
+    "/sitemap.xml/route": [
+      "static/chunks/webpack-6aad2f4b43cc9e46.js",
+      "static/chunks/4bd1b696-d7963358908d2327.js",
+      "static/chunks/684-7b785b13a72b6763.js",
+      "static/chunks/main-app-9f4f66c0efa5e0b9.js",
+      "static/chunks/app/sitemap.xml/route-634a2d6a8f12a6d4.js"
+    ],
+    "/gossip/le-coppie-vip/page": [
+      "static/chunks/webpack-6aad2f4b43cc9e46.js",
+      "static/chunks/4bd1b696-d7963358908d2327.js",
+      "static/chunks/684-7b785b13a72b6763.js",
+      "static/chunks/main-app-9f4f66c0efa5e0b9.js",
+      "static/chunks/63-2c6410b00e3cffc6.js",
+      "static/chunks/app/gossip/le-coppie-vip/page-8618f85f4ffe778b.js"
+    ],
+    "/gamehub/page": [
+      "static/chunks/webpack-6aad2f4b43cc9e46.js",
+      "static/chunks/4bd1b696-d7963358908d2327.js",
+      "static/chunks/684-7b785b13a72b6763.js",
+      "static/chunks/main-app-9f4f66c0efa5e0b9.js",
+      "static/chunks/app/gamehub/page-6cc65973adc4a4bc.js"
+    ],
+    "/library/page": [
+      "static/chunks/webpack-6aad2f4b43cc9e46.js",
+      "static/chunks/4bd1b696-d7963358908d2327.js",
+      "static/chunks/684-7b785b13a72b6763.js",
+      "static/chunks/main-app-9f4f66c0efa5e0b9.js",
+      "static/chunks/app/library/page-d1770644c80cd4a2.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-6aad2f4b43cc9e46.js",
+      "static/chunks/4bd1b696-d7963358908d2327.js",
+      "static/chunks/684-7b785b13a72b6763.js",
+      "static/chunks/main-app-9f4f66c0efa5e0b9.js",
+      "static/chunks/556-4703bae96f7ca91a.js",
+      "static/chunks/63-2c6410b00e3cffc6.js",
+      "static/chunks/502-d112d3037e09f8d4.js",
+      "static/chunks/app/page-0146753fe34d073a.js"
+    ]
+  }
+}
