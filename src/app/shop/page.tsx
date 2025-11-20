@@ -9,7 +9,6 @@ const products = [
     id: 1,
     name: 'Elgato Key Light Mini',
     description: 'Elgato Key Light Air Professional LED Panel with 1400 Lumens, Multi-layer Diffusion Technology, with App Support, Adjustable Color Temperature for Mac/Windows/iPhone/Android, Black',
-    price: '€99.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71wV2b-0g+L._AC_UF1000,1000_QL80_.jpg',
     imageHint: 'professional LED light',
     link: 'https://amzn.to/49qkSeh',
@@ -44,8 +43,7 @@ export default function ShopPage() {
               <CardTitle className="text-xl mb-2">{product.name}</CardTitle>
               <CardDescription className="flex-grow text-muted-foreground">{product.description}</CardDescription>
             </CardContent>
-            <CardFooter className="flex justify-between items-center mt-4">
-              <span className="text-2xl font-bold text-primary">{product.price}</span>
+            <CardFooter className="flex justify-end items-center mt-4">
               <Button asChild className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-primary/40">
                 <Link href={product.link} target="_blank" rel="noopener noreferrer">Buy Now</Link>
               </Button>
@@ -60,5 +58,3 @@ export default function ShopPage() {
     </div>
   );
 }
-
-
