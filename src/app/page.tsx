@@ -1,5 +1,4 @@
 
-import { AffiliatePrograms } from '@/components/affiliate-programs';
 import { ContentSubmission } from '@/components/content-submission';
 import { NewsSection } from '@/components/news-section';
 import { newsSections, curiositaArticles } from '@/lib/data';
@@ -9,7 +8,6 @@ import { StatsBar } from '@/components/stats-bar';
 import { PostingTimes } from '@/components/posting-times';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 function RecommendedProducts() {
   return (
@@ -82,8 +80,6 @@ export default function Home() {
           <StatsBar />
         </div>
         
-        <AffiliatePrograms />
-
         <RecommendedProducts />
         
         <PostingTimes />
