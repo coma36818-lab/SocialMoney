@@ -8,10 +8,10 @@ const products = [
   {
     id: 1,
     name: 'Elgato Key Light Mini',
-    description: 'Portable, powerful LED light for professional-quality streaming and content creation. Compact and rechargeable.',
+    description: 'Elgato Key Light Air Pannello LED Professionale con 1400 Lumen, Tecnologia di Diffusione a Più Strati, con Supporto App, Temperatura del Colore Regolabile per Mac/Windows/iPhone/Android, Nero',
     price: '€99.99',
-    imageUrl: 'https://m.media-amazon.com/images/I/71VjYpL+e1L._AC_SL1500_.jpg',
-    imageHint: 'LED light',
+    imageUrl: 'https://m.media-amazon.com/images/I/71wV2b-0g+L._AC_UF1000,1000_QL80_.jpg',
+    imageHint: 'professional LED light',
     link: 'https://www.amazon.it/dp/B09L725S3D',
   }
 ];

@@ -85,9 +85,9 @@ export function AppHeader() {
                    link.isDropdown && link.items ? (
                     <div key={link.label} className="flex flex-col gap-2">
                         <h4 className="font-bold text-lg px-4">{link.label}</h4>
-                        {link.items.map(item => (
-                            <Button variant="ghost" asChild key={item.href} className="justify-start text-base pl-8">
-                                <Link href={item.href} onClick={() => setIsSheetOpen(false)}>{item.label}</Link>
+                        {link.items.map(subLink => (
+                            <Button variant="ghost" asChild key={subLink.href} className="justify-start text-base pl-8">
+                                <Link href={subLink.href} onClick={() => setIsSheetOpen(false)}>{subLink.label}</Link>
                             </Button>
                         ))}
                     </div>
