@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
-import { Menu } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Menu, ChevronDown } from 'lucide-react';
 import { navLinks } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -33,6 +34,25 @@ export function AppHeader() {
         <div className="flex items-center gap-2">
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
+              if (link.isDropdown && link.items) {
+                return (
+                  <DropdownMenu key={link.label}>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="link" className="text-muted-foreground hover:text-primary transition-all">
+                        {link.label}
+                        <ChevronDown className="relative top-[1px] ml-1 h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      {link.items.map((item) => (
+                        <DropdownMenuItem key={item.href} asChild>
+                          <Link href={item.href}>{item.label}</Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                );
+              }
               const isGameLink = link.label === "Explore Games";
               return (
               <Button 
@@ -44,7 +64,7 @@ export function AppHeader() {
                   "transition-all"
                 )}
               >
-                <Link href={link.href}>{link.label}</Link>
+                <Link href={link.href!}>{link.label}</Link>
               </Button>
             )})}
           </nav>
@@ -63,10 +83,20 @@ export function AppHeader() {
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <nav className="flex flex-col gap-4 mt-8">
                 {navLinks.map((link) => (
+                   link.isDropdown && link.items ? (
+                    <div key={link.label} className="flex flex-col gap-2">
+                        <h4 className="font-bold text-lg px-4">{link.label}</h4>
+                        {link.items.map(item => (
+                            <Button variant="ghost" asChild key={item.href} className="justify-start text-base pl-8">
+                                <Link href={item.href} onClick={() => setIsSheetOpen(false)}>{item.label}</Link>
+                            </Button>
+                        ))}
+                    </div>
+                ) : (
                   <Button variant="ghost" asChild key={link.href} className="justify-start text-lg">
-                    <Link href={link.href} onClick={() => setIsSheetOpen(false)}>{link.label}</Link>
+                    <Link href={link.href!} onClick={() => setIsSheetOpen(false)}>{link.label}</Link>
                   </Button>
-                ))}
+                )))}
               </nav>
             </SheetContent>
           </Sheet>

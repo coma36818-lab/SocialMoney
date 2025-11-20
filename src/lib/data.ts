@@ -17,16 +17,23 @@ const getImage = (id: string): ImagePlaceholder => {
 };
 
 export const navLinks = [
-  { href: '/#real-news', label: 'News' },
-  { href: '/#gossip', label: 'Gossip' },
-  { href: '/#influencer', label: 'Influencer' },
-  { href: '/#cucina', label: 'Food' },
-  { href: '/#cinema', label: 'Cinema' },
-  { href: '/#games', label: 'Games' },
-  { href: '/#handmade', label: 'Handmade' },
+  {
+    label: 'Categories',
+    isDropdown: true,
+    items: [
+      { href: '/#real-news', label: 'News' },
+      { href: '/#gossip', label: 'Gossip' },
+      { href: '/#influencer', label: 'Influencer' },
+      { href: '/#cucina', label: 'Food' },
+      { href: '/#cinema', label: 'Cinema' },
+      { href: '/#games', label: 'Games' },
+      { href: '/#handmade', label: 'Handmade' },
+    ],
+  },
   { href: '/#join-creators', label: 'Join' },
   { href: '/library', label: 'Explore Games' },
 ];
+
 
 export const stats = [
   { number: '1.2M+', label: 'Monthly Readers' },
