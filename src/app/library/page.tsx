@@ -1,7 +1,9 @@
+
 'use client';
 
 import AdBanner from '@/components/ad-banner';
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 
 const games = [
   {
@@ -76,7 +78,7 @@ export default function GameLibraryPage() {
                 aria-label="Toggle Fullscreen"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m0 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5h-4m0 0v-4m0 4l-5-5" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m0 0v4m0-4l-5-5M4 16v4m0 0h4m-4 0l5-5m11 5h-4m0 0v-4m0 4l-5-5" />
                 </svg>
               </button>
               <button
@@ -107,10 +109,12 @@ export default function GameLibraryPage() {
             >
               <div className="relative h-[220px] rounded-xl shadow-xl transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                 <div className="absolute inset-0">
-                  <img
+                  <Image
                     className="h-full w-full rounded-xl object-cover shadow-xl shadow-black/40"
                     src={game.imageUrl}
                     alt={game.name}
+                    width={300}
+                    height={220}
                   />
                 </div>
                 <div className="absolute inset-0 h-full w-full rounded-xl bg-black/80 px-6 py-4 text-center text-slate-200 [transform:rotateY(180deg)] [backface-visibility:hidden]">
