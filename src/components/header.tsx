@@ -88,23 +88,25 @@ export function AppHeader() {
               <nav className="flex flex-col gap-4 mt-8">
                 {navLinks.map((link) => (
                    link.isDropdown && link.items ? (
-                    <Collapsible key={link.label} className="flex flex-col gap-2">
-                      <CollapsibleTrigger>
-                        <div className="flex items-center justify-between font-bold text-lg px-4 py-2">
-                          {link.label}
+                    <Collapsible key={link.label}>
+                      <CollapsibleTrigger className="w-full">
+                        <div className="flex items-center justify-between font-bold text-lg px-4 py-2 w-full">
+                          <span>{link.label}</span>
                           <ChevronDown className="h-4 w-4" />
                         </div>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
-                        {link.items.map(subLink => (
-                            <Button variant="ghost" asChild key={subLink.href} className="justify-start text-base pl-8">
-                                <Link href={subLink.href} onClick={() => setIsSheetOpen(false)}>{subLink.label}</Link>
-                            </Button>
-                        ))}
+                        <div className="flex flex-col gap-2 pl-4">
+                            {link.items.map(subLink => (
+                                <Button variant="ghost" asChild key={subLink.href} className="justify-start text-base">
+                                    <Link href={subLink.href} onClick={() => setIsSheetOpen(false)}>{subLink.label}</Link>
+                                </Button>
+                            ))}
+                        </div>
                       </CollapsibleContent>
                     </Collapsible>
                 ) : (
-                  <Button variant="ghost" asChild key={link.href} className="justify-start text-lg">
+                  <Button variant="ghost" asChild key={link.href} className="justify-start text-lg px-4 py-2">
                     <Link href={link.href!} onClick={() => setIsSheetOpen(false)}>{link.label}</Link>
                   </Button>
                 )))}
