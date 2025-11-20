@@ -1,7 +1,6 @@
 
 'use client';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -19,12 +18,10 @@ export function AppHeader() {
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-4" onClick={() => setIsSheetOpen(false)}>
             <div className="relative w-16 h-16">
-              <Image 
+              <img 
                 src="/logo.png" 
                 alt="MyDatinGame Logo" 
-                fill
-                sizes="(max-width: 768px) 10vw, 5vw"
-                className="object-contain"
+                className="object-contain w-full h-full"
               />
             </div>
             <div>
