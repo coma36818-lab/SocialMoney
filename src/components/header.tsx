@@ -18,7 +18,7 @@ export function AppHeader() {
       <div className="container flex h-20 items-center justify-between max-w-[1400px] mx-auto">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-4" onClick={() => setIsSheetOpen(false)}>
-            <Image src="/logo-removebg-preview copia.png" alt="MyDatinGame Logo" width={64} height={64} className="md:w-14 md:h-14" />
+            <Image src="/logo.png" alt="MyDatinGame Logo" width={64} height={64} className="md:w-14 md:h-14" />
             <div>
               <h1 className="text-xl md:text-2xl font-bold font-headline bg-gradient-to-r from-primary via-yellow-300 to-accent bg-clip-text text-transparent">
                 MyDatinGame
