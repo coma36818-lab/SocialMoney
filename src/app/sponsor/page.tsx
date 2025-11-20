@@ -31,15 +31,13 @@ export default function SponsorPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+      <div className="flex flex-wrap justify-center gap-5 mb-12">
         {plans.map((plan) => (
-          <Card key={plan.name} className="bg-card/50 flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-center text-2xl text-primary">{plan.name}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <p className="text-4xl font-bold text-center mb-6">{plan.price}</p>
-              <ul className="space-y-3 text-muted-foreground">
+          <div key={plan.name} className="border border-border/50 p-5 rounded-2xl bg-card/50 w-full max-w-[280px] flex flex-col">
+            <h3 className="text-center text-2xl text-primary font-bold">{plan.name}</h3>
+            <div className="flex-grow my-6">
+              <p className="text-4xl font-bold text-center">{plan.price}</p>
+              <ul className="mt-6 space-y-3 text-muted-foreground">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-3">
                     <span className="text-primary">✓</span>
@@ -47,13 +45,11 @@ export default function SponsorPage() {
                   </li>
                 ))}
               </ul>
-            </CardContent>
-            <div className="p-6">
-              <Button asChild className="w-full">
-                <Link href="mailto:mydatingame@gmail.com">Richiedi</Link>
-              </Button>
             </div>
-          </Card>
+            <Button asChild className="w-full mt-auto bg-foreground text-background hover:bg-foreground/80">
+                <Link href="mailto:mydatingame@gmail.com">Richiedi</Link>
+            </Button>
+          </div>
         ))}
       </div>
 

@@ -14,19 +14,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 function RecommendedProducts() {
   return (
     <section id="recommended-products" className="py-12 md:py-20">
-      <Card className="bg-gradient-to-br from-primary/10 to-accent/10 text-center p-8 md:p-12 border-primary/20 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-3xl md:text-4xl font-black text-foreground">🔥 Recommended Products for Creators</CardTitle>
-          <CardDescription className="text-lg text-muted-foreground mt-2">
+      <div className="bg-card/10 text-center p-8 md:p-12 border border-border/20 rounded-2xl shadow-lg">
+        <h2 className="text-3xl md:text-4xl font-black text-foreground mb-2">Recommended Products for Creators</h2>
+          <p className="text-lg text-muted-foreground mt-2 mb-6">
             Useful items for photos, videos, streaming, and social media.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </p>
           <Button asChild size="lg" className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-primary/40">
             <Link href="/shop">Go to Shop →</Link>
           </Button>
-        </CardContent>
-      </Card>
+      </div>
     </section>
   );
 }

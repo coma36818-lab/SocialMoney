@@ -35,31 +35,25 @@ export default function ShopPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {products.map((product) => (
-          <Card key={product.name} className="bg-card/50 overflow-hidden flex flex-col">
-            <div className="aspect-square relative w-full">
-              <Image
-                src={product.imageUrl}
-                alt={product.name}
-                fill
-                className="object-cover"
-              />
+          <div key={product.name} className="border border-border/50 p-4 rounded-xl text-center bg-card/50 flex flex-col">
+            <div className="relative w-full aspect-square mb-4">
+                <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    fill
+                    className="object-cover rounded-lg"
+                />
             </div>
-            <CardHeader>
-              <CardTitle>{product.name}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <CardDescription>{product.description}</CardDescription>
-            </CardContent>
-            <CardFooter>
-              <Button asChild className="w-full">
-                <Link href={product.link} target="_blank" rel="noopener noreferrer">
-                  Buy on Amazon →
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
+            <h3 className="font-bold text-lg">{product.name}</h3>
+            <p className="text-muted-foreground text-sm flex-grow mb-4">{product.description}</p>
+            <Button asChild className="w-full mt-auto">
+              <Link href={product.link} target="_blank" rel="noopener noreferrer">
+                Buy on Amazon →
+              </Link>
+            </Button>
+          </div>
         ))}
       </div>
 
