@@ -31,6 +31,7 @@ export const navLinks = [
     ],
   },
   { href: '/shop', label: 'Shop Page' },
+  { href: '/sponsor', label: 'Sponsor' },
   { href: '/#join-creators', label: 'Join' },
   { href: '/library', label: 'Explore Games' },
 ];
@@ -474,3 +475,4 @@ export const postingTimes = [
 ];
 
     
+
