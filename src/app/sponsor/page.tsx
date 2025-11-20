@@ -31,7 +31,7 @@ export default function SponsorPage() {
         </p>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-5 mb-12">
+      <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-5 mb-12">
         {plans.map((plan) => (
           <div key={plan.name} className="border border-border/50 p-5 rounded-2xl bg-card/50 w-full max-w-[280px] flex flex-col">
             <h3 className="text-center text-2xl text-primary font-bold">{plan.name}</h3>

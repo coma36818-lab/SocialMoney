@@ -1,4 +1,5 @@
 
+
 import { ContentSubmission } from '@/components/content-submission';
 import { NewsSection } from '@/components/news-section';
 import { newsSections, curiositaArticles } from '@/lib/data';
@@ -29,7 +30,7 @@ function RecommendedProducts() {
 export default function Home() {
   return (
     <>
-      <div className="px-6 pt-12 md:pt-16">
+      <div className="px-0 md:px-6 pt-12 md:pt-16">
         <NewsSection
           id="real-news"
           title="🔥 Latest Real-Time News"

@@ -114,7 +114,7 @@ export default function RootLayout({
         <div className="bg-animation"></div>
         <div className="relative z-10 flex min-h-screen flex-col">
           <AppHeader />
-          <main className="flex-1 max-w-[1400px] w-full mx-auto">{children}</main>
+          <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 md:p-0">{children}</main>
           <AppFooter />
         </div>
         <Toaster />
