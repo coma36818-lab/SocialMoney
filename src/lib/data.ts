@@ -18,7 +18,7 @@ const getImage = (id: string): ImagePlaceholder => {
 
 export const navLinks = [
   {
-    label: 'Categories',
+    label: 'Rubriche',
     isDropdown: true,
     items: [
       { href: '/#real-news', label: 'News' },
@@ -475,4 +475,5 @@ export const postingTimes = [
 ];
 
     
+
 
