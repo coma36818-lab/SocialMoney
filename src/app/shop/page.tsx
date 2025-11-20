@@ -12,7 +12,7 @@ const products = [
     price: '€99.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71wV2b-0g+L._AC_UF1000,1000_QL80_.jpg',
     imageHint: 'professional LED light',
-    link: 'https://www.amazon.it/dp/B09L725S3D',
+    link: 'https://amzn.to/49qkSeh',
   }
 ];
 
@@ -60,4 +60,5 @@ export default function ShopPage() {
     </div>
   );
 }
+
 
