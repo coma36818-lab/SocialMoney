@@ -8,7 +8,7 @@ const products = [
   {
     id: 1,
     name: 'Elgato Key Light Mini',
-    description: 'Elgato Key Light Air Pannello LED Professionale con 1400 Lumen, Tecnologia di Diffusione a Più Strati, con Supporto App, Temperatura del Colore Regolabile per Mac/Windows/iPhone/Android, Nero',
+    description: 'Elgato Key Light Air Professional LED Panel with 1400 Lumens, Multi-layer Diffusion Technology, with App Support, Adjustable Color Temperature for Mac/Windows/iPhone/Android, Black',
     price: '€99.99',
     imageUrl: 'https://m.media-amazon.com/images/I/71wV2b-0g+L._AC_UF1000,1000_QL80_.jpg',
     imageHint: 'professional LED light',
@@ -60,3 +60,4 @@ export default function ShopPage() {
     </div>
   );
 }
+
