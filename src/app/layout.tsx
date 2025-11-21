@@ -83,7 +83,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Organization",
@@ -114,7 +114,7 @@ export default function RootLayout({
         <div className="bg-animation"></div>
         <div className="relative z-10 flex min-h-screen flex-col">
           <AppHeader />
-          <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 md:p-0">{children}</main>
+          <main className="flex-1">{children}</main>
           <AppFooter />
         </div>
         <Toaster />
@@ -124,3 +124,6 @@ export default function RootLayout({
     </html>
   );
 }
+
+
+    
