@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { CookieBanner } from '@/components/cookie-banner';
 import { ScrollToTop } from '@/components/scroll-to-top';
+import Script from 'next/script';
 
 const siteConfig = {
   name: 'MyDatinGame',
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: siteConfig.url,
-    title: 'MyDatinGame – Trends, Gossip & Lifestyle',
+    title: 'MyDatingame – Trends, Gossip & Lifestyle',
     description: 'The most viral news and trends of 2025.',
     siteName: siteConfig.name,
     images: [
@@ -81,7 +82,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" style={{scrollBehavior: 'smooth'}}>
       <head>
-        <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=EUR"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
@@ -125,6 +125,7 @@ export default function RootLayout({
    className="floating-dm">
     ✉️
 </a>
+        <Script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=EUR" />
       </body>
     </html>
   );
