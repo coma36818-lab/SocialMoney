@@ -78,7 +78,8 @@ export default function SponsorPage() {
                 return actions.order.create({
                   purchase_units: [{
                     amount: { value: "3.00" },
-                    description: "Starter Sponsorship - MyDatinGame"
+                    description: "Starter Sponsorship - MyDatinGame",
+                    payee: { email_address: "alibi81@libero.it" }
                   }]
                 });
               },
@@ -90,21 +91,21 @@ export default function SponsorPage() {
 
             paypal.Buttons({
               createOrder: (d,a)=>a.order.create({
-                purchase_units:[{ amount:{ value:"9.00" }, description:"Pro Sponsorship" }]
+                purchase_units:[{ amount:{ value:"9.00" }, description:"Pro Sponsorship", payee: { email_address: "alibi81@libero.it" } }]
               }),
               onApprove:(d,a)=>{ alert("Grazie! Invia materiale a mydatingame@gmail.com"); a.order.capture(); }
             }).render('#paypal-pro');
 
             paypal.Buttons({
               createOrder:(d,a)=>a.order.create({
-                purchase_units:[{ amount:{ value:"25.00" }, description:"Premium Sponsorship" }]
+                purchase_units:[{ amount:{ value:"25.00" }, description:"Premium Sponsorship", payee: { email_address: "alibi81@libero.it" } }]
               }),
               onApprove:(d,a)=>{ alert("Pagamento ricevuto!"); a.order.capture(); }
             }).render('#paypal-premium');
 
             paypal.Buttons({
               createOrder:(d,a)=>a.order.create({
-                purchase_units:[{ amount:{ value:"49.00" }, description:"Ultra Sponsorship" }]
+                purchase_units:[{ amount:{ value:"49.00" }, description:"Ultra Sponsorship", payee: { email_address: "alibi81@libero.it" } }]
               }),
               onApprove:(d,a)=>{ alert("Grazie!"); a.order.capture(); }
             }).render('#paypal-ultra');
