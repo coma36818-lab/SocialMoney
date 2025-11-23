@@ -1,22 +1,25 @@
 
+'use client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { PayPalButtonsComponent } from '@/components/paypal-buttons';
 
 const plans = [
   {
     name: 'Starter',
-    price: '€20 / post',
+    price: '20.00',
+    description: '1 dedicated article, Link to your site, Inclusion in the feed',
     features: ['1 dedicated article', 'Link to your site', 'Inclusion in the feed'],
   },
   {
     name: 'Pro',
-    price: '€50 / week',
+    price: '50.00',
+    description: '3 posts per week, Homepage promotion, Newsletter inclusion',
     features: ['3 posts per week', 'Homepage promotion', 'Newsletter inclusion'],
   },
   {
     name: 'Premium',
-    price: '€120 / month',
+    price: '120.00',
+    description: 'Total visibility, Banner + sponsored articles, Dedicated social posts',
     features: ['Total visibility', 'Banner + sponsored articles', 'Dedicated social posts'],
   },
 ];
@@ -36,7 +39,7 @@ export default function SponsorPage() {
           <div key={plan.name} className="border border-border/50 p-5 rounded-2xl bg-card/50 w-full max-w-[280px] flex flex-col">
             <h3 className="text-center text-2xl text-primary font-bold">{plan.name}</h3>
             <div className="flex-grow my-6">
-              <p className="text-4xl font-bold text-center">{plan.price}</p>
+              <p className="text-4xl font-bold text-center">€{plan.price}</p>
               <ul className="mt-6 space-y-3 text-muted-foreground">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-3">
@@ -46,9 +49,13 @@ export default function SponsorPage() {
                 ))}
               </ul>
             </div>
-            <Button asChild className="w-full mt-auto bg-foreground text-background hover:bg-foreground/80">
-                <Link href="mailto:mydatingame@gmail.com">Request</Link>
-            </Button>
+            <PayPalButtonsComponent
+              plan={{
+                name: plan.name,
+                description: plan.description,
+                price: plan.price,
+              }}
+            />
           </div>
         ))}
       </div>
