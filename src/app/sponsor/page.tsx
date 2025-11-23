@@ -64,15 +64,20 @@ export default function SponsorPage() {
       <section className="contact-box">
         <h3>📧 Sponsorship Contacts</h3>
         <p>Email: <strong>mydatingame@gmail.com</strong></p>
-        <a href="mailto:mydatingame@gmail.com?subject=Richiesta%20Sponsorizzazione&body=Ciao%2C%20voglio%20promuovere%20il%20mio%20brand%20su%20MyDatinGame." 
-   className="dm-button">
-    ✉️ Invia Messaggio Diretto
-</a>
+        <a href="mailto:mydatingame@gmail.com?subject=Richiesta%20Sponsorizzazione&body=Ciao%2C%20voglio%20promuovere%20il%20mio%20brand%20su%20MyDatinGame."
+          className="dm-button">
+          ✉️ Invia Messaggio Diretto
+        </a>
       </section>
 
       <Script id="paypal-buttons-script">
         {`
-          if (typeof paypal !== 'undefined') {
+          function renderPayPalButtons() {
+            if (typeof paypal === 'undefined') {
+              setTimeout(renderPayPalButtons, 100);
+              return;
+            }
+            
             paypal.Buttons({
               createOrder: function(data, actions) {
                 return actions.order.create({
@@ -109,6 +114,12 @@ export default function SponsorPage() {
               }),
               onApprove:(d,a)=>{ alert("Grazie!"); a.order.capture(); }
             }).render('#paypal-ultra');
+          }
+
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderPayPalButtons);
+          } else {
+            renderPayPalButtons();
           }
         `}
       </Script>
