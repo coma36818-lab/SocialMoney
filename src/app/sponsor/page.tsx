@@ -64,6 +64,10 @@ export default function SponsorPage() {
       <section className="contact-box">
         <h3>📧 Sponsorship Contacts</h3>
         <p>Email: <strong>mydatingame@gmail.com</strong></p>
+        <a href="mailto:mydatingame@gmail.com?subject=Richiesta%20Sponsorizzazione&body=Ciao%2C%20voglio%20promuovere%20il%20mio%20brand%20su%20MyDatinGame." 
+   className="dm-button">
+    ✉️ Invia Messaggio Diretto
+</a>
       </section>
 
       <Script id="paypal-buttons-script">
