@@ -3,8 +3,6 @@
 import { PayPalButtonsComponent } from '@/components/paypal-provider';
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 
 const plans = [
     {
@@ -41,11 +39,14 @@ const plans = [
     },
 ];
 
+// IMPORTANTE: Sostituisci questa stringa con il tuo Client ID PayPal reale
 const PAYPAL_CLIENT_ID = "YOUR_PAYPAL_CLIENT_ID_HERE";
 
 export default function SponsorPage() {
+  const isPaypalConfigured = PAYPAL_CLIENT_ID !== "YOUR_PAYPAL_CLIENT_ID_HERE";
+
   return (
-    <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "EUR" }}>
+    <PayPalScriptProvider options={{ "clientId": isPaypalConfigured ? PAYPAL_CLIENT_ID : 'sb', currency: "EUR" }}>
       <div className="font-body">
         <section className="sponsor-hero">
           <h1>Become a Sponsor of MyDatinGame</h1>
@@ -64,7 +65,7 @@ export default function SponsorPage() {
                 ))}
               </ul>
               <div className='mt-4'>
-                {PAYPAL_CLIENT_ID !== 'YOUR_PAYPAL_CLIENT_ID_HERE' ? (
+                {isPaypalConfigured ? (
                   <PayPalButtonsComponent
                       amount={plan.price}
                       description={plan.description}
