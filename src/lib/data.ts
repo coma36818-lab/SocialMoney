@@ -28,12 +28,12 @@ export const navLinks = [
       { href: '/#cinema', label: 'Cinema' },
       { href: '/#games', label: 'Games' },
       { href: '/#handmade', label: 'Handmade' },
+      { href: '/library', label: 'Game Library' },
     ],
   },
   { href: '/shop', label: 'Shop Page' },
   { href: '/sponsor', label: 'Sponsor' },
   { href: '/#join-creators', label: 'Join' },
-  { href: '/library', label: 'Explore Games' },
 ];
 
 
