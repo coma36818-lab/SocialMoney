@@ -30,7 +30,6 @@ export const navLinks = [
       { href: '/#handmade', label: 'Handmade' },
     ],
   },
-  { href: '/viral-creator-arena', label: 'VIRAL CREATOR ARENA' },
   { href: '/shop', label: 'Shop Page' },
   { href: '/sponsor', label: 'Sponsor' },
   { href: '/#join-creators', label: 'Join' },
