@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { CookieBanner } from '@/components/cookie-banner';
 import { ScrollToTop } from '@/components/scroll-to-top';
 import Script from 'next/script';
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
 const siteConfig = {
   name: 'MyDatinGame',
@@ -112,20 +113,21 @@ export default function RootLayout({
         <meta name="google-adsense-account" content="ca-pub-5195762211359589" />
       </head>
       <body className={cn("font-body antialiased", )}>
-        <div className="bg-animation"></div>
-        <div className="relative z-10 flex min-h-screen flex-col">
-          <AppHeader />
-          <main className="flex-1">{children}</main>
-          <AppFooter />
-        </div>
-        <Toaster />
-        <CookieBanner />
-        <ScrollToTop />
-        <a href="mailto:mydatingame@gmail.com?subject=Richiesta%20Info&body=Ciao%20MyDatinGame%2C%20vorrei%20informazioni..."
-   className="floating-dm">
-    ✉️
-</a>
-        <Script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=EUR" />
+        <PayPalScriptProvider options={{ "clientId": "YOUR_PAYPAL_CLIENT_ID", currency: "EUR" }}>
+          <div className="bg-animation"></div>
+          <div className="relative z-10 flex min-h-screen flex-col">
+            <AppHeader />
+            <main className="flex-1">{children}</main>
+            <AppFooter />
+          </div>
+          <Toaster />
+          <CookieBanner />
+          <ScrollToTop />
+          <a href="mailto:mydatingame@gmail.com?subject=Richiesta%20Info&body=Ciao%20MyDatinGame%2C%20vorrei%20informazioni..."
+    className="floating-dm">
+      ✉️
+  </a>
+        </PayPalScriptProvider>
       </body>
     </html>
   );
