@@ -1,6 +1,7 @@
 
 'use client';
 import { PayPalButtonsComponent } from '@/components/paypal-provider';
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 const plans = [
   {
@@ -39,6 +40,7 @@ const plans = [
 
 export default function SponsorPage() {
   return (
+    <PayPalScriptProvider options={{ "clientId": "YOUR_PAYPAL_CLIENT_ID", currency: "EUR" }}>
       <div className="font-body">
         <section className="sponsor-hero">
           <h1>Become a Sponsor of MyDatinGame</h1>
@@ -75,5 +77,6 @@ export default function SponsorPage() {
           </a>
         </section>
       </div>
+    </PayPalScriptProvider>
   );
 }
