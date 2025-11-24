@@ -84,11 +84,12 @@ export default function SponsorPage() {
         <section className="contact-box">
           <h3>📧 Sponsorship Contacts</h3>
           <p>Email: <strong>mydatingame@gmail.com</strong></p>
-           <Button asChild className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-primary/40 transition-all duration-300 transform hover:scale-105 mt-4 text-lg py-6 px-8 rounded-full">
-              <Link href="mailto:mydatingame@gmail.com?subject=Richiesta%20Sponsorizzazione&body=Ciao%2C%20voglio%20promuovere%20il%20mio%20brand%20su%20MyDatinGame.">
-                ✉️ Invia Messaggio Diretto
-              </Link>
-            </Button>
+           <a
+              href="mailto:mydatingame@gmail.com?subject=Richiesta%20Sponsorizzazione&body=Ciao%2C%20voglio%20promuovere%20il%20mio%20brand%20su%20MyDatinGame."
+              className="inline-block bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-primary/40 transition-all duration-300 transform hover:scale-105 mt-4 text-lg py-3 px-8 rounded-full"
+            >
+              ✉️ Invia Messaggio Diretto
+            </a>
         </section>
       </div>
     </PayPalScriptProvider>
