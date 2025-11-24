@@ -189,24 +189,6 @@
   color: hsl(var(--primary));
 }
 
-.dm-button {
-    display: inline-block;
-    background: #ff2d55;
-    padding: 15px 25px;
-    border-radius: 30px;
-    color: #fff;
-    font-size: 18px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: 0.25s ease;
-    box-shadow: 0 5px 20px rgba(255,45,85,0.4);
-}
-
-.dm-button:hover {
-    background: #ff4d72;
-    transform: scale(1.05);
-}
-
 
 @keyframes float {
   0%, 100% { transform: translate(0, 0) scale(1); }

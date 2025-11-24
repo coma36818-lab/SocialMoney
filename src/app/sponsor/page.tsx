@@ -3,6 +3,8 @@
 import { PayPalButtonsComponent } from '@/components/paypal-provider';
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const plans = [
     {
@@ -39,7 +41,6 @@ const plans = [
     },
 ];
 
-// IMPORTANTE: Sostituisci questa stringa con il tuo Client ID PayPal reale
 const PAYPAL_CLIENT_ID = "ASO-5bJbcS-tklhd-_M-DrZn6lNHwa7FGDjlUajxjiarfLvpAVQiTnO0A5SPDv4HXjlT7hz4St9d7d34";
 
 export default function SponsorPage() {
@@ -83,10 +84,11 @@ export default function SponsorPage() {
         <section className="contact-box">
           <h3>📧 Sponsorship Contacts</h3>
           <p>Email: <strong>mydatingame@gmail.com</strong></p>
-           <a href="mailto:mydatingame@gmail.com?subject=Richiesta%20Sponsorizzazione&body=Ciao%2C%20voglio%20promuovere%20il%20mio%20brand%20su%20MyDatinGame."
-            className="dm-button">
-              ✉️ Invia Messaggio Diretto
-          </a>
+           <Button asChild className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-primary/40 transition-all duration-300 transform hover:scale-105 mt-4 text-lg py-6 px-8 rounded-full">
+              <Link href="mailto:mydatingame@gmail.com?subject=Richiesta%20Sponsorizzazione&body=Ciao%2C%20voglio%20promuovere%20il%20mio%20brand%20su%20MyDatinGame.">
+                ✉️ Invia Messaggio Diretto
+              </Link>
+            </Button>
         </section>
       </div>
     </PayPalScriptProvider>
