@@ -1,96 +1,161 @@
-
 'use client';
-import { PayPalButtonsComponent } from '@/components/paypal-provider';
-import { PayPalScriptProvider } from "@paypal/react-paypal-js";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-
-const plans = [
-    {
-      name: 'Starter',
-      price: '3.00',
-      priceSuffix: '/ post',
-      features: ['1 Sponsored Article', 'Link to your Website', 'Feed Visibility'],
-      isPopular: false,
-      description: "Starter Sponsorship - MyDatinGame"
-    },
-    {
-      name: 'Pro',
-      price: '9.00',
-      priceSuffix: '/ week',
-      features: ['3 Promos Weekly', 'Homepage Highlight', 'Newsletter Inclusion'],
-      isPopular: true,
-      description: "Pro Sponsorship - MyDatinGame"
-    },
-    {
-      name: 'Premium',
-      price: '25.00',
-      priceSuffix: '/ month',
-      features: ['Max Visibility', 'Banner + Sponsored Articles', 'Social Media Post'],
-      isPopular: false,
-      description: "Premium Sponsorship - MyDatinGame"
-    },
-    {
-      name: 'Ultra',
-      price: '49.00',
-      priceSuffix: '/ month',
-      features: ['Full Promotion', 'Dedicated Video Post', 'Priority Placement'],
-      isPopular: false,
-      description: "Ultra Sponsorship - MyDatinGame"
-    },
-];
+import { useState, useRef } from 'react';
+import { PayPalScriptProvider, PayPalButtons, PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
+import { storage, db } from '@/firebase/client';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const PAYPAL_CLIENT_ID = "ASO-5bJbcS-tklhd-_M-DrZn6lNHwa7FGDjlUajxjiarfLvpAVQiTnO0A5SPDv4HXjlT7hz4St9d7d34";
 
+const boostOptions = [
+  { value: '1.00', label: '1 Boost Video' },
+  { value: '3.00', label: '5 Boost Video' },
+  { value: '5.00', label: '10 Boost Video' },
+];
+
 export default function SponsorPage() {
-  const isPaypalConfigured = PAYPAL_CLIENT_ID !== "YOUR_PAYPAL_CLIENT_ID_HERE";
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setVideoFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setVideoPreview(previewUrl);
+    }
+  };
+
+  const uploadFreeVideo = async () => {
+    const lastUpload = localStorage.getItem("lastFreeUpload");
+    const today = new Date().toDateString();
+
+    if (lastUpload === today) {
+      alert("Hai già caricato 1 video oggi. Usa i Boost Video!");
+      return;
+    }
+
+    if (!videoFile) {
+      alert("Seleziona un video!");
+      return;
+    }
+
+    try {
+      const path = "videos/free_" + Date.now() + ".mp4";
+      const storageRef = ref(storage, path);
+
+      await uploadBytes(storageRef, videoFile);
+      const url = await getDownloadURL(storageRef);
+
+      await addDoc(collection(db, "videos"), {
+        url: url,
+        premium: false,
+        timestamp: serverTimestamp()
+      });
+
+      localStorage.setItem("lastFreeUpload", today);
+      alert("🎉 Video caricato! Ora è in cima alla homepage.");
+    } catch (error) {
+      console.error("Error uploading free video:", error);
+      alert("An error occurred during upload. Please try again.");
+    }
+  };
+
+  const uploadPremiumVideo = async () => {
+    if (!videoFile) {
+      alert("Seleziona un video prima di completare il pagamento!");
+      throw new Error("No video selected");
+    }
+
+    try {
+      const path = "videos/premium_" + Date.now() + ".mp4";
+      const storageRef = ref(storage, path);
+
+      await uploadBytes(storageRef, videoFile);
+      const url = await getDownloadURL(storageRef);
+
+      await addDoc(collection(db, "videos"), {
+        url: url,
+        premium: true,
+        boosted: true,
+        timestamp: serverTimestamp()
+      });
+
+      alert("🚀 Video Premium caricato con successo! È ora al TOP.");
+    } catch (error) {
+      console.error("Error uploading premium video:", error);
+      alert("An error occurred during premium upload. Please contact support.");
+      throw error;
+    }
+  };
+
+  const createOrder = (amount: string): PayPalButtonsComponentProps['createOrder'] => (data, actions) => {
+    if (!videoFile) {
+      alert("Seleziona un video prima di procedere con il pagamento!");
+      return Promise.reject(new Error("No video file selected."));
+    }
+    return actions.order.create({
+      purchase_units: [{
+        amount: {
+          value: amount,
+          currency_code: 'EUR'
+        }
+      }]
+    });
+  };
+
+  const onApprove = (boostLabel: string): PayPalButtonsComponentProps['onApprove'] => async (data, actions) => {
+    try {
+      await actions.order?.capture();
+      await uploadPremiumVideo();
+      alert(`Pagamento completato! ${boostLabel} acquistato!`);
+    } catch (error) {
+      console.error("Payment or upload failed:", error);
+      alert("C'è stato un problema con il pagamento o il caricamento. Riprova.");
+    }
+  };
 
   return (
-    <PayPalScriptProvider options={{ "clientId": isPaypalConfigured ? PAYPAL_CLIENT_ID : 'sb', currency: "EUR" }}>
-      <div className="font-body">
-        <section className="sponsor-hero">
-          <h1>Become a Sponsor of MyDatinGame</h1>
-          <p>Promote your brand to thousands of active monthly readers.</p>
-        </section>
+    <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "EUR" }}>
+      <div className="container mx-auto px-4 py-12">
+        <h1 className="text-4xl font-bold text-center mb-8 text-white">🎥 Carica il tuo Video</h1>
 
-        <section className="sponsor-plans">
-          {plans.map((plan) => (
-            <div key={plan.name} className={`plan ${plan.isPopular ? 'popular' : ''}`}>
-              {plan.isPopular && <div className="badge">Most Popular</div>}
-              <h2>{plan.name}</h2>
-              <div className="price">€{plan.price.split('.')[0]} <span>{plan.priceSuffix}</span></div>
-              <ul>
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              <div className='mt-4'>
-                {isPaypalConfigured ? (
-                  <PayPalButtonsComponent
-                      amount={plan.price}
-                      description={plan.description}
-                  />
-                ) : (
-                  <div className="text-center text-sm text-yellow-300 p-2 bg-yellow-300/10 rounded-md">
-                    Please configure your PayPal Client ID to enable payments.
-                  </div>
-                )}
+        <div className="box">
+          <h2 className="text-2xl font-bold mb-4">🔥 Caricamento Gratuito (1 al giorno)</h2>
+          <input
+            type="file"
+            id="videoInput"
+            accept="video/mp4,video/*"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+          />
+          {videoPreview && (
+            <video id="videoPreview" controls src={videoPreview} className="w-full rounded-lg mt-4"></video>
+          )}
+          <div className="upload-btn" onClick={uploadFreeVideo}>
+            Carica Gratis
+          </div>
+        </div>
+
+        <div className="box">
+          <h2 className="text-2xl font-bold mb-2">🚀 Vuoi caricare più video oggi?</h2>
+          <p className="text-muted-foreground mb-6">Compra i Boost Video e finisci SUBITO in alto sulla homepage.</p>
+          <div className="space-y-4">
+            {boostOptions.map(option => (
+              <div key={option.value}>
+                <p className="mb-2">{option.label} - €{option.value}</p>
+                <PayPalButtons
+                  style={{ layout: "horizontal", label: 'pay' }}
+                  createOrder={createOrder(option.value)}
+                  onApprove={onApprove(option.label)}
+                  onError={(err) => console.error("PayPal Error:", err)}
+                />
               </div>
-            </div>
-          ))}
-        </section>
-
-        <section className="contact-box">
-          <h3>📧 Sponsorship Contacts</h3>
-          <p>Email: <strong>mydatingame@gmail.com</strong></p>
-           <a
-              href="mailto:mydatingame@gmail.com?subject=Richiesta%20Sponsorizzazione&body=Ciao%2C%20voglio%20promuovere%20il%20mio%20brand%20su%20MyDatinGame."
-              className="inline-block bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-primary/40 transition-all duration-300 transform hover:scale-105 mt-4 text-lg py-3 px-8 rounded-full"
-            >
-              ✉️ Invia Messaggio Diretto
-            </a>
-        </section>
+            ))}
+          </div>
+        </div>
       </div>
     </PayPalScriptProvider>
   );
