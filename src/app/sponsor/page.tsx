@@ -40,7 +40,7 @@ const plans = [
 ];
 
 // IMPORTANTE: Sostituisci questa stringa con il tuo Client ID PayPal reale
-const PAYPAL_CLIENT_ID = "YOUR_PAYPAL_CLIENT_ID_HERE";
+const PAYPAL_CLIENT_ID = "ASO-5bJbcS-tklhd-_M-DrZn6lNHwa7FGDjlUajxjiarfLvpAVQiTnO0A5SPDv4HXjlT7hz4St9d7d34";
 
 export default function SponsorPage() {
   const isPaypalConfigured = PAYPAL_CLIENT_ID !== "YOUR_PAYPAL_CLIENT_ID_HERE";
