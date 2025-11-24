@@ -111,7 +111,7 @@ export default function SponsorPage() {
     try {
       await actions.order?.capture();
       await uploadPremiumVideo();
-      alert(`Payment completed! ${boostLabel} purchased!`);
+      alert(`Payment completed! ${'10 Boost Videos' === boostLabel ? '10 Boost Videos and AI Trend Analyzer' : boostLabel} purchased!`);
     } catch (error) {
       console.error("Payment or upload failed:", error);
       alert("There was an issue with the payment or upload. Please try again.");
@@ -121,7 +121,10 @@ export default function SponsorPage() {
   return (
     <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "EUR" }}>
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-center mb-8 text-white">Upload Your Videos</h1>
+        <h1 className="text-4xl font-bold text-center mb-2 text-white">Upload Your Videos</h1>
+        <p className="text-lg text-muted-foreground text-center mb-8">
+          Showcase your content on our homepage to a wide international audience of readers and creators.
+        </p>
 
         <div className="box flex flex-col items-center">
           <h2 className="text-2xl font-bold mb-4">Free Upload</h2>
@@ -134,7 +137,7 @@ export default function SponsorPage() {
             className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
           />
           {videoPreview && (
-            <video id="videoPreview" controls src={videoPreview} className="w-full rounded-lg mt-4"></video>
+            <video id="videoPreview" controls src={videoPreview} className="w-full rounded-lg mt-4 max-w-md"></video>
           )}
           <div className="upload-btn" onClick={uploadFreeVideo}>
             Upload for Free
