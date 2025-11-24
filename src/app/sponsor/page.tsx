@@ -56,7 +56,7 @@ export default function SponsorPage() {
       });
 
       localStorage.setItem("lastFreeUpload", today);
-      alert("🎉 Video caricato! Ora è in cima alla homepage.");
+      alert(" Video caricato! Ora è in cima alla homepage.");
     } catch (error) {
       console.error("Error uploading free video:", error);
       alert("An error occurred during upload. Please try again.");
@@ -123,7 +123,7 @@ export default function SponsorPage() {
         <h1 className="text-4xl font-bold text-center mb-8 text-white">Carica i tuo Video</h1>
 
         <div className="box flex flex-col items-center">
-          <h2 className="text-2xl font-bold mb-4">🔥 Caricamento Gratuito</h2>
+          <h2 className="text-2xl font-bold mb-4">Caricamento Gratuito</h2>
           <input
             type="file"
             id="videoInput"
@@ -148,7 +148,7 @@ export default function SponsorPage() {
               <div key={option.value} className="text-center">
                 <p className="mb-2">{option.label} - €{option.value}</p>
                 <PayPalButtons
-                  style={{ layout: "horizontal", label: 'pay' }}
+                  style={{ layout: "horizontal", label: 'pay', height: 55, color: 'blue' }}
                   createOrder={createOrder(option.value)}
                   onApprove={onApprove(option.label)}
                   onError={(err) => console.error("PayPal Error:", err)}
