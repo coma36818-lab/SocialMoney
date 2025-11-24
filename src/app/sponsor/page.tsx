@@ -5,6 +5,7 @@ import { PayPalScriptProvider, PayPalButtons, PayPalButtonsComponentProps } from
 import { storage, db } from '@/firebase/client';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { Star } from 'lucide-react';
 
 const PAYPAL_CLIENT_ID = "ASO-5bJbcS-tklhd-_M-DrZn6lNHwa7FGDjlUajxjiarfLvpAVQiTnO0A5SPDv4HXjlT7hz4St9d7d34";
 
@@ -145,7 +146,7 @@ export default function SponsorPage() {
           <p className="text-muted-foreground mb-6 text-center">Compra i Boost Video e finisci SUBITO in alto sulla homepage.</p>
           <div className="space-y-4">
             {boostOptions.map(option => (
-              <div key={option.value} className="text-center">
+              <div key={option.value} id={`boost-${option.value.split('.')[0]}`} className="text-center">
                 <p className="mb-2">{option.label} - €{option.value}</p>
                 <PayPalButtons
                   style={{ layout: "horizontal", label: 'pay', height: 55, color: 'blue' }}
@@ -153,6 +154,11 @@ export default function SponsorPage() {
                   onApprove={onApprove(option.label)}
                   onError={(err) => console.error("PayPal Error:", err)}
                 />
+                 {option.value === '5.00' && (
+                  <p className="text-yellow-300 text-sm mt-2 flex items-center justify-center gap-1">
+                    <Star className="w-4 h-4" /> Accesso esclusivo all'AI Trend Analyzer
+                  </p>
+                )}
               </div>
             ))}
           </div>
