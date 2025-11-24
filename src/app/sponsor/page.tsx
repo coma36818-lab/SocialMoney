@@ -152,7 +152,7 @@ export default function SponsorPage() {
               <div key={option.value} id={`boost-${option.value.split('.')[0]}`} className="text-center">
                 <p className="mb-2">{option.label} - €{option.value}</p>
                 <PayPalButtons
-                  style={{ layout: "horizontal", label: 'pay', height: 55, color: 'gold' }}
+                  style={{ layout: "horizontal", label: 'pay', height: 55, color: 'gold', shape: 'pill' }}
                   createOrder={createOrder(option.value)}
                   onApprove={onApprove(option.label)}
                   onError={(err) => console.error("PayPal Error:", err)}
