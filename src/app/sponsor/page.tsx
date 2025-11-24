@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useRef } from 'react';
 import { PayPalScriptProvider, PayPalButtons, PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
@@ -121,7 +122,7 @@ export default function SponsorPage() {
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-center mb-8 text-white">Carica i tuo Video</h1>
 
-        <div className="box">
+        <div className="box flex flex-col items-center">
           <h2 className="text-2xl font-bold mb-4">🔥 Caricamento Gratuito</h2>
           <input
             type="file"
