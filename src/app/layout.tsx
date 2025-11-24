@@ -121,10 +121,6 @@ export default function RootLayout({
           <Toaster />
           <CookieBanner />
           <ScrollToTop />
-          <a href="mailto:mydatingame@gmail.com?subject=Richiesta%20Info&body=Ciao%20MyDatinGame%2C%20vorrei%20informazioni..."
-    className="floating-dm">
-      ✉️
-  </a>
       </body>
     </html>
   );

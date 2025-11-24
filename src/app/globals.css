@@ -203,32 +203,8 @@
 }
 
 .dm-button:hover {
-    background: #ff4d72;
+    background: #ff456d;
     transform: scale(1.05);
-}
-
-.floating-dm {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    background: #ff2d55;
-    color: #fff;
-    width: 60px;
-    height: 60px;
-    font-size: 26px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    box-shadow: 0 5px 20px rgba(255,45,85,0.5);
-    transition: 0.25s ease;
-    z-index: 9999;
-}
-
-.floating-dm:hover {
-    transform: scale(1.08);
-    background: #ff4d72;
 }
 
 
