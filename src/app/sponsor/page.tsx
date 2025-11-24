@@ -140,12 +140,12 @@ export default function SponsorPage() {
           </div>
         </div>
 
-        <div className="box">
+        <div className="box flex flex-col items-center">
           <h2 className="text-2xl font-bold mb-2">🚀 Vuoi caricare più video oggi?</h2>
-          <p className="text-muted-foreground mb-6">Compra i Boost Video e finisci SUBITO in alto sulla homepage.</p>
+          <p className="text-muted-foreground mb-6 text-center">Compra i Boost Video e finisci SUBITO in alto sulla homepage.</p>
           <div className="space-y-4">
             {boostOptions.map(option => (
-              <div key={option.value}>
+              <div key={option.value} className="text-center">
                 <p className="mb-2">{option.label} - €{option.value}</p>
                 <PayPalButtons
                   style={{ layout: "horizontal", label: 'pay' }}
