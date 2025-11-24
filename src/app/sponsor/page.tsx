@@ -130,7 +130,7 @@ export default function SponsorPage() {
             accept="video/mp4,video/*"
             ref={fileInputRef}
             onChange={handleFileChange}
-            className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+            className="block text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
           />
           {videoPreview && (
             <video id="videoPreview" controls src={videoPreview} className="w-full rounded-lg mt-4"></video>
