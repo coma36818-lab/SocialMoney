@@ -59,6 +59,11 @@ export default function Home() {
     <>
       <div className="px-0 md:px-6 pt-12 md:pt-16">
         <NewsSection
+          id="influencer"
+          title="Post degli Influencer"
+          articles={newsSections.find(s => s.id === 'influencer')?.articles || []}
+        />
+        <NewsSection
           id="real-news"
           title="Latest Real-Time News"
           articles={newsSections.find(s => s.id === 'real-news')?.articles || []}
@@ -67,11 +72,6 @@ export default function Home() {
           id="gossip"
           title="💋 Gossip & VIP"
           articles={newsSections.find(s => s.id === 'gossip')?.articles || []}
-        />
-        <NewsSection
-          id="influencer"
-          title="Post degli Influencer"
-          articles={newsSections.find(s => s.id === 'influencer')?.articles || []}
         />
         <NewsSection
           id="cucina"
