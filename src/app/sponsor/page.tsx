@@ -11,8 +11,8 @@ const PAYPAL_CLIENT_ID = "ASO-5bJbcS-tklhd-_M-DrZn6lNHwa7FGDjlUajxjiarfLvpAVQiTn
 
 const boostOptions = [
   { value: '1.00', label: '1 Boost Video' },
-  { value: '3.00', label: '5 Boost Video' },
-  { value: '5.00', label: '10 Boost Video' },
+  { value: '3.00', label: '5 Boost Videos' },
+  { value: '5.00', label: '10 Boost Videos' },
 ];
 
 export default function SponsorPage() {
@@ -34,12 +34,12 @@ export default function SponsorPage() {
     const today = new Date().toDateString();
 
     if (lastUpload === today) {
-      alert("Hai già caricato 1 video oggi. Usa i Boost Video!");
+      alert("You have already uploaded 1 video today. Use Boost Videos!");
       return;
     }
 
     if (!videoFile) {
-      alert("Seleziona un video!");
+      alert("Select a video!");
       return;
     }
 
@@ -57,7 +57,7 @@ export default function SponsorPage() {
       });
 
       localStorage.setItem("lastFreeUpload", today);
-      alert("🎉 Video caricato! Ora è in cima alla homepage.");
+      alert("🎉 Video uploaded! It is now at the top of the homepage.");
     } catch (error) {
       console.error("Error uploading free video:", error);
       alert("An error occurred during upload. Please try again.");
@@ -66,7 +66,7 @@ export default function SponsorPage() {
 
   const uploadPremiumVideo = async () => {
     if (!videoFile) {
-      alert("Seleziona un video prima di completare il pagamento!");
+      alert("Select a video before completing the payment!");
       throw new Error("No video selected");
     }
 
@@ -84,7 +84,7 @@ export default function SponsorPage() {
         timestamp: serverTimestamp()
       });
 
-      alert("🚀 Video Premium caricato con successo! È ora al TOP.");
+      alert("🚀 Premium Video uploaded successfully! It is now at the TOP.");
     } catch (error) {
       console.error("Error uploading premium video:", error);
       alert("An error occurred during premium upload. Please contact support.");
@@ -94,7 +94,7 @@ export default function SponsorPage() {
 
   const createOrder = (amount: string): PayPalButtonsComponentProps['createOrder'] => (data, actions) => {
     if (!videoFile) {
-      alert("Seleziona un video prima di procedere con il pagamento!");
+      alert("Select a video before proceeding with the payment!");
       return Promise.reject(new Error("No video file selected."));
     }
     return actions.order.create({
@@ -111,39 +111,39 @@ export default function SponsorPage() {
     try {
       await actions.order?.capture();
       await uploadPremiumVideo();
-      alert(`Pagamento completato! ${boostLabel} acquistato!`);
+      alert(`Payment completed! ${boostLabel} purchased!`);
     } catch (error) {
       console.error("Payment or upload failed:", error);
-      alert("C'è stato un problema con il pagamento o il caricamento. Riprova.");
+      alert("There was an issue with the payment or upload. Please try again.");
     }
   };
 
   return (
     <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "EUR" }}>
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-center mb-8 text-white">Carica i tuo Video</h1>
+        <h1 className="text-4xl font-bold text-center mb-8 text-white">Upload Your Videos</h1>
 
         <div className="box flex flex-col items-center">
-          <h2 className="text-2xl font-bold mb-4">Caricamento Gratuito</h2>
+          <h2 className="text-2xl font-bold mb-4">Free Upload</h2>
           <input
             type="file"
             id="videoInput"
             accept="video/mp4,video/*"
             ref={fileInputRef}
             onChange={handleFileChange}
-            className="block text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+            className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
           />
           {videoPreview && (
             <video id="videoPreview" controls src={videoPreview} className="w-full rounded-lg mt-4"></video>
           )}
           <div className="upload-btn" onClick={uploadFreeVideo}>
-            Carica Gratis
+            Upload for Free
           </div>
         </div>
 
         <div className="box flex flex-col items-center">
-          <h2 className="text-2xl font-bold mb-2">Vuoi caricare più video oggi?</h2>
-          <p className="text-muted-foreground mb-6 text-center">Compra i Boost Video e finisci SUBITO in alto sulla homepage.</p>
+          <h2 className="text-2xl font-bold mb-2">Want to upload more videos today?</h2>
+          <p className="text-muted-foreground mb-6 text-center">Buy Boost Videos and get to the TOP of the homepage RIGHT AWAY.</p>
           <div className="space-y-4">
             {boostOptions.map(option => (
               <div key={option.value} id={`boost-${option.value.split('.')[0]}`} className="text-center">
@@ -156,7 +156,7 @@ export default function SponsorPage() {
                 />
                  {option.value === '5.00' && (
                   <p className="text-yellow-300 text-sm mt-2 flex items-center justify-center gap-1">
-                    <Star className="w-4 h-4" /> Accesso esclusivo all'AI Trend Analyzer
+                    <Star className="w-4 h-4" /> Exclusive access to the AI Trend Analyzer
                   </p>
                 )}
               </div>
