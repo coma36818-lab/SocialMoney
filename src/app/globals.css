@@ -117,7 +117,7 @@
 .upload-btn {
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
-    padding: 15px;
+    padding: 10px;
     border-radius: 12px;
     text-align: center;
     margin-top: 15px;
