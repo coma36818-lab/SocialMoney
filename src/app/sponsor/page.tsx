@@ -119,10 +119,10 @@ export default function SponsorPage() {
   return (
     <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "EUR" }}>
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-center mb-8 text-white">🎥 Carica i tuo Video</h1>
+        <h1 className="text-4xl font-bold text-center mb-8 text-white">Carica i tuo Video</h1>
 
         <div className="box">
-          <h2 className="text-2xl font-bold mb-4">🔥 Caricamento Gratuito (1 al giorno)</h2>
+          <h2 className="text-2xl font-bold mb-4">🔥 Caricamento Gratuito</h2>
           <input
             type="file"
             id="videoInput"
