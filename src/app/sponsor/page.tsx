@@ -56,7 +56,7 @@ export default function SponsorPage() {
       });
 
       localStorage.setItem("lastFreeUpload", today);
-      alert(" Video caricato! Ora è in cima alla homepage.");
+      alert("🎉 Video caricato! Ora è in cima alla homepage.");
     } catch (error) {
       console.error("Error uploading free video:", error);
       alert("An error occurred during upload. Please try again.");
@@ -141,7 +141,7 @@ export default function SponsorPage() {
         </div>
 
         <div className="box flex flex-col items-center">
-          <h2 className="text-2xl font-bold mb-2">🚀 Vuoi caricare più video oggi?</h2>
+          <h2 className="text-2xl font-bold mb-2">Vuoi caricare più video oggi?</h2>
           <p className="text-muted-foreground mb-6 text-center">Compra i Boost Video e finisci SUBITO in alto sulla homepage.</p>
           <div className="space-y-4">
             {boostOptions.map(option => (
