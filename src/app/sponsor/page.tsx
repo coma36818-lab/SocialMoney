@@ -2,7 +2,7 @@
 'use client';
 import { useState, useRef, ChangeEvent } from 'react';
 import { PayPalScriptProvider, PayPalButtons, PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
-import { storage, db } from '@/firebase/client';
+import { storage, db } from '../../../public/likeflow.js';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Star } from 'lucide-react';
