@@ -4,17 +4,21 @@ import { Heart, Upload, Sparkles, Check, Star, Zap, Crown, Gift } from 'lucide-r
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useWallet } from '@/context/WalletContext';
+import { initializeFirebase } from '@/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+
+const { firestore: db } = initializeFirebase();
 
 const likePackages = [
-  { id: 1, likes: 50, price: 1.00, popular: false, icon: Heart },
-  { id: 2, likes: 150, price: 2.50, popular: true, savings: '17%', icon: Zap },
-  { id: 3, likes: 300, price: 4.50, popular: false, savings: '25%', icon: Crown }
+  { id: 1, name: "50 Likes", likes: 50, price: 1.00, popular: false, icon: Heart },
+  { id: 2, name: "150 Likes", likes: 150, price: 2.50, popular: true, savings: '17%', icon: Zap },
+  { id: 3, name: "300 Likes", likes: 300, price: 4.50, popular: false, savings: '25%', icon: Crown }
 ];
 
 const uploadPackages = [
-  { id: 1, uploads: 1, price: 0.50, popular: false, icon: Upload },
-  { id: 2, uploads: 5, price: 1.50, popular: true, savings: '40%', icon: Zap },
-  { id: 3, uploads: 20, price: 4.00, popular: false, savings: '60%', icon: Crown }
+  { id: 1, name: "1 Upload", uploads: 1, price: 0.50, popular: false, icon: Upload },
+  { id: 2, name: "5 Uploads", uploads: 5, price: 1.50, popular: true, savings: '40%', icon: Zap },
+  { id: 3, name: "20 Uploads", uploads: 20, price: 4.00, popular: false, savings: '60%', icon: Crown }
 ];
 
 const PurchaseSuccess = ({ message }: { message: string }) => (
@@ -48,39 +52,66 @@ const PurchaseSuccess = ({ message }: { message: string }) => (
   </motion.div>
 );
 
+const getOrCreateUserId = (): string => {
+  let userId = localStorage.getItem('likeflow_userId');
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    localStorage.setItem('likeflow_userId', userId);
+  }
+  return userId;
+};
+
+
 export default function Packages() {
   const [activeTab, setActiveTab] = useState('likes');
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const { wallet, addLikes, addUploads } = useWallet();
 
-  const handlePurchase = (type: 'likes' | 'uploads', amount: number, price: number, pkgId: string) => {
-    setSelectedPackage(pkgId);
+  const handlePurchase = (type: 'likes' | 'uploads', amount: number, price: number, pkg: {id: number, name: string}) => {
+    setSelectedPackage(`${type}-${pkg.id}`);
     
     // open paypal
     window.open(
         "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=alibi81@libero.it" +
         "&currency_code=EUR&amount=" + price +
-        "&item_name=Acquisto " + amount + " " + type,
+        "&item_name=Acquisto " + pkg.name,
         "_blank"
     );
 
     // SIMULATION (PayPal redirect IPN)
-    setTimeout(() => {
-      if (type === 'likes') {
-        addLikes(amount);
-        setPurchaseSuccess(`+${amount} Like aggiunti!`);
-      } else {
-        addUploads(amount);
-        setPurchaseSuccess(`+${amount} Upload aggiunti!`);
+    setTimeout(async () => {
+      const userId = getOrCreateUserId();
+      try {
+        await addDoc(collection(db, "transactions"), {
+          userId: userId,
+          likeCount: type === 'likes' ? amount : 0,
+          uploadCount: type === 'uploads' ? amount : 0,
+          pricePaid: price,
+          paypalTxId: `simulated_${Date.now()}`,
+          type: type === 'likes' ? 'likePurchase' : 'uploadPurchase',
+          timestamp: serverTimestamp()
+        });
+
+        if (type === 'likes') {
+          addLikes(amount);
+          setPurchaseSuccess(`+${amount} Like aggiunti!`);
+        } else {
+          addUploads(amount);
+          setPurchaseSuccess(`+${amount} Upload aggiunti!`);
+        }
+        
+      } catch (error) {
+        console.error("Error creating transaction:", error);
       }
+      
       setSelectedPackage(null);
       setTimeout(() => setPurchaseSuccess(null), 3000);
     }, 800);
   };
 
   return (
-    <div className="min-h-[100dvh] bg-black pb-36 pt-16 overflow-y-auto">
+    <div className="min-h-screen bg-black pb-36 pt-16 overflow-y-auto">
       {/* Animated background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <motion.div
@@ -280,15 +311,15 @@ export default function Packages() {
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => handlePurchase('likes', pkg.likes, pkg.price, `like-${pkg.id}`)}
-                        disabled={selectedPackage === `like-${pkg.id}`}
+                        onClick={() => handlePurchase('likes', pkg.likes, pkg.price, {id: pkg.id, name: pkg.name})}
+                        disabled={selectedPackage === `likes-${pkg.id}`}
                         className={`px-6 py-3 rounded-2xl font-bold text-lg transition-all ${
                           pkg.popular
                             ? 'bg-gradient-to-r from-[#FFD700] to-[#B8860B] text-black shadow-lg shadow-[#FFD700]/30'
                             : 'bg-[#222] text-white hover:bg-[#333]'
                         }`}
                       >
-                        {selectedPackage === `like-${pkg.id}` ? (
+                        {selectedPackage === `likes-${pkg.id}` ? (
                           <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 1, repeat: Infinity }}
@@ -373,15 +404,15 @@ export default function Packages() {
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => handlePurchase('uploads', pkg.uploads, pkg.price, `upload-${pkg.id}`)}
-                        disabled={selectedPackage === `upload-${pkg.id}`}
+                        onClick={() => handlePurchase('uploads', pkg.uploads, pkg.price, {id: pkg.id, name: pkg.name})}
+                        disabled={selectedPackage === `uploads-${pkg.id}`}
                         className={`px-6 py-3 rounded-2xl font-bold text-lg transition-all ${
                           pkg.popular
                             ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/30'
                             : 'bg-[#222] text-white hover:bg-[#333]'
                         }`}
                       >
-                        {selectedPackage === `upload-${pkg.id}` ? (
+                        {selectedPackage === `uploads-${pkg.id}` ? (
                           <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 1, repeat: Infinity }}

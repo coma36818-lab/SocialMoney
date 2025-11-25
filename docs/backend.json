@@ -49,6 +49,10 @@
           "type": "number",
           "default": 0,
           "description": "Numero di boost acquistati"
+        },
+        "likesWeek": {
+          "type": "number",
+          "default": 0
         }
       },
       "required": [
@@ -100,6 +104,54 @@
         "likeCount",
         "priceEuro"
       ]
+    },
+    "Transaction": {
+      "name": "Transaction",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique localStorage ID for the user"
+        },
+        "postId": {
+          "type": "string",
+          "description": "ID of the purchased post (optional)"
+        },
+        "likeCount": {
+          "type": "number",
+          "description": "Number of likes purchased"
+        },
+        "pricePaid": {
+          "type": "number",
+          "description": "Price paid in Euro"
+        },
+        "paypalTxId": {
+          "type": "string",
+          "description": "PayPal transaction ID"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "likePurchase",
+            "uploadPurchase",
+            "withdraw"
+          ],
+          "description": "Type of transaction"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the transaction"
+        }
+      },
+      "required": [
+        "userId",
+        "likeCount",
+        "pricePaid",
+        "paypalTxId",
+        "type",
+        "timestamp"
+      ]
     }
   },
   "auth": {
@@ -144,6 +196,16 @@
             "$ref": "#/backend/entities/LikePackage"
           },
           "description": "Stores purchasable like packages."
+        }
+      },
+      {
+        "path": "transactions/{transactionId}",
+        "definition": {
+          "entityName": "Transaction",
+          "schema": {
+            "$ref": "#/backend/entities/Transaction"
+          },
+          "description": "Stores all PayPal transactions for likes and withdrawals."
         }
       }
     ],
