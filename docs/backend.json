@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "Post": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Post",
+      "type": "object",
+      "description": "Represents a social media post with associated media, author, and engagement data.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the post."
+        },
+        "mediaURL": {
+          "type": "string",
+          "description": "URL of the media file (image, video, or audio) associated with the post.",
+          "format": "uri"
+        },
+        "mediaType": {
+          "type": "string",
+          "description": "Type of media (e.g., 'image/jpeg', 'video/mp4', 'audio/mpeg')."
+        },
+        "authorName": {
+          "type": "string",
+          "description": "Name of the post's author."
+        },
+        "authorPhoto": {
+          "type": "string",
+          "description": "URL of the author's profile picture.",
+          "format": "uri"
+        },
+        "postDesc": {
+          "type": "string",
+          "description": "Description or caption of the post."
+        },
+        "likes": {
+          "type": "number",
+          "description": "Number of likes the post has received."
+        },
+        "likesWeek": {
+          "type": "number",
+          "description": "Number of likes the post has received this week."
+        },
+        "timestamp": {
+          "type": "number",
+          "description": "Timestamp indicating when the post was created (in milliseconds since epoch)."
+        }
+      },
+      "required": [
+        "id",
+        "mediaURL",
+        "mediaType",
+        "likes",
+        "likesWeek",
+        "timestamp"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "posts/{postId}",
+        "definition": {
+          "entityName": "Post",
+          "schema": {
+            "$ref": "#/backend/entities/Post"
+          },
+          "description": "Stores social media posts with media, author, and engagement data.",
+          "params": [
+            {
+              "name": "postId",
+              "description": "Unique identifier for the post."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support the core features of the MyDatingame platform, focusing on posts, user engagement (likes), and content submission. The primary collection is `posts`, storing all social media posts.  The structure enforces authorization independence by not requiring `get()` calls in security rules, enabling atomic operations, and enhancing debuggability.  Structural segregation ensures that all documents within a collection share the same security requirements. \n\nAuthorization Independence (Denormalization): The structure avoids hierarchical authorization dependencies. Since all users can view posts and 'like' them, no denormalization of user data into the Post is required. If more complex access control was required (e.g. posts visible only to certain user groups), the group membership information would be denormalized directly into the `Post` documents.\n\nQAPs (Rules are not Filters): The structure supports secure `list` operations.  Posts are stored in a single collection, allowing for listing of posts without complex filtering logic.  Because authorization is not based on user roles and anyone can 'like' a post, security rules are simplified without needing to filter based on user-specific attributes.  Future implementations of user-specific data (e.g. drafts) would be segregated into user-specific subcollections to avoid filtering."
+  }
+}
