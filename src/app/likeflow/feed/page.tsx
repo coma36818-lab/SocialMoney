@@ -15,7 +15,7 @@ import { useSound } from '@/context/SoundContext';
 
 const { firestore: db } = initializeFirebase();
 
-export default function Feed() {
+function Feed() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [showComments, setShowComments] = useState(false);
@@ -173,4 +173,8 @@ export default function Feed() {
       />
     </>
   );
+}
+
+export default function FeedPage() {
+  return <Feed />;
 }

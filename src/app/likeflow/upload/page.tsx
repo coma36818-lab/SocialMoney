@@ -1,9 +1,9 @@
 'use client';
 import React, { useState, useRef, ChangeEvent } from 'react';
-import { useMutation, useQueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { initializeFirebase } from '@/firebase';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { Upload as UploadIcon, Camera, Film, Mic, User, X, Check, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -12,8 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useWallet } from '@/context/WalletContext';
 
-const { firestore: db } = initializeFirebase();
-const { storage } = initializeFirebase();
+const { firestore: db, storage } = initializeFirebase();
 
 const SuccessAnimation = () => (
   <motion.div
@@ -75,7 +74,7 @@ const SuccessAnimation = () => (
   </motion.div>
 );
 
-function Upload() {
+export default function Upload() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -194,7 +193,7 @@ function Upload() {
         mediaType: formData.mediaFile.type,
         likes: 0,
         likesWeek: 0,
-        timestamp: Date.now()
+        timestamp: serverTimestamp()
       });
 
       setUploadProgress(100);
