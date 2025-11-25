@@ -4,6 +4,7 @@ import { Heart, Upload, Sparkles, Check, Star, Zap, Crown, Gift } from 'lucide-r
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useRouter } from 'next/navigation';
+import { useWallet } from '@/context/WalletContext';
 
 const likePackages = [
   { id: 1, likes: 10, price: 1.00, popular: false, icon: Heart },
@@ -52,19 +53,8 @@ export default function Packages() {
   const [activeTab, setActiveTab] = useState('likes');
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
+  const { wallet, addLikes, addUploads } = useWallet();
 
-  const [wallet, setWallet] = useState(() => {
-    if (typeof window === 'undefined') return { likes: 5, uploads: 3 };
-    const saved = localStorage.getItem('likeflow_wallet');
-    if (saved) return JSON.parse(saved);
-    return { likes: 5, uploads: 3 };
-  });
-
-  const updateWallet = (newWallet: {likes: number, uploads: number}) => {
-    setWallet(newWallet);
-    localStorage.setItem('likeflow_wallet', JSON.stringify(newWallet));
-  };
-  
   const handlePurchase = (type: 'likes' | 'uploads', amount: number, price: number, pkgId: string) => {
     setSelectedPackage(pkgId);
     
@@ -79,10 +69,10 @@ export default function Packages() {
     // SIMULATION (PayPal redirect IPN)
     setTimeout(() => {
       if (type === 'likes') {
-        updateWallet({ ...wallet, likes: wallet.likes + amount });
+        addLikes(amount);
         setPurchaseSuccess(`+${amount} Like aggiunti!`);
       } else {
-        updateWallet({ ...wallet, uploads: wallet.uploads + amount });
+        addUploads(amount);
         setPurchaseSuccess(`+${amount} Upload aggiunti!`);
       }
       setSelectedPackage(null);
@@ -433,4 +423,3 @@ export default function Packages() {
     </div>
   );
 }
-

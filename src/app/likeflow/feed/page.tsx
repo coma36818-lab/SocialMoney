@@ -5,11 +5,12 @@ import { PostCard } from '@/components/feed/PostCard';
 import { EmptyFeed } from '@/components/feed/EmptyFeed';
 import { BuyLikesModal } from '@/components/ui/BuyLikesModal';
 import { CommentsSheet } from '@/components/feed/CommentsSheet';
-import { ShareSheet } from '@/components/feed/ShareSheet';
+import ShareSheet from '@/components/feed/ShareSheet';
 import { Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { addDoc, collection, doc, getDocs, getFirestore, query, updateDoc, orderBy, limit } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
+import { useWallet } from '@/context/WalletContext';
 
 const { firestore: db } = initializeFirebase();
 
@@ -29,18 +30,7 @@ function Feed() {
   const containerRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const audioRefs = useRef<Record<string, HTMLAudioElement>>({});
-
-  const [wallet, setWallet] = useState(() => {
-    if (typeof window === 'undefined') return { likes: 5, uploads: 3 };
-    const saved = localStorage.getItem('likeflow_wallet');
-    if (saved) return JSON.parse(saved);
-    return { likes: 5, uploads: 3 };
-  });
-
-  const updateWallet = (newWallet: {likes: number, uploads: number}) => {
-    setWallet(newWallet);
-    localStorage.setItem('likeflow_wallet', JSON.stringify(newWallet));
-  };
+  const { wallet, useLike } = useWallet();
 
   const playSound = useCallback((soundName: keyof typeof SOUNDS, volume = 0.5) => {
     try {
@@ -81,11 +71,10 @@ function Feed() {
   });
 
   const handleLike = (postId: string) => {
-    if (wallet.likes <= 0) {
+    if (!useLike()) {
       setShowBuyModal(true);
       return;
     }
-    updateWallet({ ...wallet, likes: wallet.likes - 1 });
     likeMutation.mutate(postId);
   };
 

@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { CookieBanner } from '@/components/cookie-banner';
 import { ScrollToTop } from '@/components/scroll-to-top';
 import Script from 'next/script';
+import { WalletProvider } from '@/context/WalletContext';
 
 const siteConfig = {
   name: 'MyDatinGame',
@@ -123,6 +124,7 @@ export default function RootLayout({
         </script>
       </head>
       <body className={cn("font-body antialiased", )}>
+        <WalletProvider>
           <div className="bg-animation"></div>
           <div className="relative z-10 flex min-h-screen flex-col">
             <AppHeader />
@@ -145,6 +147,7 @@ export default function RootLayout({
               }
             `}
           </Script>
+        </WalletProvider>
       </body>
     </html>
   );

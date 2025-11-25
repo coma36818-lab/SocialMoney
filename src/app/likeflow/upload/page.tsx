@@ -1,15 +1,16 @@
 'use client';
 import React, { useState, useRef, ChangeEvent } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { addDoc, collection, doc, getDocs, getFirestore, query, updateDoc, orderBy, limit } from 'firebase/firestore';
+import { useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { initializeFirebase } from '@/firebase';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { Upload as UploadIcon, Image as ImageIcon, Video, Music, User, X, Check, Loader2, AlertCircle, Sparkles, Camera, Film, Mic } from 'lucide-react';
+import { addDoc, collection } from 'firebase/firestore';
+import { Upload as UploadIcon, Camera, Film, Mic, User, X, Check, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useWallet } from '@/context/WalletContext';
 
 const { firestore: db } = initializeFirebase();
 const { storage } = initializeFirebase();
@@ -74,11 +75,12 @@ const SuccessAnimation = () => (
   </motion.div>
 );
 
-export default function Upload() {
+function Upload() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const { wallet, useUpload } = useWallet();
 
   const [formData, setFormData] = useState<{
     authorName: string;
@@ -102,21 +104,6 @@ export default function Upload() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
-  const [wallet, setWallet] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('likeflow_wallet');
-      if (saved) return JSON.parse(saved);
-    }
-    return { likes: 5, uploads: 3 };
-  });
-
-  const updateWallet = (newWallet: { likes: number, uploads: number }) => {
-    setWallet(newWallet);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('likeflow_wallet', JSON.stringify(newWallet));
-    }
-  };
 
   const handleMediaSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -171,7 +158,7 @@ export default function Upload() {
       return;
     }
 
-    if (wallet.uploads <= 0) {
+    if (!useUpload()) {
       setError('Upload terminati! Acquista un pacchetto per continuare.');
       return;
     }
@@ -213,7 +200,6 @@ export default function Upload() {
       setUploadProgress(100);
       clearInterval(progressInterval);
 
-      updateWallet({ ...wallet, uploads: wallet.uploads - 1 });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
 
       setSuccess(true);
@@ -564,4 +550,14 @@ export default function Upload() {
       </div>
     </div>
   );
+}
+
+const queryClient = new QueryClient();
+
+export default function UploadPage() {
+    return (
+        <QueryClientProvider client={queryClient}>
+            <Upload />
+        </QueryClientProvider>
+    )
 }
