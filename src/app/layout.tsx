@@ -19,16 +19,17 @@ const siteConfig = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
-  title: 'MyDatingame – Trends, Gossip, Fashion & Lifestyle Magazine 2025',
+  title: 'MyDatinGame – Trends, Gossip, Fashion & Lifestyle Magazine 2025',
   description: siteConfig.description,
   keywords: siteConfig.keywords,
   authors: [{ name: 'MyDatinGame', url: siteConfig.url }],
   creator: 'MyDatinGame',
+  manifest: '/manifest.json',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: siteConfig.url,
-    title: 'MyDatingame – Trends, Gossip & Lifestyle',
+    title: 'MyDatinGame – Trends, Gossip & Lifestyle',
     description: 'The most viral news and trends of 2025.',
     siteName: siteConfig.name,
     images: [
@@ -88,7 +89,7 @@ export default function RootLayout({
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "MyDatingame",
+            "name": "MyDatinGame",
             "url": "https://mydatingame.com",
             "logo": "https://mydatingame.com/logo.png",
             "sameAs": [
@@ -100,7 +101,7 @@ export default function RootLayout({
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": "MyDatingame",
+            "name": "MyDatinGame",
             "url": "https://mydatingame.com",
             "potentialAction": {
               "@type": "SearchAction",
@@ -121,6 +122,19 @@ export default function RootLayout({
           <Toaster />
           <CookieBanner />
           <ScrollToTop />
+           <Script id="service-worker-script">
+            {`
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/service-worker.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                  }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                  });
+                });
+              }
+            `}
+          </Script>
       </body>
     </html>
   );

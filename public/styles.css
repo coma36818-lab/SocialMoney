@@ -1,227 +1,202 @@
+/* =============================
+   GLOBAL
+============================= */
 body {
-    background-color: #111;
-    color: #eee;
-    font-family: sans-serif;
     margin: 0;
-    padding: 0;
+    background: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
 }
 
-.title, .ranking-title {
-    color: gold;
-    text-align: center;
-    padding: 20px;
-    font-size: 2.5em;
-    text-shadow: 0 0 10px gold;
-}
-
+/* =============================
+   WALLET BAR
+============================= */
 #walletBox {
-    background: #222;
-    border-bottom: 1px solid gold;
-    padding: 10px 20px;
-    text-align: center;
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 100;
-    font-size: 1.1em;
-}
-
-#walletValue {
+    width: 100%;
+    background: rgba(20,20,20,0.9);
+    padding: 12px;
     color: gold;
     font-weight: bold;
+    text-align: center;
+    z-index: 999;
+    border-bottom: 1px solid gold;
 }
 
 #buyBtn {
+    margin-left: 10px;
     background: gold;
-    color: #111;
     border: none;
-    padding: 5px 15px;
-    border-radius: 5px;
-    margin-left: 15px;
-    cursor: pointer;
+    padding: 7px 14px;
+    border-radius: 6px;
+    color: black;
     font-weight: bold;
 }
 
+/* =============================
+   FEED POSTS
+============================= */
 #feedContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
+    margin-top: 70px;
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    height: calc(100vh - 70px);
 }
 
 .post {
-    background: #000;
-    border: 1px solid #333;
-    border-radius: 15px;
-    width: 100%;
-    max-width: 400px;
-    margin-bottom: 20px;
     position: relative;
-    overflow: hidden;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .post-media {
-    width: 100%;
-    display: block;
-    max-height: 70vh;
+    max-height: 100%;
+    max-width: 100%;
     object-fit: cover;
 }
 
+/* =============================
+   INFO & AUTHOR
+============================= */
 .post-info {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 15px;
-    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    bottom: 50px;
+    left: 15px;
     color: #fff;
-    display: flex;
-    align-items: center;
+    max-width: 60%;
+    font-size: 14px;
 }
 
 .author-photo {
-    width: 40px;
-    height: 40px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     border: 2px solid gold;
-    margin-right: 10px;
     object-fit: cover;
 }
 
 .author-name {
     font-weight: bold;
+    margin-top: 5px;
+    color: gold;
 }
 
 .post-desc {
-    font-size: 0.9em;
-    margin-left: auto;
-    max-width: 60%;
-    text-align: right;
+    margin-top: 5px;
+    opacity: 0.9;
 }
 
+/* =============================
+   LIKE BUTTON
+============================= */
 .like-btn {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(0,0,0,0.5);
-    color: #fff;
-    border: 1px solid #fff;
+    right: 20px;
+    bottom: 50%;
+    transform: translateY(50%);
+    background: rgba(0,0,0,0.6);
+    border: 2px solid gold;
+    color: gold;
+    padding: 15px;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    font-size: 24px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    font-size: 1.2em;
-    transition: transform 0.2s;
+    animation: pulse 1.4s infinite;
 }
 
-.like-btn:active {
-    transform: scale(0.9);
+@keyframes pulse {
+    0% { transform: scale(1) translateY(50%); }
+    50% { transform: scale(1.15) translateY(50%); }
+    100% { transform: scale(1) translateY(50%); }
 }
 
-.like-btn span {
-    font-size: 0.6em;
-    display: block;
+/* =============================
+   UPLOAD PAGE
+============================= */
+.title {
+    text-align: center;
+    color: gold;
+    margin: 20px;
+    font-size: 30px;
 }
 
-
-/* Upload Page */
 .upload-container {
-    background: #222;
-    padding: 30px;
-    border-radius: 15px;
-    max-width: 500px;
-    margin: 20px auto;
-    border: 1px solid #333;
+    padding: 20px;
 }
 
-.upload-container label {
-    display: block;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    color: #ccc;
-}
-
-.upload-container input,
-.upload-container textarea,
-.upload-container button {
+input, textarea {
     width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #444;
-    background: #333;
-    color: #fff;
-    box-sizing: border-box;
+    padding: 12px;
+    background: #111;
+    border: 1px solid gold;
+    border-radius: 8px;
+    color: gold;
+    margin-bottom: 15px;
 }
 
-.upload-container button {
+button {
+    width: 100%;
+    padding: 12px;
     background: gold;
-    color: #111;
+    border: none;
+    color: black;
     font-weight: bold;
+    border-radius: 10px;
     cursor: pointer;
+    margin-top: 10px;
+}
+
+/* =============================
+   RANKING PAGE
+============================= */
+.ranking-title {
+    color: gold;
+    text-align: center;
     margin-top: 20px;
 }
 
-/* Ranking Page */
-#rankingContainer {
-    max-width: 600px;
-    margin: auto;
-    padding: 0 10px;
-}
-
 .rank-card {
-    background: #222;
-    border-radius: 10px;
-    margin-bottom: 10px;
     display: flex;
     align-items: center;
+    background: #111;
+    border: 1px solid gold;
+    margin: 10px;
     padding: 10px;
-    border: 1px solid #333;
+    border-radius: 12px;
 }
 
 .rank-num {
-    font-size: 1.5em;
-    font-weight: bold;
+    font-size: 28px;
+    margin-right: 15px;
     color: gold;
-    width: 50px;
-    text-align: center;
+    font-weight: bold;
 }
 
 .rank-author {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    object-fit: cover;
     border: 2px solid gold;
-    margin: 0 15px;
+    object-fit: cover;
+    margin-right: 15px;
 }
 
 .rank-info {
-    flex-grow: 1;
+    color: #fff;
 }
 
-.rank-name {
-    font-size: 1.2em;
-    font-weight: bold;
+/* Floating TikTok-style animation for new likes */
+.like-btn:active {
+    animation: pop 0.3s ease;
 }
 
-.rank-likes, .rank-week {
-    font-size: 0.9em;
-    color: #ccc;
-}
-
-.rank-week {
-    color: gold;
-}
-
-/* Purchase Page Box */
-.box {
-    background: #222;
-    border: 1px solid #333;
-    border-radius: 15px;
-    padding: 20px;
-    margin-top: 20px;
+@keyframes pop {
+    0% { transform: scale(1) translateY(50%); }
+    50% { transform: scale(1.30) translateY(50%); }
+    100% { transform: scale(1) translateY(50%); }
 }
