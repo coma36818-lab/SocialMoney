@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient, QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PostCard } from '@/components/feed/PostCard';
 import { EmptyFeed } from '@/components/feed/EmptyFeed';
 import { BuyLikesModal } from '@/components/ui/BuyLikesModal';
@@ -15,7 +15,7 @@ import { useSound } from '@/context/SoundContext';
 
 const { firestore: db } = initializeFirebase();
 
-function Feed() {
+export default function Feed() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [showComments, setShowComments] = useState(false);
@@ -155,8 +155,6 @@ function Feed() {
         ))}
       </div>
 
-      <div className="h-20" />
-
       <BuyLikesModal 
         isOpen={showBuyModal} 
         onClose={() => setShowBuyModal(false)} 
@@ -174,15 +172,5 @@ function Feed() {
         postId={selectedPostId}
       />
     </>
-  );
-}
-
-const queryClient = new QueryClient();
-
-export default function FeedPage() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Feed />
-    </QueryClientProvider>
   );
 }

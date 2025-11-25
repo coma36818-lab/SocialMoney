@@ -1,7 +1,6 @@
-
 'use client';
 import React from 'react';
-import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useQuery, QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { Heart, Trophy, Medal, Award, User, Loader2, Crown, Flame, Star, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { initializeFirebase } from '@/firebase';
@@ -23,7 +22,7 @@ const getRankIcon = (index: number) => {
 };
 
 const PodiumPlace = ({ post, place, delay }: { post: any, place: number, delay: number }) => {
-  const heights = { 1: 'h-32', 2: 'h-24', 3: 'h-20' };
+  const heights: { [key: number]: string } = { 1: 'h-32', 2: 'h-24', 3: 'h-20' };
   const colors: {[key: number]: string} = { 
     1: 'from-[#FFD700] to-[#B8860B]', 
     2: 'from-gray-300 to-gray-400', 
@@ -34,8 +33,8 @@ const PodiumPlace = ({ post, place, delay }: { post: any, place: number, delay: 
     2: 'shadow-gray-300/30',
     3: 'shadow-amber-600/30'
   };
-  const sizes = { 1: 'w-20 h-20', 2: 'w-16 h-16', 3: 'w-16 h-16' };
-  const badgeSizes = { 1: 'w-8 h-8 text-lg', 2: 'w-7 h-7 text-base', 3: 'w-7 h-7 text-base' };
+  const sizes: { [key: number]: string } = { 1: 'w-20 h-20', 2: 'w-16 h-16', 3: 'w-16 h-16' };
+  const badgeSizes: { [key: number]: string } = { 1: 'w-8 h-8 text-lg', 2: 'w-7 h-7 text-base', 3: 'w-7 h-7 text-base' };
 
   return (
     <motion.div
@@ -321,15 +320,3 @@ function Ranking() {
     </div>
   );
 }
-
-const queryClient = new QueryClient();
-
-export default function TopCreatorsPage() {
-    return (
-        <QueryClientProvider client={queryClient}>
-            <Ranking />
-        </QueryClientProvider>
-    )
-}
-
-    

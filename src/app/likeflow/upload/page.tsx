@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useRef, ChangeEvent } from 'react';
-import { useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useMutation, useQueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { initializeFirebase } from '@/firebase';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { addDoc, collection } from 'firebase/firestore';
@@ -550,14 +550,4 @@ function Upload() {
       </div>
     </div>
   );
-}
-
-const queryClient = new QueryClient();
-
-export default function UploadPage() {
-    return (
-        <QueryClientProvider client={queryClient}>
-            <Upload />
-        </QueryClientProvider>
-    )
 }
