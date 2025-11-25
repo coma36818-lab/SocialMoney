@@ -146,11 +146,38 @@
       },
       "required": [
         "userId",
-        "likeCount",
         "pricePaid",
         "paypalTxId",
         "type",
         "timestamp"
+      ]
+    },
+    "Wallet": {
+      "name": "Wallet",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique localStorage ID for the user/author"
+        },
+        "credit": {
+          "type": "number",
+          "description": "Accumulated credit from likes in Euro"
+        },
+        "commission": {
+          "type": "number",
+          "description": "Commission rate on each purchased like"
+        },
+        "lastUpdate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last wallet update"
+        }
+      },
+      "required": [
+        "userId",
+        "credit",
+        "lastUpdate"
       ]
     }
   },
@@ -206,6 +233,22 @@
             "$ref": "#/backend/entities/Transaction"
           },
           "description": "Stores all PayPal transactions for likes and withdrawals."
+        }
+      },
+      {
+        "path": "wallets/{walletId}",
+        "definition": {
+          "entityName": "Wallet",
+          "schema": {
+            "$ref": "#/backend/entities/Wallet"
+          },
+          "description": "Stores the credit wallet for each author, identified by their unique localStorage userId.",
+          "params": [
+            {
+              "name": "walletId",
+              "description": "Should correspond to the author's userId."
+            }
+          ]
         }
       }
     ],

@@ -22,7 +22,11 @@ service cloud.firestore {
 
     match /transactions/{transactionId} {
       allow read: if true;
-      allow write: if request.resource.data.keys().hasOnly(['userId', 'likeCount', 'uploadCount', 'pricePaid', 'paypalTxId', 'type', 'timestamp']);
+      allow write: if request.resource.data.keys().hasOnly(['userId', 'postId', 'likeCount', 'uploadCount', 'pricePaid', 'paypalTxId', 'type', 'timestamp']);
+    }
+
+    match /wallets/{walletId} {
+      allow read, write: if true;
     }
   }
 }
