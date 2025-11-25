@@ -1,4 +1,3 @@
-
 // -------------------------------
 // FIREBASE INIT
 // -------------------------------
@@ -45,12 +44,19 @@ export function updateWalletUI() {
 // UPLOAD POST
 // -------------------------------
 window.uploadPost = async function() {
-    const file = document.getElementById("mediaFile").files[0];
+    const fileInput = document.getElementById("mediaFile");
+    if (!fileInput) return;
+    const file = fileInput.files[0];
     if (!file) return alert("Carica un file!");
 
-    const authorName = document.getElementById("authorName").value || "";
-    const postDesc = document.getElementById("postDesc").value || "";
-    const authorPhotoFile = document.getElementById("authorPhoto").files[0];
+    const authorNameInput = document.getElementById("authorName");
+    const authorName = authorNameInput ? authorNameInput.value || "" : "";
+
+    const postDescInput = document.getElementById("postDesc");
+    const postDesc = postDescInput ? postDescInput.value || "" : "";
+    
+    const authorPhotoInput = document.getElementById("authorPhoto");
+    const authorPhotoFile = authorPhotoInput ? authorPhotoInput.files[0] : null;
 
     let authorPhotoURL = "";
     if (authorPhotoFile) {
@@ -59,9 +65,7 @@ window.uploadPost = async function() {
         authorPhotoURL = await getDownloadURL(apRef);
     }
 
-    const mediaPath = "posts/" + Date.now() + "-" + file.name;
-    const mediaRef = ref(storage, mediaPath);
-
+    const mediaRef = ref(storage, "posts/" + Date.now() + "-" + file.name);
     await uploadBytes(mediaRef, file);
     const mediaURL = await getDownloadURL(mediaRef);
 
@@ -77,9 +81,8 @@ window.uploadPost = async function() {
     });
 
     alert("Post pubblicato!");
-    location.href = "feed.html";
+    location.href = "feed";
 }
-
 
 // -------------------------------
 // LOAD FEED
@@ -121,9 +124,12 @@ async function loadFeed() {
 }
 
 if (document.getElementById("feedContainer")) {
-  loadFeed();
+    loadFeed();
 }
-updateWalletUI();
+
+if (document.getElementById("walletValue")) {
+    updateWalletUI();
+}
 
 // -------------------------------
 // LIKE A POST
@@ -132,11 +138,16 @@ window.likePost = async function (postId, btn) {
     if (!useLike()) return alert("Non hai abbastanza like. Compra un pacchetto!");
 
     const span = btn.querySelector("span");
-    span.innerText = parseInt(span.innerText) + 1;
+    const currentLikes = parseInt(span.innerText);
+    const newLikes = currentLikes + 1;
+    span.innerText = newLikes;
 
     const postRef = doc(db, "posts", postId);
+    
+    // To keep this simple, we'll update both likes and likesWeek to the same value.
+    // In a real app, likesWeek might involve more complex logic.
     await updateDoc(postRef, {
-        likes: parseInt(span.innerText),
-        likesWeek: parseInt(span.innerText)
+        likes: newLikes,
+        likesWeek: newLikes 
     });
 };

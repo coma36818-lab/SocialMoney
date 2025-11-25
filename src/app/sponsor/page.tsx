@@ -174,7 +174,7 @@ export default function SponsorPage() {
         {filePreview && (
           <div className="mt-4 max-w-md w-full">
             {activeTab === 'video' && <video id="videoPreview" controls src={filePreview} className="w-full rounded-lg"></video>}
-            {active-tab === 'audio' && <audio id="audioPreview" controls src={filePreview} className="w-full rounded-lg"></audio>}
+            {activeTab === 'audio' && <audio id="audioPreview" controls src={filePreview} className="w-full rounded-lg"></audio>}
             {activeTab === 'image' && <img id="imagePreview" src={filePreview} alt="Preview" className="w-full rounded-lg" />}
           </div>
         )}
