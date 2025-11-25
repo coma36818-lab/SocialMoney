@@ -171,23 +171,22 @@ export default function Upload() {
     }, 200);
 
     try {
-      const mediaRef = ref(storage, "posts/" + Date.now() + "-" + formData.mediaFile.name);
-      await uploadBytes(mediaRef, formData.mediaFile);
-      const mediaUrl = await getDownloadURL(mediaRef);
+      const storageRef = ref(storage, `posts/${Date.now()}-${formData.mediaFile.name}`);
+      await uploadBytes(storageRef, formData.mediaFile);
+      const url = await getDownloadURL(storageRef);
 
       setUploadProgress(95);
 
       await addDoc(collection(db, "posts"), {
-        authorName: formData.authorName || 'Anonimo',
-        description: formData.description || '',
-        mediaUrl: mediaUrl,
-        mediaType: formData.mediaFile.type.split('/')[0],
+        mediaUrl: url,
+        mediaType: formData.mediaFile.type.startsWith("video") ? "video" : formData.mediaFile.type.startsWith("image") ? "photo" : "audio",
+        authorName: formData.authorName || "Anonimo",
+        description: formData.description || "",
         likes: 0,
-        likesWeek: 0,
         boostScore: 0,
-        creditValue: 0.00,
-        boostPurchased: 0,
-        timestamp: serverTimestamp()
+        creditValue: 0,
+        timestamp: serverTimestamp(),
+        boostPurchased: 0
       });
 
       setUploadProgress(100);
@@ -219,7 +218,7 @@ export default function Upload() {
   };
 
   return (
-    <div className="min-h-screen bg-black pb-28 pt-8 md:pt-12 overflow-y-auto">
+    <div className="min-h-screen bg-black pb-36 pt-8 md:pt-12 overflow-y-auto">
       {/* Success animation */}
       <AnimatePresence>
         {success && <SuccessAnimation />}
@@ -361,13 +360,20 @@ export default function Upload() {
               {formData.mediaType === 'audio' && (
                 <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a]">
                   <motion.div
-                    animate={{ rotate: 360 }}
+                    animate={true ? { rotate: 360 } : {}}
                     transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                    className="w-32 h-32 rounded-full bg-gradient-to-br from-[#FFD700] to-[#B8860B] flex items-center justify-center mb-6"
+                    className="relative w-32 h-32"
                   >
-                    <Mic className="w-16 h-16 text-black" />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#FFD700] via-[#B8860B] to-[#8B6914] shadow-2xl shadow-[#FFD700]/30" />
+                    <div className="absolute inset-6 rounded-full bg-black" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Mic className="w-16 h-16 text-[#FFD700]" />
+                    </div>
+                    <div className="absolute inset-10 rounded-full border border-[#333]" />
+                    <div className="absolute inset-16 rounded-full border border-[#333]" />
+                    <div className="absolute inset-20 rounded-full border border-[#333]" />
                   </motion.div>
-                  <audio src={formData.mediaPreview!} controls className="w-3/4" />
+                  <audio src={formData.mediaPreview!} controls className="w-3/4 mt-6" />
                 </div>
               )}
               
