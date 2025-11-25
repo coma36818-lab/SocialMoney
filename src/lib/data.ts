@@ -33,7 +33,6 @@ export const navLinks = [
   },
   { href: '/shop', label: 'Shop Page' },
   { href: '/likeflow/feed', label: 'LikeFlow' },
-  { href: '/#join-creators', label: 'Join' },
 ];
 
 
@@ -448,7 +447,6 @@ export const footerSectionsData = {
             { href: '/#tips', label: 'Creator Tips' },
             { href: '/#ai-analyzer', label: 'AI Trend Analyzer' },
             { href: '/#guadagnare-social', label: 'Monetize Social Media' },
-            { href: '/#join-creators', label: 'Participate' },
         ],
     },
 };

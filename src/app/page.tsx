@@ -1,6 +1,5 @@
 
 
-import { ContentSubmission } from '@/components/content-submission';
 import { NewsSection } from '@/components/news-section';
 import { newsSections, curiositaArticles } from '@/lib/data';
 import { Hero } from '@/components/hero';
@@ -112,7 +111,6 @@ export default function Home() {
         
         <PostingTimes />
 
-        <ContentSubmission />
       </div>
     </>
   );

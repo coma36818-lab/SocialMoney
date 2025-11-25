@@ -11,11 +11,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       priority: 1.0,
     },
-     {
-      url: `${baseUrl}/#join-creators`,
-      lastModified: '2025-11-11',
-      priority: 0.8,
-    },
     {
       url: `${baseUrl}/shop`,
       lastModified: '2025-11-11',
