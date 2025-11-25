@@ -1,10 +1,11 @@
 
 'use client';
-import Head from 'next/head';
+import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
 
 export default function LikeFlowFeedPage() {
   useEffect(() => {
+    // Inject styles and scripts for the feed functionality
     const style = document.createElement('link');
     style.rel = 'stylesheet';
     style.href = '/styles.css';
@@ -16,7 +17,10 @@ export default function LikeFlowFeedPage() {
     document.body.appendChild(script);
 
     return () => {
-      document.head.removeChild(style);
+      // Cleanup on component unmount
+      if (style.parentNode) {
+          document.head.removeChild(style);
+      }
       if (script.parentNode) {
         document.body.removeChild(script);
       }
@@ -24,18 +28,16 @@ export default function LikeFlowFeedPage() {
   }, []);
 
   return (
-    <>
-      <Head>
-        <title>LikeFlow - Feed</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
-      <div id="walletBox">
-        Like disponibili: <span id="walletValue">0</span>
-        <button id="buyBtn" onClick={() => window.location.href = '/likeflow/purchase'}>Compra Like</button>
-      </div>
-      <div id="feedContainer"></div>
-    </>
+    <div className="container mx-auto px-4 py-8">
+        <div id="walletBox" className="bg-card/50 border border-border rounded-lg p-4 mb-8 flex items-center justify-between max-w-md mx-auto">
+            <p className="text-muted-foreground">
+                Like disponibili: <span id="walletValue" className="font-bold text-primary">0</span>
+            </p>
+            <Button onClick={() => window.location.href = '/likeflow/purchase'} size="sm">
+                Compra Like
+            </Button>
+        </div>
+        <div id="feedContainer"></div>
+    </div>
   );
 }
-
-    
