@@ -1,114 +1,142 @@
 
-// FIREBASE SETUP
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-import { getStorage, ref, uploadBytes, getDownloadURL }
-from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
-import { getFirestore, collection, addDoc, serverTimestamp }
-from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+// -------------------------------
+// FIREBASE INIT
+// -------------------------------
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAX1j0On74HzyDrwRIrnRIcZPHDICBN-M0",
-  authDomain: "studio-8742723834-1421e.firebaseapp.com",
-  projectId: "studio-8742723834-1421e",
-  storageBucket: "studio-8742723834-1421e.firebasestorage.app",
-  messagingSenderId: "665625375719",
-  appId: "1:665625375719:web:d680c46b80cd64e3578342"
-};
+export const app = initializeApp({
+    apiKey: "AIzaSyAX1j0On74HzyDrwRIrnRIcZPHDICBN-M0",
+    authDomain: "studio-8742723834-1421e.firebaseapp.com",
+    projectId: "studio-8742723834-1421e",
+    storageBucket: "studio-8742723834-1421e.appspot.com",
+});
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
 
-
-// PREVIEW
-const mediaFileInput = document.getElementById("mediaFile");
-if(mediaFileInput) {
-    mediaFileInput.addEventListener("change", (event) => {
-        const f = event.target.files[0];
-        if (!f) return;
-
-        const preview = document.getElementById("preview");
-        if(preview) {
-            preview.style.display = "block";
-
-            if (f.type.startsWith("video")) {
-                preview.innerHTML = `<video controls style="width:100%;border-radius:10px;"><source src="${URL.createObjectURL(f)}"></video>`;
-            } else if (f.type.startsWith("image")) {
-                preview.innerHTML = `<img src="${URL.createObjectURL(f)}" style="width:100%;border-radius:10px;">`;
-            } else {
-                preview.innerHTML = `<audio controls src="${URL.createObjectURL(f)}"></audio>`;
-            }
-        }
-    });
+// -------------------------------
+// WALLET (LOCALSTORAGE)
+// -------------------------------
+export function getWallet() {
+    return parseInt(localStorage.getItem("wallet") || "0");
 }
 
-
-// SAVE POST
-async function savePost(mediaUrl, mediaType, authorPhotoUrl, authorDescription, premium) {
-    await addDoc(collection(db, "posts"), {
-        mediaUrl,
-        mediaType,
-        authorPhotoUrl: authorPhotoUrl || null,
-        authorDescription: authorDescription || null,
-        likes: 0,
-        premium: premium,
-        timestamp: serverTimestamp()
-    });
-    alert("Pubblicato con successo!");
+export function addWallet(amount) {
+    localStorage.setItem("wallet", getWallet() + amount);
+    updateWalletUI();
 }
 
+export function useLike() {
+    const w = getWallet();
+    if (w <= 0) return false;
+    localStorage.setItem("wallet", w - 1);
+    updateWalletUI();
+    return true;
+}
 
-// FREE UPLOAD
-window.uploadFree = async function() {
-    const last = localStorage.getItem("lf_last_upload");
-    const today = new Date().toDateString();
+export function updateWalletUI() {
+    const el = document.getElementById("walletValue");
+    if (el) el.innerText = getWallet();
+}
 
-    if (last === today) {
-        alert("Hai già usato l'upload gratis oggi.");
-        return;
+// -------------------------------
+// UPLOAD POST
+// -------------------------------
+window.uploadPost = async function() {
+    const file = document.getElementById("mediaFile").files[0];
+    if (!file) return alert("Carica un file!");
+
+    const authorName = document.getElementById("authorName").value || "";
+    const postDesc = document.getElementById("postDesc").value || "";
+    const authorPhotoFile = document.getElementById("authorPhoto").files[0];
+
+    let authorPhotoURL = "";
+    if (authorPhotoFile) {
+        const apRef = ref(storage, "authors/" + Date.now() + "-" + authorPhotoFile.name);
+        await uploadBytes(apRef, authorPhotoFile);
+        authorPhotoURL = await getDownloadURL(apRef);
     }
 
-    await processUpload(false);
-
-    localStorage.setItem("lf_last_upload", today);
-}
-
-
-// UPLOAD PROCESS
-async function processUpload(premium) {
-    const file = document.getElementById("mediaFile")?.files[0];
-    if (!file) return alert("Seleziona un file!");
-
-    const authorPhoto = document.getElementById("authorPhoto")?.files[0];
-    const desc = document.getElementById("authorDescription")?.value;
-
-    const mediaPath = "media/" + Date.now() + "_" + file.name;
+    const mediaPath = "posts/" + Date.now() + "-" + file.name;
     const mediaRef = ref(storage, mediaPath);
 
     await uploadBytes(mediaRef, file);
-    const mediaUrl = await getDownloadURL(mediaRef);
+    const mediaURL = await getDownloadURL(mediaRef);
 
-    let authorPhotoUrl = null;
-    if (authorPhoto) {
-        const authPath = "authors/" + Date.now() + "_" + authorPhoto.name;
-        const authRef = ref(storage, authPath);
-        await uploadBytes(authRef, authorPhoto);
-        authorPhotoUrl = await getDownloadURL(authRef);
-    }
+    await addDoc(collection(db, "posts"), {
+        mediaURL,
+        mediaType: file.type,
+        authorName,
+        authorPhoto: authorPhotoURL,
+        postDesc,
+        likes: 0,
+        likesWeek: 0,
+        timestamp: Date.now()
+    });
 
-    const mediaType = file.type.startsWith("video") ? "video" :
-                      file.type.startsWith("image") ? "image" : "audio";
-
-    await savePost(mediaUrl, mediaType, authorPhotoUrl, desc, premium);
+    alert("Post pubblicato!");
+    location.href = "feed.html";
 }
 
-window.uploadPost = async function(premium = false) {
-    if (premium) {
-        // Here you would integrate with a payment system to charge for a boosted post
-        // For now, we'll just treat it as a premium post for demonstration
-        console.log("Processing premium post...");
-    }
-    await processUpload(premium);
+
+// -------------------------------
+// LOAD FEED
+// -------------------------------
+async function loadFeed() {
+    const container = document.getElementById("feedContainer");
+    if (!container) return;
+
+    const snap = await getDocs(collection(db, "posts"));
+    container.innerHTML = "";
+
+    snap.forEach(p => {
+        const d = p.data();
+
+        let mediaHTML = "";
+
+        if (d.mediaType.startsWith("video"))
+            mediaHTML = `<video class="post-media" src="${d.mediaURL}" autoplay muted loop></video>`;
+        if (d.mediaType.startsWith("image"))
+            mediaHTML = `<img class="post-media" src="${d.mediaURL}">`;
+        if (d.mediaType.startsWith("audio"))
+            mediaHTML = `<audio class="post-media" src="${d.mediaURL}" controls></audio>`;
+
+        container.innerHTML += `
+        <div class="post">
+            ${mediaHTML}
+
+            <div class="post-info">
+                <img src="${d.authorPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80'}" class="author-photo">
+                <div class="author-name">${d.authorName || "Anonimo"}</div>
+                <div class="post-desc">${d.postDesc || ""}</div>
+            </div>
+
+            <button class="like-btn" onclick="likePost('${p.id}', this)">
+                ❤️ <span>${d.likes}</span>
+            </button>
+        </div>`;
+    });
 }
 
-    
+if (document.getElementById("feedContainer")) {
+  loadFeed();
+}
+updateWalletUI();
+
+// -------------------------------
+// LIKE A POST
+// -------------------------------
+window.likePost = async function (postId, btn) {
+    if (!useLike()) return alert("Non hai abbastanza like. Compra un pacchetto!");
+
+    const span = btn.querySelector("span");
+    span.innerText = parseInt(span.innerText) + 1;
+
+    const postRef = doc(db, "posts", postId);
+    await updateDoc(postRef, {
+        likes: parseInt(span.innerText),
+        likesWeek: parseInt(span.innerText)
+    });
+};
