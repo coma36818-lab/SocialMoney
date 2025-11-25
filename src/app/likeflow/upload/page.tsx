@@ -1,13 +1,18 @@
 'use client';
 import React, { useState, useRef, ChangeEvent } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { addDoc, collection, doc, getDocs, getFirestore, query, updateDoc, orderBy, limit } from 'firebase/firestore';
+import { initializeFirebase } from '@/firebase';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Upload as UploadIcon, Image as ImageIcon, Video, Music, User, X, Check, Loader2, AlertCircle, Sparkles, Camera, Film, Mic } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+
+const { firestore: db } = initializeFirebase();
+const { storage } = initializeFirebase();
 
 const SuccessAnimation = () => (
   <motion.div
@@ -75,14 +80,22 @@ export default function Upload() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    authorName: string;
+    authorPhoto: File | null;
+    authorPhotoPreview: string | null;
+    description: string;
+    mediaFile: File | null;
+    mediaPreview: string | null;
+    mediaType: 'video' | 'audio' | 'photo' | null
+}>({
     authorName: '',
-    authorPhoto: null as File | null,
-    authorPhotoPreview: null as string | null,
+    authorPhoto: null,
+    authorPhotoPreview: null,
     description: '',
-    mediaFile: null as File | null,
-    mediaPreview: null as string | null,
-    mediaType: null as 'video' | 'audio' | 'photo' | null
+    mediaFile: null,
+    mediaPreview: null,
+    mediaType: null
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -167,32 +180,31 @@ export default function Upload() {
     setError(null);
     setUploadProgress(0);
 
-    // Simulate progress
     const progressInterval = setInterval(() => {
       setUploadProgress(prev => Math.min(prev + 10, 90));
     }, 200);
 
     try {
-      const mediaResult = await base44.integrations.Core.UploadFile({
-        file: formData.mediaFile
-      });
+      const mediaRef = ref(storage, "posts/" + Date.now() + "-" + formData.mediaFile.name);
+      await uploadBytes(mediaRef, formData.mediaFile);
+      const mediaURL = await getDownloadURL(mediaRef);
 
-      let authorPhotoUrl = null;
+
+      let authorPhotoUrl = "";
       if (formData.authorPhoto) {
-        const photoResult = await base44.integrations.Core.UploadFile({
-          file: formData.authorPhoto
-        });
-        authorPhotoUrl = photoResult.file_url;
+          const apRef = ref(storage, "authors/" + Date.now() + "-" + formData.authorPhoto.name);
+          await uploadBytes(apRef, formData.authorPhoto);
+          authorPhotoUrl = await getDownloadURL(apRef);
       }
 
       setUploadProgress(95);
 
-      await base44.entities.Post.create({
+      await addDoc(collection(db, "posts"), {
         authorName: formData.authorName || null,
         authorPhoto: authorPhotoUrl,
         postDesc: formData.description || null,
-        mediaURL: mediaResult.file_url,
-        mediaType: formData.mediaType,
+        mediaURL: mediaURL,
+        mediaType: formData.mediaFile.type,
         likes: 0,
         likesWeek: 0,
         timestamp: Date.now()
