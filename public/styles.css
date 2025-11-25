@@ -1,22 +1,28 @@
-
 body {
-    background: #000;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    padding: 15px;
+    background-color: #111;
+    color: #eee;
+    font-family: sans-serif;
     margin: 0;
+    padding: 0;
+}
+
+.title, .ranking-title {
+    color: gold;
+    text-align: center;
+    padding: 20px;
+    font-size: 2.5em;
+    text-shadow: 0 0 10px gold;
 }
 
 #walletBox {
-    background: #111;
-    border-bottom: 1px solid #333;
-    padding: 12px;
+    background: #222;
+    border-bottom: 1px solid gold;
+    padding: 10px 20px;
     text-align: center;
-    position: fixed;
+    position: sticky;
     top: 0;
-    left: 0;
-    width: 100%;
     z-index: 100;
+    font-size: 1.1em;
 }
 
 #walletValue {
@@ -26,51 +32,60 @@ body {
 
 #buyBtn {
     background: gold;
-    color: #000;
+    color: #111;
     border: none;
-    padding: 6px 12px;
-    border-radius: 8px;
+    padding: 5px 15px;
+    border-radius: 5px;
     margin-left: 15px;
     cursor: pointer;
+    font-weight: bold;
 }
 
 #feedContainer {
-    padding-top: 70px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 25px;
+    padding: 20px;
 }
 
 .post {
+    background: #000;
+    border: 1px solid #333;
+    border-radius: 15px;
     width: 100%;
     max-width: 400px;
-    background: #111;
-    border: 1px solid #222;
-    border-radius: 12px;
+    margin-bottom: 20px;
+    position: relative;
     overflow: hidden;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
 }
 
 .post-media {
     width: 100%;
-    height: auto;
     display: block;
+    max-height: 70vh;
+    object-fit: cover;
 }
 
 .post-info {
-    padding: 12px;
-}
-
-.post-author {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    color: #fff;
     display: flex;
     align-items: center;
-    gap: 10px;
 }
 
 .author-photo {
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    border: 2px solid gold;
+    margin-right: 10px;
+    object-fit: cover;
 }
 
 .author-name {
@@ -78,26 +93,135 @@ body {
 }
 
 .post-desc {
-    font-size: 14px;
-    color: #aaa;
-    margin-top: 8px;
+    font-size: 0.9em;
+    margin-left: auto;
+    max-width: 60%;
+    text-align: right;
 }
 
 .like-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    font-size: 24px;
     position: absolute;
-    bottom: 20px;
-    right: 20px;
+    top: 15px;
+    right: 15px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+    font-size: 1.2em;
+    transition: transform 0.2s;
 }
 
-    
+.like-btn:active {
+    transform: scale(0.9);
+}
+
+.like-btn span {
+    font-size: 0.6em;
+    display: block;
+}
+
+
+/* Upload Page */
+.upload-container {
+    background: #222;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 500px;
+    margin: 20px auto;
+    border: 1px solid #333;
+}
+
+.upload-container label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: #ccc;
+}
+
+.upload-container input,
+.upload-container textarea,
+.upload-container button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background: #333;
+    color: #fff;
+    box-sizing: border-box;
+}
+
+.upload-container button {
+    background: gold;
+    color: #111;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+/* Ranking Page */
+#rankingContainer {
+    max-width: 600px;
+    margin: auto;
+    padding: 0 10px;
+}
+
+.rank-card {
+    background: #222;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #333;
+}
+
+.rank-num {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: gold;
+    width: 50px;
+    text-align: center;
+}
+
+.rank-author {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid gold;
+    margin: 0 15px;
+}
+
+.rank-info {
+    flex-grow: 1;
+}
+
+.rank-name {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.rank-likes, .rank-week {
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+.rank-week {
+    color: gold;
+}
+
+/* Purchase Page Box */
+.box {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 20px;
+}
