@@ -49,26 +49,44 @@ export default function PurchasePage() {
       <Head>
         <title>Compra Like</title>
         <link rel="stylesheet" href="/styles.css" />
+        <script type="module" src="/likeflow.js" defer></script>
       </Head>
       
       <h1 className="title">❤️ Compra Like</h1>
 
       <div className="upload-container">
-        <div className="pack" onClick={() => (window as any).buyPack(1)}>
-            <h2>10 Like</h2>
-            <p>€1.00</p>
-        </div>
 
-        <div className="pack" onClick={() => (window as any).buyPack(2)}>
-            <h2>60 Like</h2>
-            <p>€3.00</p>
-        </div>
+<div className="pack" onClick={() => (window as any).buyPack(1)}>
+    <h2>10 Like</h2>
+    <p>€1.00</p>
+</div>
 
-        <div className="pack" onClick={() => (window as any).buyPack(3)}>
-            <h2>150 Like</h2>
-            <p>€5.00</p>
-        </div>
-      </div>
+<div className="pack" onClick={() => (window as any).buyPack(2)}>
+    <h2>60 Like</h2>
+    <p>€3.00</p>
+</div>
+
+<div className="pack" onClick={() => (window as any).buyPack(3)}>
+    <h2>150 Like</h2>
+    <p>€5.00</p>
+</div>
+
+</div>
+<style jsx>{`
+.pack {
+    background: #111;
+    border: 2px solid gold;
+    padding: 20px;
+    margin: 15px 0;
+    text-align: center;
+    border-radius: 12px;
+    cursor: pointer;
+}
+.pack h2 {
+    color: gold;
+}
+`}</style>
+
     </>
   );
 }
