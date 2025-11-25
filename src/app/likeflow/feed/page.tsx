@@ -12,6 +12,8 @@ import { addDoc, collection, doc, getDocs, getFirestore, query, updateDoc, order
 import { initializeFirebase } from '@/firebase';
 import { useWallet } from '@/context/WalletContext';
 import { useSound } from '@/context/SoundContext';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 const { firestore: db } = initializeFirebase();
 
@@ -32,11 +34,21 @@ async function buyLikes(postId: string, likeCount: number, priceEuro: number, pa
   
   // Aggiorna post
   const postRef = doc(db, "Posts", postId);
-  await updateDoc(postRef, {
+  updateDoc(postRef, {
     likes: increment(likeCount),
     likesWeek: increment(likeCount),
     creditValue: increment(likeCount * 0.01) // 1 like = 0.01€
+  }).catch(error => {
+    errorEmitter.emit(
+        'permission-error',
+        new FirestorePermissionError({
+        path: postRef.path,
+        operation: 'update',
+        requestResourceData: { likes: 'increment', likesWeek: 'increment', creditValue: 'increment' },
+        })
+    )
   });
+
 
   // Wallet autore
   const postSnap = await getDoc(postRef);
@@ -44,15 +56,26 @@ async function buyLikes(postId: string, likeCount: number, priceEuro: number, pa
   const authorId = postData?.authorId || localUserId; // Usa l'authorId del post o il localUserId come fallback
   
   const walletRef = doc(db, "Wallets", authorId);
-  await setDoc(walletRef, {
+  const walletUpdateData = {
     credit: increment(likeCount * 0.01 * 0.85), // 15% commissione
     commission: increment(likeCount * 0.01 * 0.15),
     lastUpdate: serverTimestamp(),
     userId: authorId // Assicurati che l'ID utente sia nel wallet
-  }, { merge: true });
+  };
+  setDoc(walletRef, walletUpdateData, { merge: true }).catch(error => {
+    errorEmitter.emit(
+        'permission-error',
+        new FirestorePermissionError({
+        path: walletRef.path,
+        operation: 'update',
+        requestResourceData: walletUpdateData,
+        })
+    )
+  });
+
 
   // Registra transazione
-  await addDoc(collection(db, "Transactions"), {
+  const transactionData = {
     userId: localUserId,
     postId,
     likeCount,
@@ -60,6 +83,17 @@ async function buyLikes(postId: string, likeCount: number, priceEuro: number, pa
     paypalTxId,
     type: "likePurchase",
     timestamp: serverTimestamp()
+  };
+  const transactionsCollectionRef = collection(db, "Transactions");
+  addDoc(transactionsCollectionRef, transactionData).catch(error => {
+    errorEmitter.emit(
+        'permission-error',
+        new FirestorePermissionError({
+        path: transactionsCollectionRef.path,
+        operation: 'create',
+        requestResourceData: transactionData,
+        })
+    )
   });
 }
 

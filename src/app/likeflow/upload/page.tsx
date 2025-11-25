@@ -3,7 +3,7 @@ import React, { useState, useRef, ChangeEvent } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { initializeFirebase } from '@/firebase';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, doc, updateDoc, increment } from 'firebase/firestore';
 import { Upload as UploadIcon, Camera, Film, Mic, User, X, Check, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useWallet } from '@/context/WalletContext';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 const { firestore: db, storage } = initializeFirebase();
 
@@ -89,18 +91,33 @@ async function uploadMedia(file: File, authorName: string, description: string) 
   await uploadBytes(storageRef, file);
   const url = await getDownloadURL(storageRef);
 
-  await addDoc(collection(db, "Posts"), {
+  const postData = {
     mediaUrl: url,
     mediaType: file.type.startsWith("video") ? "video" : file.type.startsWith("image") ? "photo" : "audio",
     authorName: authorName || "Anonimo",
     authorId: authorId,
     description: description || "",
     likes: 0,
+    likesWeek: 0,
     boostScore: 0,
     creditValue: 0,
     timestamp: serverTimestamp(),
     boostPurchased: 0
-  });
+  };
+
+  const collectionRef = collection(db, "Posts");
+  
+  addDoc(collectionRef, postData)
+    .catch(error => {
+        errorEmitter.emit(
+          'permission-error',
+          new FirestorePermissionError({
+            path: collectionRef.path,
+            operation: 'create',
+            requestResourceData: postData,
+          })
+        )
+      });
 
   return url;
 }
@@ -216,8 +233,10 @@ export default function Upload() {
 
     } catch (err) {
       clearInterval(progressInterval);
+      // The specific error is now thrown globally by the error emitter
+      // so we don't need to console.error here. We can still show a generic
+      // message to the user if we want.
       setError('Errore durante il caricamento. Riprova.');
-      console.error(err);
     } finally {
       setIsUploading(false);
     }
