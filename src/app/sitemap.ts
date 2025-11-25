@@ -42,11 +42,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/sponsor`,
-      lastModified: new Date(),
-      priority: 0.8,
-    },
-    {
       url: `${baseUrl}/about`,
       lastModified: '2025-11-11',
       priority: 0.7,
@@ -94,4 +89,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [...staticUrls, ...categoryUrls, ...curiositaUrl];
 }
 
+    
     

@@ -16,7 +16,6 @@ const footerSections = {
       { href: '/cookies', label: 'Cookie Policy' },
       { href: '/contact-us', label: 'Contact Us' },
       { href: '/shop', label: 'Shop' },
-      { href: '/sponsor', label: 'Sponsor' },
     ],
   },
 };
@@ -77,3 +76,5 @@ export function AppFooter() {
     </footer>
   );
 }
+
+    

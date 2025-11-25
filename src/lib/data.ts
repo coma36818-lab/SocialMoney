@@ -33,7 +33,6 @@ export const navLinks = [
   },
   { href: '/shop', label: 'Shop Page' },
   { href: '/likeflow/feed', label: 'LikeFlow' },
-  { href: '/sponsor', label: 'Sponsor' },
   { href: '/#join-creators', label: 'Join' },
 ];
 
@@ -469,10 +468,11 @@ export const affiliatePrograms = [
 export const postingTimes = [
     { platform: '📱 Instagram', times: 'Weekdays: 6:00 PM - 8:00 PM\nWeekends: 11:00 AM - 1:00 PM', details: 'Peak engagement during evening scrolling sessions.' },
     { platform: '🎵 TikTok', times: 'Daily: 7:00 PM - 10:00 PM\nSaturday: 9:00 AM - 11:00 AM', details: 'Late evening when users unwind with entertainment.' },
-    { platform: '📘 Facebook', times: 'Lunch: 12:00 PM - 2:00 PM\nEvening: 5:00 PM - 7:00 PM', details: 'Target lunch breaks and post-work browsing.' },
+    { platform: '📘 Facebook', times: 'Weekdays: 12:00 PM - 2:00 PM\nEvening: 5:00 PM - 7:00 PM', details: 'Target lunch breaks and post-work browsing.' },
     { platform: '🎥 YouTube', times: 'Weekdays: 2:00 PM - 4:00 PM\nWeekends: 9:00 AM - 11:00 AM', details: 'Afternoon and weekend morning viewing peaks.' },
     { platform: '🐦 Twitter/X', times: 'Weekdays: 8:00 AM - 10:00 AM\nLunch: 12:00 PM - 1:00 PM', details: 'Morning commute and lunch break engagement.' },
     { platform: '💼 LinkedIn', times: 'Weekdays: 7:00 AM - 9:00 AM\nLunch: 12:00 PM - 1:00 PM', details: 'Professional browsing before and during work.' },
 ];
 
+    
     
