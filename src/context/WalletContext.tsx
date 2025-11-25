@@ -20,12 +20,12 @@ interface WalletContextType {
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
-const INITIAL_UPLOADS = 3;
+const INITIAL_UPLOADS = 0; // Set to 0 as daily limit is handled by backend
 
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [wallet, setWallet] = useState<Wallet>({
     likes: 0,
-    uploads: 0, // Set to 0, will be loaded from localStorage
+    uploads: 0,
     credits: 0,
     commission: 0,
   });
@@ -44,12 +44,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           commission: parsed.commission ?? 0
         });
       } else {
-        // If no saved wallet, initialize uploads
         setWallet(prev => ({ ...prev, uploads: INITIAL_UPLOADS }));
       }
     } catch (e) {
       console.error("Failed to load wallet from localStorage", e);
-      // Fallback if localStorage fails
       setWallet(prev => ({ ...prev, uploads: INITIAL_UPLOADS }));
     }
     setIsHydrated(true);
@@ -74,15 +72,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const useUpload = useCallback(() => {
-    let success = false;
-    setWallet(prev => {
-      if (prev.uploads > 0) {
-        success = true;
-        return { ...prev, uploads: prev.uploads - 1 };
-      }
-      return prev;
-    });
-    return success;
+    // This is now just a placeholder as the check is server-side
+    // We can use it to optimistically update the UI if needed
+    return true;
   }, []);
 
   const addCredits = useCallback((amount: number) => {

@@ -186,6 +186,11 @@
           "type": "string",
           "format": "date-time",
           "description": "Timestamp of the last wallet update"
+        },
+        "lastUpload": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last upload"
         }
       },
       "required": [
@@ -193,6 +198,20 @@
         "credit",
         "lastUpdate"
       ]
+    },
+    "UploadCooldown": {
+      "name": "UploadCooldown",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "timestamp"]
     }
   },
   "auth": {
@@ -261,6 +280,22 @@
             {
               "name": "walletId",
               "description": "Should correspond to the author's userId."
+            }
+          ]
+        }
+      },
+       {
+        "path": "uploadCooldowns/{userId}",
+        "definition": {
+          "entityName": "UploadCooldown",
+          "schema": {
+            "$ref": "#/backend/entities/UploadCooldown"
+          },
+          "description": "Stores a timestamp of the last upload for a given user to enforce a daily limit.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user."
             }
           ]
         }

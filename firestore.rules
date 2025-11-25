@@ -3,20 +3,22 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Posts can be read by anyone. 
-    // Writes are restricted to prevent cheating.
     match /Posts/{postId} {
       allow read: if true;
       allow create: if request.resource.data.keys().hasAll([
           'mediaUrl', 'mediaType', 'authorId', 'authorName', 'description', 
           'likes', 'likesWeek', 'boostScore', 'creditValue', 'timestamp', 'boostPurchased'
         ]) &&
+        request.resource.data.authorId == request.auth.uid &&
         request.resource.data.likes == 0 &&
         request.resource.data.likesWeek == 0 &&
         request.resource.data.boostScore == 0 &&
         request.resource.data.creditValue == 0 &&
-        request.resource.data.boostPurchased == 0;
-        
+        request.resource.data.boostPurchased == 0 &&
+        // Check if a valid upload token exists, created within the last 5 minutes
+        exists(/databases/$(database)/documents/uploadCooldowns/$(request.auth.uid)) &&
+        request.time - get(/databases/$(database)/documents/uploadCooldowns/$(request.auth.uid)).data.timestamp < duration.value(5, 'm');
+
       allow update: if 
         // Allow liking (increment by 1)
         (request.resource.data.likes == resource.data.likes + 1 &&
@@ -32,13 +34,11 @@ service cloud.firestore {
       allow create: if request.resource.data.keys().hasAll(['postId', 'authorName', 'text', 'timestamp']);
     }
 
-    // Like packages are read-only from the client
     match /likePackages/{packageId} {
       allow read: if true;
       allow write: if false;
     }
 
-    // Transactions can be created but not modified
     match /transactions/{transactionId} {
       allow read: if true;
       allow create: if request.resource.data.keys().hasOnly([
@@ -52,10 +52,18 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // A user can only read/write their own wallet
     match /wallets/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow create: if true; // Allow wallet creation for new users
+      allow create: if true;
+    }
+
+    match /uploadCooldowns/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Allow creation only if no document exists or the last one is older than 24 hours.
+      allow create: if request.auth != null && request.auth.uid == userId &&
+                    (!exists(/databases/$(database)/documents/uploadCooldowns/$(userId)) ||
+                     request.time - get(/databases/$(database)/documents/uploadCooldowns/$(userId)).data.timestamp > duration.value(24, 'h'));
+      allow update, delete: if false;
     }
   }
 }

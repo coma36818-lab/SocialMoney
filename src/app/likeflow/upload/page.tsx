@@ -3,7 +3,7 @@ import React, { useState, useRef, ChangeEvent } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { initializeFirebase } from '@/firebase';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { addDoc, collection, serverTimestamp, doc, updateDoc, increment } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, doc, updateDoc, increment, setDoc } from 'firebase/firestore';
 import { Upload as UploadIcon, Camera, Film, Mic, User, X, Check, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useWallet } from '@/context/WalletContext';
-import { addDocumentNonBlocking } from '@/firebase';
+import { addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
 
 const { firestore: db, storage } = initializeFirebase();
 
@@ -102,8 +102,9 @@ async function uploadMedia(file: File, authorName: string, description: string) 
     timestamp: serverTimestamp(),
     boostPurchased: 0
   };
-
-  addDocumentNonBlocking(collection(db, "Posts"), postData);
+  
+  // This write will be validated by Firestore rules against the cooldown document
+  await addDoc(collection(db, "Posts"), postData);
 
   return url;
 }
@@ -191,11 +192,6 @@ export default function Upload() {
       return;
     }
 
-    if (!useUpload()) {
-      setError('Upload terminati! Acquista un pacchetto per continuare.');
-      return;
-    }
-
     setIsUploading(true);
     setError(null);
     setUploadProgress(0);
@@ -205,23 +201,39 @@ export default function Upload() {
     }, 200);
 
     try {
-      await uploadMedia(formData.mediaFile, formData.authorName, formData.description);
+        const userId = getOrCreateUserId();
+        const cooldownRef = doc(db, 'uploadCooldowns', userId);
+        
+        // Attempt to set the cooldown document. Firestore rules will validate this.
+        await setDoc(cooldownRef, {
+            userId: userId,
+            timestamp: serverTimestamp()
+        });
 
-      setUploadProgress(100);
-      clearInterval(progressInterval);
+        // If the above write was successful, proceed with the upload.
+        await uploadMedia(formData.mediaFile, formData.authorName, formData.description);
 
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
+        setUploadProgress(100);
+        clearInterval(progressInterval);
 
-      setSuccess(true);
-      setTimeout(() => {
-        router.push('/likeflow/feed');
-      }, 2500);
+        queryClient.invalidateQueries({ queryKey: ['posts'] });
 
-    } catch (err) {
-      clearInterval(progressInterval);
-      setError('Errore durante il caricamento. Riprova.');
+        setSuccess(true);
+        setTimeout(() => {
+            router.push('/likeflow/feed');
+        }, 2500);
+
+    } catch (err: any) {
+        clearInterval(progressInterval);
+        if (err.code === 'permission-denied') {
+            setError('Limite di upload giornaliero raggiunto. Riprova tra 24 ore.');
+        } else {
+            setError('Errore durante il caricamento. Riprova.');
+            console.error(err);
+        }
+        setUploadProgress(0);
     } finally {
-      setIsUploading(false);
+        setIsUploading(false);
     }
   };
 
@@ -256,7 +268,7 @@ export default function Upload() {
             transition={{ duration: 2, repeat: Infinity }}
           >
             <UploadIcon className="w-4 h-4 text-[#FFD700]" />
-            <span className="text-[#FFD700] text-sm font-medium">{wallet.uploads} disponibili</span>
+            <span className="text-[#FFD700] text-sm font-medium">1 Upload Gratuito al Giorno</span>
           </motion.div>
         </div>
       </motion.div>
@@ -531,25 +543,6 @@ export default function Upload() {
             </>
           )}
         </motion.button>
-
-        {wallet.uploads <= 1 && !isUploading && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-6 p-4 rounded-2xl border border-[#FFD700]/30 bg-[#FFD700]/5"
-          >
-            <p className="text-[#FFD700] text-sm text-center mb-3">
-              ⚡ Upload quasi terminati!
-            </p>
-            <Button
-              onClick={() => router.push('/likeflow/purchase')}
-              variant="outline"
-              className="w-full border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700] hover:text-black rounded-xl"
-            >
-              Acquista Upload
-            </Button>
-          </motion.div>
-        )}
       </div>
     </div>
   );
