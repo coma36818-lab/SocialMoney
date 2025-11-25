@@ -159,7 +159,7 @@ export default function SponsorPage() {
     };
     
     return (
-      <div className="box flex flex-col items-center">
+      <div className="box flex flex-col items-center py-8">
         <h2 className="text-2xl font-bold mb-4">Free Upload</h2>
         <Input
           type="file"
