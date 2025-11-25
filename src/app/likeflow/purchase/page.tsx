@@ -1,11 +1,11 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Heart, Upload, Sparkles, Check, Star, Zap, Crown, Gift, Wallet as WalletIcon } from 'lucide-react';
+import { Heart, Upload, Sparkles, Check, Star, Zap, Crown, Gift } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useWallet } from '@/context/WalletContext';
 import { initializeFirebase } from '@/firebase';
-import { addDoc, collection, serverTimestamp, doc, getDoc, setDoc, increment } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 const { firestore: db } = initializeFirebase();
 
@@ -61,68 +61,13 @@ const getOrCreateUserId = (): string => {
   return userId;
 };
 
-// Mock PayPal payment creation
-async function createPayPalPayment(amount: number): Promise<string> {
-  console.log(`Simulating PayPal payment creation for €${amount}`);
-  // In a real app, this would call the PayPal API
-  return `mock_paypal_tx_${Date.now()}`;
-}
-
-async function withdrawCredits(localUserId: string) {
-  const walletRef = doc(db, "Wallets", localUserId);
-  const walletSnap = await getDoc(walletRef);
-  
-  if (!walletSnap.exists() || walletSnap.data().credit < 5) {
-    alert("Minimo €5 per riscuotere.");
-    return;
-  }
-  
-  const walletData = walletSnap.data();
-  const creditToWithdraw = walletData.credit;
-
-  try {
-    // 1. Create PayPal transaction (simulated)
-    const paypalTxId = await createPayPalPayment(creditToWithdraw);
-
-    // 2. Update wallet and record transaction
-    await setDoc(walletRef, { credit: 0, lastUpdate: serverTimestamp() }, { merge: true });
-    await addDoc(collection(db, "Transactions"), {
-      userId: localUserId,
-      pricePaid: creditToWithdraw,
-      paypalTxId,
-      type: "withdraw",
-      timestamp: serverTimestamp()
-    });
-
-    alert(`Riscossione di €${creditToWithdraw.toFixed(2)} completata! Transazione ID: ${paypalTxId}`);
-    return paypalTxId;
-  } catch (error) {
-    console.error("Withdrawal failed:", error);
-    alert("Si è verificato un errore durante la riscossione. Riprova.");
-  }
-}
-
-
 export default function Packages() {
   const [activeTab, setActiveTab] = useState('likes');
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
-  const [isWithdrawing, setIsWithdrawing] = useState(false);
-  const { wallet, addLikes, addUploads, addCredits, resetCredits } = useWallet();
+  const { addLikes, addUploads } = useWallet();
 
   const userId = getOrCreateUserId();
-
-  useEffect(() => {
-    const fetchWallet = async () => {
-      const walletRef = doc(db, "Wallets", userId);
-      const walletSnap = await getDoc(walletRef);
-      if (walletSnap.exists()) {
-        addCredits(walletSnap.data().credit);
-      }
-    };
-    fetchWallet();
-  }, [userId, addCredits]);
-
 
   const handlePurchase = (type: 'likes' | 'uploads', amount: number, price: number, pkg: {id: number, name: string}) => {
     setSelectedPackage(`${type}-${pkg.id}`);
@@ -138,8 +83,8 @@ export default function Packages() {
       try {
         await addDoc(collection(db, "Transactions"), {
           userId: userId,
-          likeCount: type === 'likes' ? amount : 0,
-          uploadCount: type === 'uploads' ? amount : 0,
+          likeCount: type === 'likes' ? amount : undefined,
+          uploadCount: type === 'uploads' ? amount : undefined,
           pricePaid: price,
           paypalTxId: `simulated_${Date.now()}`,
           type: type === 'likes' ? 'likePurchase' : 'uploadPurchase',
@@ -161,13 +106,6 @@ export default function Packages() {
       setSelectedPackage(null);
       setTimeout(() => setPurchaseSuccess(null), 3000);
     }, 800);
-  };
-
-  const handleWithdraw = async () => {
-    setIsWithdrawing(true);
-    await withdrawCredits(userId);
-    resetCredits();
-    setIsWithdrawing(false);
   };
 
   return (
@@ -211,96 +149,6 @@ export default function Packages() {
         </h1>
       </motion.div>
 
-      {/* Wallet Summary */}
-      <div className="relative px-4 py-6">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-3xl p-6 border border-[#FFD700]/20 relative overflow-hidden"
-        >
-          {/* Glow effect */}
-          <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-[#FFD700]/20 blur-3xl" />
-          
-          <h2 className="text-gray-400 text-sm uppercase tracking-wider mb-4">Il tuo Wallet</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <motion.div 
-              whileHover={{ scale: 1.02 }}
-              className="bg-black/50 rounded-2xl p-4 border border-[#FFD700]/10 relative overflow-hidden"
-            >
-              <motion.div 
-                className="absolute inset-0 bg-gradient-to-br from-[#FFD700]/10 to-transparent"
-                animate={{ opacity: [0.3, 0.6, 0.3] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-2">
-                  <Heart className="w-5 h-5 text-[#FFD700] fill-[#FFD700]" />
-                  <span className="text-gray-400 text-sm">Like</span>
-                </div>
-                <motion.p 
-                  key={wallet.likes}
-                  initial={{ scale: 1.5, color: '#FFFFFF' }}
-                  animate={{ scale: 1, color: '#FFFFFF' }}
-                  className="text-white text-3xl font-bold"
-                >
-                  {wallet.likes}
-                </motion.p>
-              </div>
-            </motion.div>
-            <motion.div 
-              whileHover={{ scale: 1.02 }}
-              className="bg-black/50 rounded-2xl p-4 border border-purple-500/10 relative overflow-hidden"
-            >
-              <motion.div 
-                className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent"
-                animate={{ opacity: [0.3, 0.6, 0.3] }}
-                transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-              />
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-2">
-                  <Upload className="w-5 h-5 text-purple-400" />
-                  <span className="text-gray-400 text-sm">Upload</span>
-                </div>
-                <motion.p 
-                  key={wallet.uploads}
-                  initial={{ scale: 1.5, color: '#FFFFFF' }}
-                  animate={{ scale: 1, color: '#FFFFFF' }}
-                  className="text-white text-3xl font-bold"
-                >
-                  {wallet.uploads}
-                </motion.p>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-      </div>
-
-       {/* Withdraw Section */}
-      <div className="relative px-4 py-6">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-3xl p-6 border border-green-500/20 relative overflow-hidden"
-        >
-          <div className="absolute -top-20 -left-20 w-40 h-40 rounded-full bg-green-500/10 blur-3xl" />
-          <h2 className="text-gray-400 text-sm uppercase tracking-wider mb-2 flex items-center gap-2"><WalletIcon className="w-4 h-4"/>Il tuo Guadagno</h2>
-          <div className="flex items-center justify-between">
-            <p className="text-white text-4xl font-bold">€{wallet.credits.toFixed(2)}</p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleWithdraw}
-              disabled={wallet.credits < 5 || isWithdrawing}
-              className="px-6 py-3 rounded-2xl font-bold text-lg transition-all bg-gradient-to-r from-green-500 to-emerald-500 text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-green-500/20"
-            >
-              {isWithdrawing ? "Processing..." : "Riscuoti"}
-            </motion.button>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">Minimo per riscuotere: €5.00</p>
-        </motion.div>
-      </div>
-
       {/* Success notification */}
       <AnimatePresence>
         {purchaseSuccess && (
@@ -309,7 +157,7 @@ export default function Packages() {
       </AnimatePresence>
 
       {/* Tabs */}
-      <div className="relative px-4">
+      <div className="relative px-4 pt-10">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full bg-[#111] border border-[#222] rounded-2xl p-1.5 h-14">
             <TabsTrigger 

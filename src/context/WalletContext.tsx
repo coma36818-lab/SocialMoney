@@ -25,7 +25,7 @@ const INITIAL_UPLOADS = 3;
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [wallet, setWallet] = useState<Wallet>({
     likes: 0,
-    uploads: INITIAL_UPLOADS,
+    uploads: 0, // Set to 0, will be loaded from localStorage
     credits: 0,
     commission: 0,
   });
@@ -43,13 +43,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           credits: parsed.credits ?? 0,
           commission: parsed.commission ?? 0
         });
+      } else {
+        // If no saved wallet, initialize uploads
+        setWallet(prev => ({ ...prev, uploads: INITIAL_UPLOADS }));
       }
     } catch (e) {
       console.error("Failed to load wallet from localStorage", e);
+      // Fallback if localStorage fails
+      setWallet(prev => ({ ...prev, uploads: INITIAL_UPLOADS }));
     }
     setIsHydrated(true);
   }, []);
-
 
   useEffect(() => {
     if (isHydrated) {

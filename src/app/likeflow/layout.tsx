@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import { Home, Upload, ShoppingBag, Trophy, Heart } from 'lucide-react';
+import { Home, Upload, ShoppingBag, Trophy, Wallet as WalletIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useWallet } from '@/context/WalletContext';
 import { usePathname } from 'next/navigation';
@@ -122,18 +122,26 @@ export default function LikeFlowLayout({ children }: { children: React.ReactNode
               })}
 
               <Link
-                href='/likeflow/purchase'
-                className="relative flex flex-col items-center justify-center"
+                href='/likeflow/wallet'
+                className="relative flex flex-col items-center justify-center group"
               >
                 <motion.div whileTap={{ scale: 0.85 }}>
-                  <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/30 flex items-center justify-center">
-                    <div className="text-center">
-                      <Upload className="w-5 h-5 text-purple-400 mx-auto" />
-                      <span className="text-purple-400 text-[8px] font-bold">{wallet.uploads}</span>
-                    </div>
+                  <div className={`relative w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+                        pathname === '/likeflow/wallet'
+                          ? 'bg-gradient-to-br from-purple-500 to-purple-600'
+                          : 'bg-white/5 hover:bg-white/10'
+                      }`}>
+                     <WalletIcon 
+                        className={`w-6 h-6 transition-all ${
+                          pathname === '/likeflow/wallet' ? 'text-white' : 'text-purple-400'
+                        }`}
+                        strokeWidth={pathname === '/likeflow/wallet' ? 2.5 : 1.5}
+                      />
                   </div>
                 </motion.div>
-                <span className="text-[10px] mt-1.5 font-medium text-gray-400">Wallet</span>
+                <span className={`text-[10px] mt-1.5 font-medium transition-colors ${
+                      pathname === '/likeflow/wallet' ? 'text-purple-400' : 'text-gray-400'
+                    }`}>Wallet</span>
               </Link>
             </div>
           </nav>
