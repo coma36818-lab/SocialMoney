@@ -63,17 +63,9 @@ const PodiumPlace = ({ post, place, delay }: { post: any, place: number, delay: 
           transition={{ duration: 2, repeat: Infinity }}
         />
         
-        {post.authorPhoto ? (
-          <img 
-            src={post.authorPhoto}
-            alt={post.authorName || 'Autore'}
-            className={`${sizes[place]} rounded-full object-cover border-3 border-white relative z-10 shadow-xl ${glows[place]}`}
-          />
-        ) : (
-          <div className={`${sizes[place]} rounded-full bg-gradient-to-br ${colors[place]} flex items-center justify-center relative z-10 shadow-xl ${glows[place]}`}>
+        <div className={`${sizes[place]} rounded-full bg-gradient-to-br ${colors[place]} flex items-center justify-center relative z-10 shadow-xl ${glows[place]}`}>
             <User className={place === 1 ? 'w-10 h-10 text-black' : 'w-8 h-8 text-white'} />
-          </div>
-        )}
+        </div>
         
         <motion.div 
           className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${badgeSizes[place]} rounded-full bg-gradient-to-r ${colors[place]} flex items-center justify-center font-bold text-black z-20 shadow-lg`}
@@ -257,15 +249,6 @@ function Ranking() {
                   </div>
 
                   <div className="relative">
-                    {post.authorPhoto ? (
-                      <img 
-                        src={post.authorPhoto}
-                        alt={post.authorName || 'Autore'}
-                        className={`w-12 h-12 rounded-full object-cover ${
-                          index < 3 ? 'border-2 border-[#FFD700]' : 'border border-[#333]'
-                        }`}
-                      />
-                    ) : (
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
                         index < 3 
                           ? 'bg-gradient-to-br from-[#FFD700]/30 to-[#B8860B]/30 border-2 border-[#FFD700]' 
@@ -273,7 +256,6 @@ function Ranking() {
                       }`}>
                         <User className={`w-6 h-6 ${index < 3 ? 'text-[#FFD700]' : 'text-gray-500'}`} />
                       </div>
-                    )}
                     {index === 0 && (
                       <motion.div
                         className="absolute -top-1 -right-1"
@@ -289,9 +271,9 @@ function Ranking() {
                     <p className={`font-medium truncate ${index < 3 ? 'text-white' : 'text-gray-300'}`}>
                       @{post.authorName || 'anonimo'}
                     </p>
-                    {post.postDesc && (
+                    {post.description && (
                       <p className="text-gray-500 text-sm truncate">
-                        {post.postDesc}
+                        {post.description}
                       </p>
                     )}
                   </div>

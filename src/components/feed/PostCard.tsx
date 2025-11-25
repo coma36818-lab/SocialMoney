@@ -137,10 +137,16 @@ export function PostCard({ post, onLike, userLikes, isActive, onOpenComments, on
     }
   };
 
-  const formatDate = (dateValue: number | undefined) => {
-    if (!dateValue) return '';
-    const date = new Date(dateValue);
-    return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return '';
+    const date = timestamp.toDate();
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diff < 60) return `${diff}s`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+    return `${Math.floor(diff / 86400)}g`;
   };
 
   return (
@@ -153,7 +159,7 @@ export function PostCard({ post, onLike, userLikes, isActive, onOpenComments, on
         {post.mediaType && post.mediaType.startsWith('video') && (
           <video
             ref={videoRef}
-            src={post.mediaURL}
+            src={post.mediaUrl}
             className="absolute inset-0 w-full h-full object-contain bg-black"
             loop
             muted={isMuted}
@@ -167,8 +173,8 @@ export function PostCard({ post, onLike, userLikes, isActive, onOpenComments, on
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-            src={post.mediaURL}
-            alt={post.postDesc || 'Post'}
+            src={post.mediaUrl}
+            alt={post.description || 'Post'}
             className="absolute inset-0 w-full h-full object-contain bg-black"
           />
         )}
@@ -191,7 +197,7 @@ export function PostCard({ post, onLike, userLikes, isActive, onOpenComments, on
             </motion.div>
             <audio
               ref={audioRef}
-              src={post.mediaURL}
+              src={post.mediaUrl}
               loop
               muted={isMuted}
             />
@@ -212,17 +218,9 @@ export function PostCard({ post, onLike, userLikes, isActive, onOpenComments, on
           className="relative mb-2"
           whileHover={{ scale: 1.1 }}
         >
-          {post.authorPhoto ? (
-            <img 
-              src={post.authorPhoto}
-              alt={post.authorName || 'Autore'}
-              className="w-12 h-12 rounded-full object-cover border-2 border-white"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#B8860B] flex items-center justify-center border-2 border-white">
-              <User className="w-6 h-6 text-black" />
-            </div>
-          )}
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#B8860B] flex items-center justify-center border-2 border-white">
+            <User className="w-6 h-6 text-black" />
+          </div>
           <motion.div 
             className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#FFD700] flex items-center justify-center"
             animate={{ scale: [1, 1.2, 1] }}
@@ -340,14 +338,14 @@ export function PostCard({ post, onLike, userLikes, isActive, onOpenComments, on
           <span className="text-gray-400 text-xs">• {formatDate(post.timestamp)}</span>
         </motion.div>
 
-        {post.postDesc && (
+        {post.description && (
           <motion.p 
             className="text-white text-sm line-clamp-2 leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            {post.postDesc}
+            {post.description}
           </motion.p>
         )}
 

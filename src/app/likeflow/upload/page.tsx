@@ -173,26 +173,20 @@ export default function Upload() {
     try {
       const mediaRef = ref(storage, "posts/" + Date.now() + "-" + formData.mediaFile.name);
       await uploadBytes(mediaRef, formData.mediaFile);
-      const mediaURL = await getDownloadURL(mediaRef);
-
-
-      let authorPhotoUrl = "";
-      if (formData.authorPhoto) {
-          const apRef = ref(storage, "authors/" + Date.now() + "-" + formData.authorPhoto.name);
-          await uploadBytes(apRef, formData.authorPhoto);
-          authorPhotoUrl = await getDownloadURL(apRef);
-      }
+      const mediaUrl = await getDownloadURL(mediaRef);
 
       setUploadProgress(95);
 
       await addDoc(collection(db, "posts"), {
-        authorName: formData.authorName || null,
-        authorPhoto: authorPhotoUrl,
-        postDesc: formData.description || null,
-        mediaURL: mediaURL,
-        mediaType: formData.mediaFile.type,
+        authorName: formData.authorName || 'Anonimo',
+        description: formData.description || '',
+        mediaUrl: mediaUrl,
+        mediaType: formData.mediaFile.type.split('/')[0],
         likes: 0,
         likesWeek: 0,
+        boostScore: 0,
+        creditValue: 0.00,
+        boostPurchased: 0,
         timestamp: serverTimestamp()
       });
 
@@ -225,7 +219,7 @@ export default function Upload() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-black pb-28 pt-16 overflow-y-auto">
+    <div className="min-h-screen bg-black pb-28 pt-8 md:pt-12 overflow-y-auto">
       {/* Success animation */}
       <AnimatePresence>
         {success && <SuccessAnimation />}

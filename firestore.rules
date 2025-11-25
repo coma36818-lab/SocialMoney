@@ -6,7 +6,7 @@ service cloud.firestore {
     match /posts/{docId} {
       allow read: if true;
       allow write: if request.resource.data.keys().hasOnly([
-        'mediaURL', 'mediaType', 'authorName', 'authorPhoto', 'postDesc', 'likes', 'likesWeek', 'timestamp'
+        'mediaUrl', 'mediaType', 'authorName', 'description', 'likes', 'likesWeek', 'timestamp', 'boostScore', 'creditValue', 'boostPurchased'
       ]);
     }
 

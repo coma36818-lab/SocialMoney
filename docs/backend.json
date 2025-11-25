@@ -4,23 +4,11 @@
       "name": "Post",
       "type": "object",
       "properties": {
-        "author_name": {
-          "type": "string",
-          "description": "Nome dell'autore (opzionale)"
-        },
-        "author_photo": {
-          "type": "string",
-          "description": "URL foto autore (opzionale)"
-        },
-        "description": {
-          "type": "string",
-          "description": "Descrizione del post"
-        },
-        "media_url": {
+        "mediaUrl": {
           "type": "string",
           "description": "URL del media caricato"
         },
-        "media_type": {
+        "mediaType": {
           "type": "string",
           "enum": [
             "video",
@@ -29,20 +17,43 @@
           ],
           "description": "Tipo di media"
         },
+        "authorName": {
+          "type": "string",
+          "description": "Nome dell'autore (opzionale)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Descrizione del post"
+        },
         "likes": {
           "type": "number",
           "default": 0,
           "description": "Numero di like ricevuti"
         },
-        "boost_score": {
+        "boostScore": {
           "type": "number",
           "default": 0,
           "description": "Punteggio boost per classifica"
+        },
+        "creditValue": {
+          "type": "number",
+          "default": 0,
+          "description": "Valore dei like in € per l'autore"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp del post"
+        },
+        "boostPurchased": {
+          "type": "number",
+          "default": 0,
+          "description": "Numero di boost acquistati"
         }
       },
       "required": [
-        "media_url",
-        "media_type"
+        "mediaUrl",
+        "mediaType"
       ]
     },
     "Comment": {
