@@ -53,6 +53,34 @@
         "likesWeek",
         "timestamp"
       ]
+    },
+    "Comment": {
+      "title": "Comment",
+      "type": "object",
+      "description": "Represents a comment on a post.",
+      "properties": {
+        "postId": {
+          "type": "string",
+          "description": "The ID of the post this comment belongs to."
+        },
+        "authorName": {
+          "type": "string",
+          "description": "The name of the user who wrote the comment."
+        },
+        "text": {
+          "type": "string",
+          "description": "The content of the comment."
+        },
+        "timestamp": {
+          "type": "object",
+          "description": "The server timestamp of when the comment was created."
+        }
+      },
+      "required": [
+        "postId",
+        "text",
+        "timestamp"
+      ]
     }
   },
   "auth": {
@@ -77,6 +105,16 @@
               "description": "Unique identifier for the post."
             }
           ]
+        }
+      },
+      {
+        "path": "comments/{commentId}",
+        "definition": {
+          "entityName": "Comment",
+          "schema": {
+            "$ref": "#/backend/entities/Comment"
+          },
+          "description": "Stores comments for posts."
         }
       }
     ],

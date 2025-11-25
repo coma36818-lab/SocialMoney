@@ -9,5 +9,10 @@ service cloud.firestore {
         'mediaURL', 'mediaType', 'authorName', 'authorPhoto', 'postDesc', 'likes', 'likesWeek', 'timestamp'
       ]);
     }
+
+    match /comments/{commentId} {
+      allow read: if true;
+      allow write: if request.resource.data.keys().hasOnly(['postId', 'authorName', 'text', 'timestamp']);
+    }
   }
 }
