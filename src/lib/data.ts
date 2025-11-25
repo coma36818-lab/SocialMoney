@@ -32,6 +32,7 @@ export const navLinks = [
     ],
   },
   { href: '/shop', label: 'Shop Page' },
+  { href: '/likeflow', label: 'LikeFlow' },
   { href: '/sponsor', label: 'Sponsor' },
   { href: '/#join-creators', label: 'Join' },
 ];
@@ -474,4 +475,5 @@ export const postingTimes = [
     { platform: '💼 LinkedIn', times: 'Weekdays: 7:00 AM - 9:00 AM\nLunch: 12:00 PM - 1:00 PM', details: 'Professional browsing before and during work.' },
 ];
 
+    
     

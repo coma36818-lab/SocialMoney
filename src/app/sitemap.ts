@@ -22,6 +22,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/likeflow`,
+      lastModified: '2025-11-11',
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/sponsor`,
       lastModified: new Date(),
       priority: 0.8,
