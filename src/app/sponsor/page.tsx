@@ -1,5 +1,4 @@
 
-
 'use client';
 import { useState, useRef, ChangeEvent } from 'react';
 import { PayPalScriptProvider, PayPalButtons, PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
@@ -187,7 +186,7 @@ export default function SponsorPage() {
   return (
     <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "EUR" }}>
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-center mb-2 text-white">Upload Your Videos</h1>
+        <h1 className="text-4xl font-bold text-center mb-2 text-white">Upload Your Content</h1>
         <p className="text-lg text-muted-foreground text-center mb-8">
           Showcase your content on our homepage to a wide international audience of readers and creators.
         </p>
@@ -214,7 +213,7 @@ export default function SponsorPage() {
         </Tabs>
         
         <div className="box flex flex-col items-center mt-12">
-          <h2 className="text-2xl font-bold mb-2">Want to upload more videos today?</h2>
+          <h2 className="text-2xl font-bold mb-2 text-center">Want to upload more videos today?</h2>
           <p className="text-muted-foreground mb-6 text-center">Buy Boost Videos and get to the TOP of the homepage RIGHT AWAY.</p>
           <div className="space-y-4">
             {boostOptions.map(option => (
