@@ -20,12 +20,12 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    match /Transactions/{transactionId} {
+    match /transactions/{transactionId} {
       allow read: if true;
-      allow write: if request.resource.data.keys().hasOnly(['userId', 'postId', 'likeCount', 'pricePaid', 'paypalTxId', 'type', 'timestamp']);
+      allow write: if request.resource.data.keys().hasOnly(['userId', 'postId', 'likeCount', 'boostAmount', 'pricePaid', 'paypalTxId', 'type', 'timestamp']);
     }
 
-    match /Wallets/{walletId} {
+    match /wallets/{walletId} {
       allow read, write: if true;
     }
   }

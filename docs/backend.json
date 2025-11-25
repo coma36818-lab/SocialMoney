@@ -124,7 +124,11 @@
         },
         "likeCount": {
           "type": "number",
-          "description": "Number of likes purchased"
+          "description": "Number of likes purchased (optional)"
+        },
+        "boostAmount": {
+          "type": "number",
+          "description": "Amount of boost purchased (optional)"
         },
         "pricePaid": {
           "type": "number",
@@ -138,7 +142,8 @@
           "type": "string",
           "enum": [
             "likePurchase",
-            "withdraw"
+            "withdraw",
+            "boostPurchase"
           ],
           "description": "Type of transaction"
         },

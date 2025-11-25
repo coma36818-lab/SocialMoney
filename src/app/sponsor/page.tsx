@@ -2,25 +2,57 @@
 'use client';
 import { useState, useRef, ChangeEvent } from 'react';
 import { PayPalScriptProvider, PayPalButtons, PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
-// import { storage, db } from '@/firebase/client';
-// import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-// import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Star } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { initializeFirebase } from '@/firebase';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, increment } from 'firebase/firestore';
+
+const { firestore: db } = initializeFirebase();
 
 const PAYPAL_CLIENT_ID = "ASO-5bJbcS-tklhd-_M-DrZn6lNHwa7FGDjlUajxjiarfLvpAVQiTnO0A5SPDv4HXjlT7hz4St9d7d34";
 
 const boostOptions = [
-  { value: '1.00', label: '1 Boost Video' },
-  { value: '3.00', label: '5 Boost Videos' },
-  { value: '5.00', label: '10 Boost Videos' },
+  { value: '1.00', label: '1 Boost Video', boostAmount: 1 },
+  { value: '3.00', label: '5 Boost Videos', boostAmount: 5 },
+  { value: '5.00', label: '10 Boost Videos', boostAmount: 10 },
 ];
 
 type FileType = 'video' | 'audio' | 'image';
 
+const getOrCreateUserId = (): string => {
+  let userId = localStorage.getItem('likeflow_userId');
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    localStorage.setItem('likeflow_userId', userId);
+  }
+  return userId;
+};
+
+
+async function boostPost(postId: string, boostAmount: number, localUserId: string, priceEuro: number, paypalTxId: string) {
+  const postRef = doc(db, "Posts", postId);
+  await updateDoc(postRef, {
+    boostScore: increment(boostAmount),
+    boostPurchased: increment(boostAmount)
+  });
+
+  // Registra transazione PayPal
+  await addDoc(collection(db, "transactions"), {
+    userId: localUserId,
+    postId,
+    boostAmount,
+    pricePaid: priceEuro,
+    paypalTxId,
+    type: "boostPurchase",
+    timestamp: serverTimestamp()
+  });
+}
+
+
 export default function SponsorPage() {
   const [file, setFile] = useState<File | null>(null);
+  const [postId, setPostId] = useState('');
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<FileType>('video');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -34,103 +66,31 @@ export default function SponsorPage() {
     }
   };
 
-  const getUploadConfig = (type: FileType) => {
-    switch (type) {
-      case 'video':
-        return {
-          localStorageKey: "lastFreeVideoUpload",
-          storagePath: "videos/free_",
-          collectionName: "videos",
-          fileTypeMessage: "video"
-        };
-      case 'audio':
-        return {
-          localStorageKey: "lastFreeAudioUpload",
-          storagePath: "audios/free_",
-          collectionName: "audios",
-          fileTypeMessage: "audio file"
-        };
-      case 'image':
-        return {
-          localStorageKey: "lastFreeImageUpload",
-          storagePath: "images/free_",
-          collectionName: "images",
-          fileTypeMessage: "image"
-        };
+  const uploadFreeFile = async () => {
+    alert("This feature is temporarily disabled.");
+  };
+
+  const onApprove = (boostAmount: number, price: number): PayPalButtonsComponentProps['onApprove'] => async (data, actions) => {
+    if (!postId) {
+      alert("Please enter a Post ID to boost.");
+      return;
+    }
+    
+    try {
+      await actions.order?.capture();
+      const localUserId = getOrCreateUserId();
+      await boostPost(postId, boostAmount, localUserId, price, data.orderID);
+      alert(`Payment completed! Post boosted successfully.`);
+    } catch (error) {
+      console.error("Payment or boost failed:", error);
+      alert("There was an issue with the payment or boost. Please try again.");
     }
   };
 
-  const uploadFreeFile = async () => {
-    alert("This feature is temporarily disabled.");
-    // const config = getUploadConfig(activeTab);
-    // const lastUpload = localStorage.getItem(config.localStorageKey);
-    // const today = new Date().toDateString();
-
-    // if (lastUpload === today) {
-    //   alert(`You have already uploaded 1 ${config.fileTypeMessage} today. Use Boosts!`);
-    //   return;
-    // }
-
-    // if (!file) {
-    //   alert(`Select a ${config.fileTypeMessage}!`);
-    //   return;
-    // }
-
-    // try {
-    //   const extension = file.name.split('.').pop();
-    //   const path = `${config.storagePath}${Date.now()}.${extension}`;
-    //   const storageRef = ref(storage, path);
-
-    //   await uploadBytes(storageRef, file);
-    //   const url = await getDownloadURL(storageRef);
-
-    //   await addDoc(collection(db, config.collectionName), {
-    //     url: url,
-    //     premium: false,
-    //     timestamp: serverTimestamp()
-    //   });
-
-    //   localStorage.setItem(config.localStorageKey, today);
-    //   alert(`🎉 ${config.fileTypeMessage.charAt(0).toUpperCase() + config.fileTypeMessage.slice(1)} uploaded! It is now at the top of the homepage.`);
-    // } catch (error) {
-    //   console.error(`Error uploading free ${config.fileTypeMessage}:`, error);
-    //   alert("An error occurred during upload. Please try again.");
-    // }
-  };
-
-  const uploadPremiumVideo = async () => {
-    alert("This feature is temporarily disabled.");
-    // if (!file) {
-    //   alert("Select a video before completing the payment!");
-    //   throw new Error("No video selected");
-    // }
-
-    // try {
-    //   const path = "videos/premium_" + Date.now() + ".mp4";
-    //   const storageRef = ref(storage, path);
-
-    //   await uploadBytes(storageRef, file);
-    //   const url = await getDownloadURL(storageRef);
-
-    //   await addDoc(collection(db, "videos"), {
-    //     url: url,
-    //     premium: true,
-    //     boosted: true,
-    //     timestamp: serverTimestamp()
-    //   });
-
-    //   alert("🚀 Premium Video uploaded successfully! It is now at the TOP.");
-    // } catch (error) {
-    //   console.error("Error uploading premium video:", error);
-    //   alert("An error occurred during premium upload. Please contact support.");
-    //   throw error;
-    // }
-  };
-
   const createOrder = (amount: string): PayPalButtonsComponentProps['createOrder'] => (data, actions) => {
-    if (!file || activeTab !== 'video') {
-      alert("Select a video before proceeding with the payment!");
-      return Promise.reject(new Error("No video file selected for boost."));
+    if (!postId) {
+      alert("Please enter a Post ID to boost.");
+      return Promise.reject(new Error("No Post ID provided."));
     }
     return actions.order.create({
       purchase_units: [{
@@ -140,17 +100,6 @@ export default function SponsorPage() {
         }
       }]
     });
-  };
-
-  const onApprove = (boostLabel: string): PayPalButtonsComponentProps['onApprove'] => async (data, actions) => {
-    try {
-      await actions.order?.capture();
-      await uploadPremiumVideo();
-      alert(`Payment completed! ${'10 Boost Videos' === boostLabel ? '10 Boost Videos and AI Trend Analyzer' : boostLabel} purchased!`);
-    } catch (error) {
-      console.error("Payment or upload failed:", error);
-      alert("There was an issue with the payment or upload. Please try again.");
-    }
   };
 
   const renderFileInput = () => {
@@ -217,6 +166,15 @@ export default function SponsorPage() {
         <div className="box flex flex-col items-center mt-12 py-8">
           <h2 className="text-2xl font-bold mb-2 text-center">Want to upload more content today?</h2>
           <p className="text-muted-foreground mb-6 text-center">Buy Boosts and get to the TOP of the homepage RIGHT AWAY.</p>
+          <div className="w-full max-w-sm mb-6">
+            <Input 
+              type="text"
+              placeholder="Enter Post ID to boost"
+              value={postId}
+              onChange={(e) => setPostId(e.target.value)}
+              className="text-center bg-background"
+            />
+          </div>
           <div className="space-y-4">
             {boostOptions.map(option => (
               <div key={option.value} id={`boost-${option.value.split('.')[0]}`} className="text-center">
@@ -224,7 +182,7 @@ export default function SponsorPage() {
                 <PayPalButtons
                   style={{ layout: "horizontal", shape: "pill", color: "gold" }}
                   createOrder={createOrder(option.value)}
-                  onApprove={onApprove(option.label)}
+                  onApprove={onApprove(option.boostAmount, parseFloat(option.value))}
                   onError={(err) => console.error("PayPal Error:", err)}
                 />
                  {option.value === '5.00' && (
