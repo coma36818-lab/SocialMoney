@@ -1,91 +1,13 @@
-/**
- * This ruleset defines the security model for a public social media feed application.
- *
- * Core Philosophy:
- * The security model is designed for rapid prototyping. It prioritizes public readability
- * and allows any authenticated user to contribute content. Reads are completely public
- * to support the main feed, while all write operations (create, update, delete) require
- * a user to be signed in, which can include anonymous authentication.
- *
- * Data Structure:
- * The data is organized in a single top-level collection: `/posts`. This flat
- * structure holds all user-generated content, simplifying queries for the public feed.
- *
- * Key Security Decisions:
- * - Public Feed: The `/posts` collection is fully readable by anyone on the internet
- *   (get, list) to allow the application's feed to function without requiring user login.
- * - Authenticated-Only Writes: To prevent spam and anonymous abuse, creating new posts
- *   is restricted to users who are signed in.
- * - Permissive Modification (Prototyping Only): A critical decision was made to allow
- *   *any* authenticated user to update or delete *any* post. This is a temporary measure
- *   to support features like a public "like" counter without a complex backend. This
- *   is insecure for production and relies on the `Post` schema being updated with an
- *   `ownerId` field to enforce proper ownership rules.
- *
- * Denormalization for Authorization:
- * This principle is not heavily applied in the current version due to the simple, public
- * nature of the data. In a future iteration where posts might have restricted visibility,
- * user roles or access lists would be denormalized directly onto post documents to
- * avoid slow and costly `get()` calls in rules.
- *
- * Structural Segregation:
- * The current model uses a single collection because all posts share the same public
- * security profile. If private content like drafts were introduced, they would be stored
- * in a separate, user-owned subcollection (e.g., `/users/{userId}/drafts/{postId}`) to
- * ensure private data cannot be accidentally listed publicly.
- */
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    /**************************************************************
-     * Helper Functions
-     **************************************************************/
-
-    /**
-     * Checks if the user making the request is authenticated.
-     */
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    /**
-     * Checks for authenticated updates/deletes on existing documents.
-     * Ensures the document exists before allowing a state-changing operation.
-     */
-    function isExistingDocAndUserIsSignedIn() {
-      return isSignedIn() && resource != null;
-    }
-
-    /**************************************************************
-     * Collection Rules
-     **************************************************************/
-
-    /**
-     * @description Defines rules for public posts. All posts are public to read,
-     *              but creating, updating, or deleting them requires authentication.
-     * @path        /posts/{postId}
-     * @allow       (list) Any client, authenticated or not, can list all posts for the feed.
-     * @deny        (create) An unauthenticated user cannot create a new post.
-     * @principle   Implements a public feed model. Reads are open to all, while writes
-     *              require authentication. Lacks ownership controls for rapid prototyping.
-     */
-    match /posts/{postId} {
-      // READ: Anyone can read posts from the public feed.
-      allow get: if true;
-      allow list: if true;
-
-      // CREATE: Any signed-in user (including anonymous) can create a new post.
-      // Data shape is not validated to allow for flexible prototyping.
-      allow create: if isSignedIn();
-
-      // UPDATE & DELETE: Any signed-in user can modify or remove any post.
-      // CRITICAL: This is an insecure pattern for production. It is used here for prototyping
-      // because the 'Post' entity is missing an 'ownerId' or 'authorId' field.
-      // Without an ownership field, it is impossible to restrict modifications to the
-      // original author, making content vulnerable to tampering by any other user.
-      allow update: if isExistingDocAndUserIsSignedIn(); // TODO: Add owner validation once the schema is updated with an ownership field.
-      allow delete: if isExistingDocAndUserIsSignedIn(); // TODO: Add owner validation once the schema is updated with an ownership field.
+    
+    match /posts/{docId} {
+      allow read: if true;
+      allow write: if request.resource.data.keys().hasOnly([
+        'mediaURL', 'mediaType', 'authorName', 'authorPhoto', 'postDesc', 'likes', 'likesWeek', 'timestamp'
+      ]);
     }
   }
 }
