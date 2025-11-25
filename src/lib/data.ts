@@ -28,22 +28,13 @@ export const navLinks = [
       { href: '/#cinema', label: 'Cinema' },
       { href: '/#games', label: 'Games' },
       { href: '/#handmade', label: 'Handmade' },
-      { href: '/library', label: 'Game Library' },
     ],
   },
   { href: '/shop', label: 'Shop Page' },
-  {
-    label: 'LikeFlow',
-    isDropdown: true,
-    items: [
-      { href: '/likeflow/upload', label: 'Upload' },
-      { href: '/likeflow/feed', label: 'Feed' },
-      { href: '/likeflow/top', label: 'Top Creators' },
-      { href: '/likeflow/purchase', label: 'Buy Likes' },
-    ],
-  },
+  { href: '/likeflow/feed', label: 'LikeFlow' },
   { href: '/sponsor', label: 'Sponsor' },
   { href: '/#join-creators', label: 'Join' },
+  { href: '/library', label: 'Explore Games' },
 ];
 
 
