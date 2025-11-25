@@ -2,9 +2,9 @@
 'use client';
 import { useState, useRef, ChangeEvent } from 'react';
 import { PayPalScriptProvider, PayPalButtons, PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
-import { storage, db } from '../../../public/likeflow.js';
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+// import { storage, db } from '@/firebase/client';
+// import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Star } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -61,68 +61,70 @@ export default function SponsorPage() {
   };
 
   const uploadFreeFile = async () => {
-    const config = getUploadConfig(activeTab);
-    const lastUpload = localStorage.getItem(config.localStorageKey);
-    const today = new Date().toDateString();
+    alert("This feature is temporarily disabled.");
+    // const config = getUploadConfig(activeTab);
+    // const lastUpload = localStorage.getItem(config.localStorageKey);
+    // const today = new Date().toDateString();
 
-    if (lastUpload === today) {
-      alert(`You have already uploaded 1 ${config.fileTypeMessage} today. Use Boosts!`);
-      return;
-    }
+    // if (lastUpload === today) {
+    //   alert(`You have already uploaded 1 ${config.fileTypeMessage} today. Use Boosts!`);
+    //   return;
+    // }
 
-    if (!file) {
-      alert(`Select a ${config.fileTypeMessage}!`);
-      return;
-    }
+    // if (!file) {
+    //   alert(`Select a ${config.fileTypeMessage}!`);
+    //   return;
+    // }
 
-    try {
-      const extension = file.name.split('.').pop();
-      const path = `${config.storagePath}${Date.now()}.${extension}`;
-      const storageRef = ref(storage, path);
+    // try {
+    //   const extension = file.name.split('.').pop();
+    //   const path = `${config.storagePath}${Date.now()}.${extension}`;
+    //   const storageRef = ref(storage, path);
 
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
+    //   await uploadBytes(storageRef, file);
+    //   const url = await getDownloadURL(storageRef);
 
-      await addDoc(collection(db, config.collectionName), {
-        url: url,
-        premium: false,
-        timestamp: serverTimestamp()
-      });
+    //   await addDoc(collection(db, config.collectionName), {
+    //     url: url,
+    //     premium: false,
+    //     timestamp: serverTimestamp()
+    //   });
 
-      localStorage.setItem(config.localStorageKey, today);
-      alert(`🎉 ${config.fileTypeMessage.charAt(0).toUpperCase() + config.fileTypeMessage.slice(1)} uploaded! It is now at the top of the homepage.`);
-    } catch (error) {
-      console.error(`Error uploading free ${config.fileTypeMessage}:`, error);
-      alert("An error occurred during upload. Please try again.");
-    }
+    //   localStorage.setItem(config.localStorageKey, today);
+    //   alert(`🎉 ${config.fileTypeMessage.charAt(0).toUpperCase() + config.fileTypeMessage.slice(1)} uploaded! It is now at the top of the homepage.`);
+    // } catch (error) {
+    //   console.error(`Error uploading free ${config.fileTypeMessage}:`, error);
+    //   alert("An error occurred during upload. Please try again.");
+    // }
   };
 
   const uploadPremiumVideo = async () => {
-    if (!file) {
-      alert("Select a video before completing the payment!");
-      throw new Error("No video selected");
-    }
+    alert("This feature is temporarily disabled.");
+    // if (!file) {
+    //   alert("Select a video before completing the payment!");
+    //   throw new Error("No video selected");
+    // }
 
-    try {
-      const path = "videos/premium_" + Date.now() + ".mp4";
-      const storageRef = ref(storage, path);
+    // try {
+    //   const path = "videos/premium_" + Date.now() + ".mp4";
+    //   const storageRef = ref(storage, path);
 
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
+    //   await uploadBytes(storageRef, file);
+    //   const url = await getDownloadURL(storageRef);
 
-      await addDoc(collection(db, "videos"), {
-        url: url,
-        premium: true,
-        boosted: true,
-        timestamp: serverTimestamp()
-      });
+    //   await addDoc(collection(db, "videos"), {
+    //     url: url,
+    //     premium: true,
+    //     boosted: true,
+    //     timestamp: serverTimestamp()
+    //   });
 
-      alert("🚀 Premium Video uploaded successfully! It is now at the TOP.");
-    } catch (error) {
-      console.error("Error uploading premium video:", error);
-      alert("An error occurred during premium upload. Please contact support.");
-      throw error;
-    }
+    //   alert("🚀 Premium Video uploaded successfully! It is now at the TOP.");
+    // } catch (error) {
+    //   console.error("Error uploading premium video:", error);
+    //   alert("An error occurred during premium upload. Please contact support.");
+    //   throw error;
+    // }
   };
 
   const createOrder = (amount: string): PayPalButtonsComponentProps['createOrder'] => (data, actions) => {
@@ -172,7 +174,7 @@ export default function SponsorPage() {
         {filePreview && (
           <div className="mt-4 max-w-md w-full">
             {activeTab === 'video' && <video id="videoPreview" controls src={filePreview} className="w-full rounded-lg"></video>}
-            {activeTab === 'audio' && <audio id="audioPreview" controls src={filePreview} className="w-full rounded-lg"></audio>}
+            {active-tab === 'audio' && <audio id="audioPreview" controls src={filePreview} className="w-full rounded-lg"></audio>}
             {activeTab === 'image' && <img id="imagePreview" src={filePreview} alt="Preview" className="w-full rounded-lg" />}
           </div>
         )}
@@ -199,7 +201,7 @@ export default function SponsorPage() {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="video">Video</TabsTrigger>
             <TabsTrigger value="audio">Audio/Music</TabsTrigger>
-            <TabsTrigger value="image">Photo/Image</TabsTrigger>
+            <TabsTrigger value="image">Image</TabsTrigger>
           </TabsList>
           <TabsContent value="video">
             {renderFileInput()}
