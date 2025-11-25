@@ -11,38 +11,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { addDoc, collection, doc, getDocs, getFirestore, query, updateDoc, orderBy, limit } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { useWallet } from '@/context/WalletContext';
+import { useSound } from '@/context/SoundContext';
 
 const { firestore: db } = initializeFirebase();
-
-
-const SOUNDS = {
-  like: 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYZNJYBOAAAAAAD/+9DEAAAGAAGn9AAAIyYmM/MPJBQAAAGkAAAAIAAABpBnP/u77/+7/v/+7BAQEBBwcEBAQ8PDz//d3/+Hu7u7u7v+7//u77/BAQf/wQEH4ICD/u///+7u7u7vd3f93f/wQeH/5znP+c5z/8xjHMYxjGMYx/8YABgAGAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+9DEUwPAAAGkAAAAIAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==',
-  scroll: 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYY4OSQVAAAAAAD/+9DEAAAGAAGn9AAAIwImM/MPJBSqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/70MRTg8AAAaQAAAAgAAA0gAAABKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqo='
-};
 
 function Feed() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [showShare, setShowShare] = useState(false);
-  const [selectedPostId, setSelectedPostId] = useState(null);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
-  const audioRefs = useRef<Record<string, HTMLAudioElement>>({});
   const { wallet, useLike } = useWallet();
-
-  const playSound = useCallback((soundName: keyof typeof SOUNDS, volume = 0.5) => {
-    try {
-      if (!audioRefs.current[soundName]) {
-        audioRefs.current[soundName] = new Audio(SOUNDS[soundName]);
-      }
-      const audio = audioRefs.current[soundName];
-      audio.volume = volume;
-      audio.currentTime = 0;
-      audio.play().catch(() => {});
-    } catch (e) {}
-  }, []);
+  const { playSound } = useSound();
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['posts'],
@@ -166,7 +149,6 @@ function Feed() {
             onLike={handleLike}
             userLikes={wallet.likes}
             isActive={index === activeIndex}
-            playSound={playSound}
             onOpenComments={() => openComments(post.id)}
             onOpenShare={() => openShare(post.id)}
           />
@@ -202,5 +184,5 @@ export default function FeedPage() {
     <QueryClientProvider client={queryClient}>
       <Feed />
     </QueryClientProvider>
-  )
+  );
 }

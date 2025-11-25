@@ -1,9 +1,8 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Heart, Upload, Sparkles, Check, Star, Zap, Crown, Gift } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { useRouter } from 'next/navigation';
 import { useWallet } from '@/context/WalletContext';
 
 const likePackages = [

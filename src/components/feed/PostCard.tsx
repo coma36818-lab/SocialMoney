@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Heart, Music, User, Volume2, VolumeX, Share2, MessageCircle, Disc3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSound } from '@/context/SoundContext';
 
 const FloatingHeart = ({ id, onComplete, color = '#FFD700' }: { id: any, onComplete: (id: any) => void, color?: string }) => {
   const randomX = Math.random() * 80 - 40;
@@ -52,7 +53,7 @@ const DoubleTapHeart = ({ show }: { show: boolean }) => (
   </AnimatePresence>
 );
 
-export function PostCard({ post, onLike, userLikes, isActive, playSound, onOpenComments, onOpenShare }: any) {
+export function PostCard({ post, onLike, userLikes, isActive, onOpenComments, onOpenShare }: any) {
   const [floatingHearts, setFloatingHearts] = useState<any[]>([]);
   const [isLiking, setIsLiking] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -61,6 +62,7 @@ export function PostCard({ post, onLike, userLikes, isActive, playSound, onOpenC
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const comments = []; // Placeholder
+  const { playSound } = useSound();
 
   useEffect(() => {
     if (isActive) {
