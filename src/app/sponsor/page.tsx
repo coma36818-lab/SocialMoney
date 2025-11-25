@@ -159,7 +159,7 @@ export default function SponsorPage() {
     };
     
     return (
-      <div className="box flex flex-col items-center py-12">
+      <div className="box flex flex-col items-center py-8">
         <h2 className="text-2xl font-bold mb-4">Free Upload</h2>
         <Input
           type="file"
@@ -220,7 +220,7 @@ export default function SponsorPage() {
               <div key={option.value} id={`boost-${option.value.split('.')[0]}`} className="text-center">
                 <p className="mb-2">{option.label} - €{option.value}</p>
                 <PayPalButtons
-                  style={{ layout: "horizontal", label: 'pay', height: 55, color: 'gold', shape: 'pill' }}
+                  style={{ layout: "horizontal", shape: "pill", color: "gold" }}
                   createOrder={createOrder(option.value)}
                   onApprove={onApprove(option.label)}
                   onError={(err) => console.error("PayPal Error:", err)}
