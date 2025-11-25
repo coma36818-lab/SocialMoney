@@ -21,6 +21,10 @@
           "type": "string",
           "description": "Nome dell'autore (opzionale)"
         },
+        "authorId": {
+          "type": "string",
+          "description": "ID univoco dell'autore"
+        },
         "description": {
           "type": "string",
           "description": "Descrizione del post"
@@ -57,7 +61,8 @@
       },
       "required": [
         "mediaUrl",
-        "mediaType"
+        "mediaType",
+        "authorId"
       ]
     },
     "Comment": {
@@ -133,7 +138,6 @@
           "type": "string",
           "enum": [
             "likePurchase",
-            "uploadPurchase",
             "withdraw"
           ],
           "description": "Type of transaction"

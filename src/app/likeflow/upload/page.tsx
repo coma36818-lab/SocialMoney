@@ -14,6 +14,15 @@ import { useWallet } from '@/context/WalletContext';
 
 const { firestore: db, storage } = initializeFirebase();
 
+const getOrCreateUserId = (): string => {
+  let userId = localStorage.getItem('likeflow_userId');
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    localStorage.setItem('likeflow_userId', userId);
+  }
+  return userId;
+};
+
 const SuccessAnimation = () => (
   <motion.div
     initial={{ opacity: 0 }}
@@ -73,6 +82,28 @@ const SuccessAnimation = () => (
     </motion.p>
   </motion.div>
 );
+
+async function uploadMedia(file: File, authorName: string, description: string) {
+  const authorId = getOrCreateUserId();
+  const storageRef = ref(storage, `uploads/${Date.now()}-${file.name}`);
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
+
+  await addDoc(collection(db, "Posts"), {
+    mediaUrl: url,
+    mediaType: file.type.startsWith("video") ? "video" : file.type.startsWith("image") ? "photo" : "audio",
+    authorName: authorName || "Anonimo",
+    authorId: authorId,
+    description: description || "",
+    likes: 0,
+    boostScore: 0,
+    creditValue: 0,
+    timestamp: serverTimestamp(),
+    boostPurchased: 0
+  });
+
+  return url;
+}
 
 export default function Upload() {
   const router = useRouter();
@@ -171,23 +202,7 @@ export default function Upload() {
     }, 200);
 
     try {
-      const storageRef = ref(storage, `posts/${Date.now()}-${formData.mediaFile.name}`);
-      await uploadBytes(storageRef, formData.mediaFile);
-      const url = await getDownloadURL(storageRef);
-
-      setUploadProgress(95);
-
-      await addDoc(collection(db, "posts"), {
-        mediaUrl: url,
-        mediaType: formData.mediaFile.type.startsWith("video") ? "video" : formData.mediaFile.type.startsWith("image") ? "photo" : "audio",
-        authorName: formData.authorName || "Anonimo",
-        description: formData.description || "",
-        likes: 0,
-        boostScore: 0,
-        creditValue: 0,
-        timestamp: serverTimestamp(),
-        boostPurchased: 0
-      });
+      await uploadMedia(formData.mediaFile, formData.authorName, formData.description);
 
       setUploadProgress(100);
       clearInterval(progressInterval);

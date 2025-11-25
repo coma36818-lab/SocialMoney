@@ -3,10 +3,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    match /posts/{docId} {
+    match /Posts/{docId} {
       allow read: if true;
       allow write: if request.resource.data.keys().hasOnly([
-        'mediaUrl', 'mediaType', 'authorName', 'description', 'likes', 'likesWeek', 'timestamp', 'boostScore', 'creditValue', 'boostPurchased'
+        'mediaUrl', 'mediaType', 'authorName', 'authorId', 'description', 'likes', 'likesWeek', 'timestamp', 'boostScore', 'creditValue', 'boostPurchased'
       ]);
     }
 
@@ -20,12 +20,12 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    match /transactions/{transactionId} {
+    match /Transactions/{transactionId} {
       allow read: if true;
-      allow write: if request.resource.data.keys().hasOnly(['userId', 'postId', 'likeCount', 'uploadCount', 'pricePaid', 'paypalTxId', 'type', 'timestamp']);
+      allow write: if request.resource.data.keys().hasOnly(['userId', 'postId', 'likeCount', 'pricePaid', 'paypalTxId', 'type', 'timestamp']);
     }
 
-    match /wallets/{walletId} {
+    match /Wallets/{walletId} {
       allow read, write: if true;
     }
   }

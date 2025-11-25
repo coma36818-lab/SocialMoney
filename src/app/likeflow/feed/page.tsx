@@ -8,12 +8,60 @@ import { CommentsSheet } from '@/components/feed/CommentsSheet';
 import ShareSheet from '@/components/feed/ShareSheet';
 import { Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { addDoc, collection, doc, getDocs, getFirestore, query, updateDoc, orderBy, limit } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, getFirestore, query, updateDoc, orderBy, limit, increment, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { useWallet } from '@/context/WalletContext';
 import { useSound } from '@/context/SoundContext';
 
 const { firestore: db } = initializeFirebase();
+
+// Funzione per ottenere/creare un userId unico nel localStorage
+const getOrCreateUserId = (): string => {
+  let userId = localStorage.getItem('likeflow_userId');
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    localStorage.setItem('likeflow_userId', userId);
+  }
+  return userId;
+};
+
+
+// Logica di acquisto like
+async function buyLikes(postId: string, likeCount: number, priceEuro: number, paypalTxId: string) {
+  const localUserId = getOrCreateUserId();
+  
+  // Aggiorna post
+  const postRef = doc(db, "Posts", postId);
+  await updateDoc(postRef, {
+    likes: increment(likeCount),
+    creditValue: increment(likeCount * 0.01) // 1 like = 0.01€
+  });
+
+  // Wallet autore
+  const postSnap = await getDoc(postRef);
+  const postData = postSnap.data();
+  const authorId = postData?.authorId || localUserId; // Usa l'authorId del post o il localUserId come fallback
+  
+  const walletRef = doc(db, "Wallets", authorId);
+  await setDoc(walletRef, {
+    credit: increment(likeCount * 0.01 * 0.85), // 15% commissione
+    commission: increment(likeCount * 0.01 * 0.15),
+    lastUpdate: serverTimestamp(),
+    userId: authorId // Assicurati che l'ID utente sia nel wallet
+  }, { merge: true });
+
+  // Registra transazione
+  await addDoc(collection(db, "Transactions"), {
+    userId: localUserId,
+    postId,
+    likeCount,
+    pricePaid: priceEuro,
+    paypalTxId,
+    type: "likePurchase",
+    timestamp: serverTimestamp()
+  });
+}
+
 
 function Feed() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -30,7 +78,7 @@ function Feed() {
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['posts'],
     queryFn: async () => {
-      const postsRef = collection(db, "posts");
+      const postsRef = collection(db, "Posts");
       const q = query(postsRef, orderBy("timestamp", "desc"), limit(100));
       const snap = await getDocs(q);
       return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -39,14 +87,9 @@ function Feed() {
 
   const likeMutation = useMutation({
     mutationFn: async (postId: string) => {
-      const post = posts.find((p: any) => p.id === postId);
-      if (post) {
-        const postRef = doc(db, "posts", postId);
-        await updateDoc(postRef, {
-            likes: (post.likes || 0) + 1,
-            likesWeek: (post.likesWeek || 0) + 1
-        });
-      }
+      // In a real scenario, you might trigger a purchase flow here.
+      // For this example, we'll simulate a 1-like "purchase".
+      await buyLikes(postId, 1, 0.02, `sim_like_${Date.now()}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -54,12 +97,12 @@ function Feed() {
   });
 
   const handleLike = (postId: string) => {
-    if (!useLike()) {
-      setShowBuyModal(true);
-      return;
-    }
+    // The logic to check for available likes is now implicitly handled by whatever
+    // mechanism you use to charge the user. Here we just call the mutation.
     likeMutation.mutate(postId);
+    playSound('like', 0.6);
   };
+  
 
   const handleScroll = useCallback(() => {
     if (containerRef.current) {
@@ -147,7 +190,7 @@ function Feed() {
             key={post.id}
             post={post}
             onLike={handleLike}
-            userLikes={wallet.likes}
+            userLikes={wallet.likes} // This prop might be deprecated if likes are infinite now
             isActive={index === activeIndex}
             onOpenComments={() => openComments(post.id)}
             onOpenShare={() => openShare(post.id)}
