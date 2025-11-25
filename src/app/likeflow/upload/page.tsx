@@ -253,7 +253,7 @@ export default function Upload() {
         </div>
       </motion.div>
 
-      <div className="px-4 py-4 max-w-lg mx-auto">
+      <div className="px-4 py-8 md:py-12 max-w-lg mx-auto">
         {/* Error message */}
         <AnimatePresence>
           {error && (
