@@ -1,15 +1,7 @@
 
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { AppHeader } from '@/components/header';
-import { AppFooter } from '@/components/footer';
-import { cn } from '@/lib/utils';
-import { Toaster } from '@/components/ui/toaster';
-import { CookieBanner } from '@/components/cookie-banner';
-import { ScrollToTop } from '@/components/scroll-to-top';
-import Script from 'next/script';
-import { WalletProvider } from '@/context/WalletContext';
-import { SoundProvider } from '@/context/SoundContext';
+import { LayoutProvider } from '@/components/layout-provider';
 
 const siteConfig = {
   name: 'MyDatinGame',
@@ -124,33 +116,8 @@ export default function RootLayout({
           `}
         </script>
       </head>
-      <body className={cn("font-body antialiased", )}>
-        <WalletProvider>
-          <SoundProvider>
-            <div className="bg-animation"></div>
-            <div className="relative z-10 flex min-h-screen flex-col">
-              <AppHeader />
-              <main className="flex-1">{children}</main>
-              <AppFooter />
-            </div>
-            <Toaster />
-            <CookieBanner />
-            <ScrollToTop />
-            <Script id="service-worker-script">
-              {`
-                if ('serviceWorker' in navigator) {
-                  window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/service-worker.js').then(registration => {
-                      console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    }, err => {
-                      console.log('ServiceWorker registration failed: ', err);
-                    });
-                  });
-                }
-              `}
-            </Script>
-          </SoundProvider>
-        </WalletProvider>
+      <body>
+        <LayoutProvider>{children}</LayoutProvider>
       </body>
     </html>
   );

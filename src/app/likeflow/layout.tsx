@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useWallet } from '@/context/WalletContext';
 import { usePathname } from 'next/navigation';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AppHeader } from '@/components/header';
 
 const navItems = [
   { name: 'Feed', icon: Home, page: '/likeflow/feed' },
@@ -66,7 +67,8 @@ export default function LikeFlowLayout({ children }: { children: React.ReactNode
               filter: blur(0.5px);
             }
           `}</style>
-
+          
+          <AppHeader />
           <main className="h-[100dvh]">
             {children}
           </main>
