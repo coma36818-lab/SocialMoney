@@ -20,7 +20,7 @@ export function Hero() {
               <Link href="#real-news">Explore Now</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="backdrop-blur-sm">
-              <Link href="#join-creators">Join Us</Link>
+              <Link href="/likeflow/feed">Join Us</Link>
             </Button>
           </div>
         </div>
