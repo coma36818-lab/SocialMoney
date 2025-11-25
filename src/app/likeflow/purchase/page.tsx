@@ -1,45 +1,74 @@
-
 'use client';
 import { useEffect } from 'react';
 import Head from 'next/head';
 
 export default function PurchasePage() {
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://www.paypal.com/sdk/js?client-id=sb&currency=EUR';
-    document.body.appendChild(script);
+    // Attach the buyPack function to the window object
+    (window as any).buyPack = (id: number) => {
+        const pack: { likes: number; price: number } | undefined = {
+            1: { likes: 10, price: 1.00 },
+            2: { likes: 60, price: 3.00 },
+            3: { likes: 150, price: 5.00 }
+        }[id as keyof typeof pack];
 
-    const likeflowScript = document.createElement('script');
-    likeflowScript.type = 'module';
-    likeflowScript.src = '/paypal.js';
-    document.body.appendChild(likeflowScript);
-    
-    return () => {
-        if(script.parentNode) document.body.removeChild(script);
-        if(likeflowScript.parentNode) document.body.removeChild(likeflowScript);
+        if (!pack) return;
+
+        // open paypal
+        window.open(
+            "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=alibi81@libero.it" +
+            "&currency_code=EUR&amount=" + pack.price +
+            "&item_name=Acquisto+" + pack.likes + "+Like",
+            "_blank"
+        );
+
+        // SIMULATION (PayPal redirect IPN)
+        setTimeout(() => {
+            const currentWallet = parseInt(localStorage.getItem("wallet") || "0");
+            localStorage.setItem("wallet", (currentWallet + pack.likes).toString());
+            alert("Like ricevuti!");
+            window.location.href = "/likeflow/feed";
+        }, 3000);
     };
   }, []);
 
   return (
     <>
       <Head>
-        <title>LikeFlow - Buy Likes</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Compra Like</title>
+        <link rel="stylesheet" href="/styles.css" />
       </Head>
-      <div className="container mx-auto px-4 py-12 text-white">
-        <h1 className="text-4xl font-bold text-center mb-8" style={{ color: 'gold' }}>Buy Like Packs</h1>
-        <div className="max-w-md mx-auto">
-            <div className="box">
-                <h2>💛 Buy Like Packs</h2>
-                <div id="likes50" className="mb-4"></div>
-                <div id="likes200" className="mb-4"></div>
-                <div id="likes500" className="mb-4"></div>
-                <div id="likes1500"></div>
+      <body>
+        <h1 className="title">❤️ Compra Like</h1>
+        <div className="upload-container">
+            <div className="pack" onClick={() => (window as any).buyPack(1)}>
+                <h2>10 Like</h2>
+                <p>€1.00</p>
+            </div>
+            <div className="pack" onClick={() => (window as any).buyPack(2)}>
+                <h2>60 Like</h2>
+                <p>€3.00</p>
+            </div>
+            <div className="pack" onClick={() => (window as any).buyPack(3)}>
+                <h2>150 Like</h2>
+                <p>€5.00</p>
             </div>
         </div>
-      </div>
+        <style jsx>{`
+            .pack {
+                background: #111;
+                border: 2px solid gold;
+                padding: 20px;
+                margin: 15px 0;
+                text-align: center;
+                border-radius: 12px;
+                cursor: pointer;
+            }
+            .pack h2 {
+                color: gold;
+            }
+        `}</style>
+      </body>
     </>
   );
 }
-
-    
