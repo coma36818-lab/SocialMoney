@@ -160,7 +160,7 @@ export default function SponsorPage() {
     };
     
     return (
-      <div className="box flex flex-col items-center py-8">
+      <div className="box flex flex-col items-center">
         <h2 className="text-2xl font-bold mb-4">Free Upload</h2>
         <Input
           type="file"
@@ -177,7 +177,7 @@ export default function SponsorPage() {
             {activeTab === 'image' && <img id="imagePreview" src={filePreview} alt="Preview" className="w-full rounded-lg" />}
           </div>
         )}
-        <div className="upload-btn" onClick={uploadFreeFile}>
+        <div className="upload-btn mt-4" onClick={uploadFreeFile}>
           Upload for Free
         </div>
       </div>
