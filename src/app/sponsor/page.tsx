@@ -176,7 +176,7 @@ export default function SponsorPage() {
             {activeTab === 'image' && <img id="imagePreview" src={filePreview} alt="Preview" className="w-full rounded-lg" />}
           </div>
         )}
-        <div className="upload-btn mt-4" onClick={uploadFreeFile}>
+        <div className="upload-btn mt-8" onClick={uploadFreeFile}>
           Upload for Free
         </div>
       </div>
