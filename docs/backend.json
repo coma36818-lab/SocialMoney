@@ -62,7 +62,11 @@
       "required": [
         "mediaUrl",
         "mediaType",
-        "authorId"
+        "authorId",
+        "likes",
+        "boostScore",
+        "creditValue",
+        "timestamp"
       ]
     },
     "Comment": {
@@ -143,7 +147,8 @@
           "enum": [
             "likePurchase",
             "withdraw",
-            "boostPurchase"
+            "boostPurchase",
+            "uploadPurchase"
           ],
           "description": "Type of transaction"
         },
@@ -260,7 +265,6 @@
           ]
         }
       }
-    ],
-    "reasoning": "The Firestore structure is designed to support the core features of the MyDatingame platform, focusing on posts, user engagement (likes), and content submission. The primary collection is `posts`, storing all social media posts.  The structure enforces authorization independence by not requiring `get()` calls in security rules, enabling atomic operations, and enhancing debuggability.  Structural segregation ensures that all documents within a collection share the same security requirements. \n\nAuthorization Independence (Denormalization): The structure avoids hierarchical authorization dependencies. Since all users can view posts and 'like' them, no denormalization of user data into the Post is required. If more complex access control was required (e.g. posts visible only to certain user groups), the group membership information would be denormalized directly into the `Post` documents.\n\nQAPs (Rules are not Filters): The structure supports secure `list` operations.  Posts are stored in a single collection, allowing for listing of posts without complex filtering logic.  Because authorization is not based on user roles and anyone can 'like' a post, security rules are simplified without needing to filter based on user-specific attributes.  Future implementations of user-specific data (e.g. drafts) would be segregated into user-specific subcollections to avoid filtering."
+    ]
   }
 }

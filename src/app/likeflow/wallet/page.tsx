@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Heart, Upload, Wallet as WalletIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useWallet } from '@/context/WalletContext';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase, setDocumentNonBlocking, addDocumentNonBlocking } from '@/firebase';
 import { addDoc, collection, serverTimestamp, doc, getDoc, setDoc, increment } from 'firebase/firestore';
 
 const { firestore: db } = initializeFirebase();
@@ -41,8 +41,8 @@ async function withdrawCredits(localUserId: string) {
     const paypalTxId = await createPayPalPayment(creditToWithdraw);
 
     // 2. Update wallet and record transaction
-    await setDoc(walletRef, { credit: 0, lastUpdate: serverTimestamp() }, { merge: true });
-    await addDoc(collection(db, "Transactions"), {
+    setDocumentNonBlocking(walletRef, { credit: 0, lastUpdate: serverTimestamp() }, { merge: true });
+    addDocumentNonBlocking(collection(db, "Transactions"), {
       userId: localUserId,
       pricePaid: creditToWithdraw,
       paypalTxId,

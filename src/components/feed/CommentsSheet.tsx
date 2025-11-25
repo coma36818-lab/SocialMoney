@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Input } from '@/components/ui/input';
 import { collection, addDoc, query, where, onSnapshot, serverTimestamp, orderBy } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase, addDocumentNonBlocking } from '@/firebase';
 
 const { firestore: db } = initializeFirebase();
 
@@ -38,10 +38,11 @@ export function CommentsSheet({ isOpen, onClose, postId }: { isOpen: boolean, on
 
   const addCommentMutation = useMutation({
     mutationFn: (data: { postId: string, authorName: string, text: string }) => {
-        return addDoc(collection(db, "comments"), {
-            ...data,
-            timestamp: serverTimestamp()
-        });
+        const commentData = {
+          ...data,
+          timestamp: serverTimestamp()
+        };
+        return addDocumentNonBlocking(collection(db, "comments"), commentData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });

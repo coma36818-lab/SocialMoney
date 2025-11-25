@@ -11,8 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useWallet } from '@/context/WalletContext';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+import { addDocumentNonBlocking } from '@/firebase';
 
 const { firestore: db, storage } = initializeFirebase();
 
@@ -45,7 +44,6 @@ const SuccessAnimation = () => (
       >
         <Check className="w-12 h-12 text-black" />
       </motion.div>
-      {/* Confetti particles */}
       {[...Array(12)].map((_, i) => (
         <motion.div
           key={i}
@@ -105,19 +103,7 @@ async function uploadMedia(file: File, authorName: string, description: string) 
     boostPurchased: 0
   };
 
-  const collectionRef = collection(db, "Posts");
-  
-  addDoc(collectionRef, postData)
-    .catch(error => {
-        errorEmitter.emit(
-          'permission-error',
-          new FirestorePermissionError({
-            path: collectionRef.path,
-            operation: 'create',
-            requestResourceData: postData,
-          })
-        )
-      });
+  addDocumentNonBlocking(collection(db, "Posts"), postData);
 
   return url;
 }
@@ -233,9 +219,6 @@ export default function Upload() {
 
     } catch (err) {
       clearInterval(progressInterval);
-      // The specific error is now thrown globally by the error emitter
-      // so we don't need to console.error here. We can still show a generic
-      // message to the user if we want.
       setError('Errore durante il caricamento. Riprova.');
     } finally {
       setIsUploading(false);
@@ -253,12 +236,10 @@ export default function Upload() {
 
   return (
     <div className="min-h-screen bg-black pb-36 pt-8 md:pt-12 overflow-y-auto">
-      {/* Success animation */}
       <AnimatePresence>
         {success && <SuccessAnimation />}
       </AnimatePresence>
 
-      {/* Header */}
       <motion.div 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -281,7 +262,6 @@ export default function Upload() {
       </motion.div>
 
       <div className="px-4 py-8 md:py-12 max-w-lg mx-auto">
-        {/* Error message */}
         <AnimatePresence>
           {error && (
             <motion.div
@@ -298,7 +278,6 @@ export default function Upload() {
           )}
         </AnimatePresence>
 
-        {/* Media upload area */}
         <motion.div 
           className="mb-6"
           initial={{ opacity: 0, y: 20 }}
@@ -312,7 +291,6 @@ export default function Upload() {
               onClick={() => fileInputRef.current?.click()}
               className="w-full aspect-[9/16] max-h-[400px] rounded-3xl border-2 border-dashed border-[#333] bg-gradient-to-br from-[#111] to-[#0a0a0a] flex flex-col items-center justify-center gap-6 transition-all overflow-hidden relative"
             >
-              {/* Animated background */}
               <div className="absolute inset-0 overflow-hidden">
                 <motion.div
                   className="absolute w-96 h-96 rounded-full bg-[#FFD700]/5 blur-3xl"
@@ -340,7 +318,6 @@ export default function Upload() {
                 <p className="text-gray-600 text-xs mt-1">Max 20MB</p>
               </div>
 
-              {/* Quick action buttons */}
               <div className="flex gap-4 mt-2 relative z-10">
                 <motion.div 
                   whileHover={{ scale: 1.1 }}
@@ -411,7 +388,6 @@ export default function Upload() {
                 </div>
               )}
               
-              {/* Remove button */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -421,7 +397,6 @@ export default function Upload() {
                 <X className="w-5 h-5 text-white" />
               </motion.button>
               
-              {/* Media type badge */}
               <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-black/70 backdrop-blur-sm rounded-full px-4 py-2">
                 {getMediaIcon()}
                 <span className="text-white text-sm font-medium capitalize">{formData.mediaType}</span>
@@ -438,7 +413,6 @@ export default function Upload() {
           />
         </motion.div>
 
-        {/* Author section */}
         <motion.div 
           className="mb-6 p-4 rounded-2xl bg-[#111] border border-[#222]"
           initial={{ opacity: 0, y: 20 }}
@@ -496,7 +470,6 @@ export default function Upload() {
           />
         </motion.div>
 
-        {/* Description */}
         <motion.div 
           className="mb-8"
           initial={{ opacity: 0, y: 20 }}
@@ -512,7 +485,6 @@ export default function Upload() {
           />
         </motion.div>
 
-        {/* Upload progress */}
         <AnimatePresence>
           {isUploading && (
             <motion.div
@@ -536,7 +508,6 @@ export default function Upload() {
           )}
         </AnimatePresence>
 
-        {/* Submit button */}
         <motion.button
           whileHover={{ scale: formData.mediaFile && !isUploading ? 1.02 : 1 }}
           whileTap={{ scale: formData.mediaFile && !isUploading ? 0.98 : 1 }}
@@ -561,7 +532,6 @@ export default function Upload() {
           )}
         </motion.button>
 
-        {/* Low uploads warning */}
         {wallet.uploads <= 1 && !isUploading && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

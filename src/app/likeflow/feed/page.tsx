@@ -9,11 +9,9 @@ import ShareSheet from '@/components/feed/ShareSheet';
 import { Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { addDoc, collection, doc, getDocs, getFirestore, query, updateDoc, orderBy, limit, increment, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase, updateDocumentNonBlocking } from '@/firebase';
 import { useWallet } from '@/context/WalletContext';
 import { useSound } from '@/context/SoundContext';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
 
 const { firestore: db } = initializeFirebase();
 
@@ -26,76 +24,6 @@ const getOrCreateUserId = (): string => {
   }
   return userId;
 };
-
-
-// Logica di acquisto like
-async function buyLikes(postId: string, likeCount: number, priceEuro: number, paypalTxId: string) {
-  const localUserId = getOrCreateUserId();
-  
-  // Aggiorna post
-  const postRef = doc(db, "Posts", postId);
-  updateDoc(postRef, {
-    likes: increment(likeCount),
-    likesWeek: increment(likeCount),
-    creditValue: increment(likeCount * 0.01) // 1 like = 0.01€
-  }).catch(error => {
-    errorEmitter.emit(
-        'permission-error',
-        new FirestorePermissionError({
-        path: postRef.path,
-        operation: 'update',
-        requestResourceData: { likes: 'increment', likesWeek: 'increment', creditValue: 'increment' },
-        })
-    )
-  });
-
-
-  // Wallet autore
-  const postSnap = await getDoc(postRef);
-  const postData = postSnap.data();
-  const authorId = postData?.authorId || localUserId; // Usa l'authorId del post o il localUserId come fallback
-  
-  const walletRef = doc(db, "Wallets", authorId);
-  const walletUpdateData = {
-    credit: increment(likeCount * 0.01 * 0.85), // 15% commissione
-    commission: increment(likeCount * 0.01 * 0.15),
-    lastUpdate: serverTimestamp(),
-    userId: authorId // Assicurati che l'ID utente sia nel wallet
-  };
-  setDoc(walletRef, walletUpdateData, { merge: true }).catch(error => {
-    errorEmitter.emit(
-        'permission-error',
-        new FirestorePermissionError({
-        path: walletRef.path,
-        operation: 'update',
-        requestResourceData: walletUpdateData,
-        })
-    )
-  });
-
-
-  // Registra transazione
-  const transactionData = {
-    userId: localUserId,
-    postId,
-    likeCount,
-    pricePaid: priceEuro,
-    paypalTxId,
-    type: "likePurchase",
-    timestamp: serverTimestamp()
-  };
-  const transactionsCollectionRef = collection(db, "Transactions");
-  addDoc(transactionsCollectionRef, transactionData).catch(error => {
-    errorEmitter.emit(
-        'permission-error',
-        new FirestorePermissionError({
-        path: transactionsCollectionRef.path,
-        operation: 'create',
-        requestResourceData: transactionData,
-        })
-    )
-  });
-}
 
 
 function Feed() {
@@ -122,9 +50,11 @@ function Feed() {
 
   const likeMutation = useMutation({
     mutationFn: async (postId: string) => {
-      // In a real scenario, you might trigger a purchase flow here.
-      // For this example, we'll simulate a 1-like "purchase".
-      await buyLikes(postId, 1, 0.02, `sim_like_${Date.now()}`);
+      const postRef = doc(db, "Posts", postId);
+      updateDocumentNonBlocking(postRef, {
+        likes: increment(1),
+        likesWeek: increment(1)
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -132,8 +62,6 @@ function Feed() {
   });
 
   const handleLike = (postId: string) => {
-    // The logic to check for available likes is now implicitly handled by whatever
-    // mechanism you use to charge the user. Here we just call the mutation.
     likeMutation.mutate(postId);
     playSound('like', 0.6);
   };
