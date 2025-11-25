@@ -225,7 +225,7 @@ export default function Upload() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-black pb-8 pt-16 overflow-y-auto">
+    <div className="min-h-[100dvh] bg-black pb-28 pt-16 overflow-y-auto">
       {/* Success animation */}
       <AnimatePresence>
         {success && <SuccessAnimation />}
