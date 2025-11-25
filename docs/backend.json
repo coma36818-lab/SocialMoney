@@ -77,6 +77,29 @@
         "post_id",
         "text"
       ]
+    },
+    "LikePackage": {
+      "name": "LikePackage",
+      "type": "object",
+      "properties": {
+        "packageName": {
+          "type": "string",
+          "description": "Name of the like package"
+        },
+        "likeCount": {
+          "type": "number",
+          "description": "Number of likes in the package"
+        },
+        "priceEuro": {
+          "type": "number",
+          "description": "Price of the package in Euro"
+        }
+      },
+      "required": [
+        "packageName",
+        "likeCount",
+        "priceEuro"
+      ]
     }
   },
   "auth": {
@@ -111,6 +134,16 @@
             "$ref": "#/backend/entities/Comment"
           },
           "description": "Stores comments for posts."
+        }
+      },
+      {
+        "path": "likePackages/{packageId}",
+        "definition": {
+          "entityName": "LikePackage",
+          "schema": {
+            "$ref": "#/backend/entities/LikePackage"
+          },
+          "description": "Stores purchasable like packages."
         }
       }
     ],

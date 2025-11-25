@@ -6,9 +6,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useWallet } from '@/context/WalletContext';
 
 const likePackages = [
-  { id: 1, likes: 10, price: 1.00, popular: false, icon: Heart },
-  { id: 2, likes: 60, price: 3.00, popular: true, savings: '50%', icon: Zap },
-  { id: 3, likes: 150, price: 5.00, popular: false, savings: '67%', icon: Crown }
+  { id: 1, likes: 50, price: 1.00, popular: false, icon: Heart },
+  { id: 2, likes: 150, price: 2.50, popular: true, savings: '17%', icon: Zap },
+  { id: 3, likes: 300, price: 4.50, popular: false, savings: '25%', icon: Crown }
 ];
 
 const uploadPackages = [
@@ -80,7 +80,7 @@ export default function Packages() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-black pb-28 pt-16 overflow-y-auto">
+    <div className="min-h-[100dvh] bg-black pb-36 pt-16 overflow-y-auto">
       {/* Animated background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <motion.div
@@ -148,7 +148,7 @@ export default function Packages() {
                 </div>
                 <motion.p 
                   key={wallet.likes}
-                  initial={{ scale: 1.5, color: '#FFD700' }}
+                  initial={{ scale: 1.5, color: '#FFFFFF' }}
                   animate={{ scale: 1, color: '#FFFFFF' }}
                   className="text-white text-3xl font-bold"
                 >
@@ -172,7 +172,7 @@ export default function Packages() {
                 </div>
                 <motion.p 
                   key={wallet.uploads}
-                  initial={{ scale: 1.5, color: '#A855F7' }}
+                  initial={{ scale: 1.5, color: '#FFFFFF' }}
                   animate={{ scale: 1, color: '#FFFFFF' }}
                   className="text-white text-3xl font-bold"
                 >
