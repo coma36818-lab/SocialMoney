@@ -1,3 +1,4 @@
+
 'use client';
 import React from 'react';
 import { useQuery, QueryClientProvider, QueryClient } from '@tanstack/react-query';
@@ -7,6 +8,7 @@ import { initializeFirebase } from '@/firebase';
 import { getDocs, collection, query, orderBy, limit } from 'firebase/firestore';
 
 const { firestore: db } = initializeFirebase();
+const queryClient = new QueryClient();
 
 const getRankIcon = (index: number) => {
   switch (index) {
@@ -193,8 +195,8 @@ function Ranking() {
                   key={i}
                   className="absolute"
                   style={{ 
-                    left: `${20 + i * 15}%`, 
-                    top: `${10 + (i % 3) * 20}%` 
+                    left: `${'${'}20 + i * 15}%`, 
+                    top: `${'${'}10 + (i % 3) * 20}%` 
                   }}
                   animate={{ 
                     y: [0, -20, 0],
@@ -222,7 +224,7 @@ function Ranking() {
             </div>
             
             <div className="space-y-3">
-              {rankedPosts.map((post: any, index) => (
+              {rankedPosts.map((post: any, index: number) => (
                 <motion.div
                   key={post.id}
                   initial={{ opacity: 0, x: -30 }}
@@ -301,4 +303,12 @@ function Ranking() {
       )}
     </div>
   );
+}
+
+export default function TopPage() {
+    return (
+        <QueryClientProvider client={queryClient}>
+            <Ranking />
+        </QueryClientProvider>
+    )
 }
