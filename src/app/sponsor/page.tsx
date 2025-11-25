@@ -66,7 +66,7 @@ export default function SponsorPage() {
     const today = new Date().toDateString();
 
     if (lastUpload === today) {
-      alert(`You have already uploaded 1 ${config.fileTypeMessage} today. Use Boost Videos!`);
+      alert(`You have already uploaded 1 ${config.fileTypeMessage} today. Use Boosts!`);
       return;
     }
 
@@ -159,7 +159,7 @@ export default function SponsorPage() {
     };
     
     return (
-      <div className="box flex flex-col items-center py-8">
+      <div className="box flex flex-col items-center py-12">
         <h2 className="text-2xl font-bold mb-4">Free Upload</h2>
         <Input
           type="file"
