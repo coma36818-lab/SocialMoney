@@ -56,8 +56,6 @@ export default function LikeFlowPage() {
               padding: 10px;
               border-radius: 8px;
               border: none;
-              background: #222;
-              color: #fff;
           }
       
           .upload-box {
@@ -77,7 +75,6 @@ export default function LikeFlowPage() {
               color: #000;
               font-weight: bold;
               margin-top: 15px;
-              cursor: pointer;
           }
         `}</style>
       </Head>
