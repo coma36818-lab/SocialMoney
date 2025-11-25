@@ -212,9 +212,9 @@ export default function SponsorPage() {
           </TabsContent>
         </Tabs>
         
-        <div className="box flex flex-col items-center mt-12">
-          <h2 className="text-2xl font-bold mb-2 text-center">Want to upload more videos today?</h2>
-          <p className="text-muted-foreground mb-6 text-center">Buy Boost Videos and get to the TOP of the homepage RIGHT AWAY.</p>
+        <div className="box flex flex-col items-center mt-12 py-8">
+          <h2 className="text-2xl font-bold mb-2 text-center">Want to upload more content today?</h2>
+          <p className="text-muted-foreground mb-6 text-center">Buy Boosts and get to the TOP of the homepage RIGHT AWAY.</p>
           <div className="space-y-4">
             {boostOptions.map(option => (
               <div key={option.value} id={`boost-${option.value.split('.')[0]}`} className="text-center">
