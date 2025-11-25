@@ -111,6 +111,16 @@ export default function RootLayout({
         })}} />
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5195762211359589" crossOrigin="anonymous"></script>
         <meta name="google-adsense-account" content="ca-pub-5195762211359589" />
+        <link rel="manifest" href="/manifest.json" />
+        <script>
+          {`
+            if ("serviceWorker" in navigator) {
+              window.addEventListener("load", () => {
+                navigator.serviceWorker.register("/service-worker.js");
+              });
+            }
+          `}
+        </script>
       </head>
       <body className={cn("font-body antialiased", )}>
           <div className="bg-animation"></div>
