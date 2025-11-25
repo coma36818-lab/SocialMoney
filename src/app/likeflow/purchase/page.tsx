@@ -4,6 +4,13 @@ import Head from 'next/head';
 
 export default function PurchasePage() {
   useEffect(() => {
+    // This script now handles all LikeFlow logic.
+    // Ensure it's correctly placed in the /public folder.
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = '/likeflow.js';
+    document.body.appendChild(script);
+
     // Attach the buyPack function to the window object
     (window as any).buyPack = (id: number) => {
         const pack: { likes: number; price: number } | undefined = {
@@ -24,12 +31,17 @@ export default function PurchasePage() {
 
         // SIMULATION (PayPal redirect IPN)
         setTimeout(() => {
-            const currentWallet = parseInt(localStorage.getItem("wallet") || "0");
-            localStorage.setItem("wallet", (currentWallet + pack.likes).toString());
+            (window as any).addWallet(pack.likes);
             alert("Like ricevuti!");
             window.location.href = "/likeflow/feed";
         }, 3000);
     };
+
+    return () => {
+        if (script.parentNode) {
+            script.parentNode.removeChild(script);
+        }
+    }
   }, []);
 
   return (
@@ -38,37 +50,25 @@ export default function PurchasePage() {
         <title>Compra Like</title>
         <link rel="stylesheet" href="/styles.css" />
       </Head>
-      <body>
-        <h1 className="title">❤️ Compra Like</h1>
-        <div className="upload-container">
-            <div className="pack" onClick={() => (window as any).buyPack(1)}>
-                <h2>10 Like</h2>
-                <p>€1.00</p>
-            </div>
-            <div className="pack" onClick={() => (window as any).buyPack(2)}>
-                <h2>60 Like</h2>
-                <p>€3.00</p>
-            </div>
-            <div className="pack" onClick={() => (window as any).buyPack(3)}>
-                <h2>150 Like</h2>
-                <p>€5.00</p>
-            </div>
+      
+      <h1 className="title">❤️ Compra Like</h1>
+
+      <div className="upload-container">
+        <div className="pack" onClick={() => (window as any).buyPack(1)}>
+            <h2>10 Like</h2>
+            <p>€1.00</p>
         </div>
-        <style jsx>{`
-            .pack {
-                background: #111;
-                border: 2px solid gold;
-                padding: 20px;
-                margin: 15px 0;
-                text-align: center;
-                border-radius: 12px;
-                cursor: pointer;
-            }
-            .pack h2 {
-                color: gold;
-            }
-        `}</style>
-      </body>
+
+        <div className="pack" onClick={() => (window as any).buyPack(2)}>
+            <h2>60 Like</h2>
+            <p>€3.00</p>
+        </div>
+
+        <div className="pack" onClick={() => (window as any).buyPack(3)}>
+            <h2>150 Like</h2>
+            <p>€5.00</p>
+        </div>
+      </div>
     </>
   );
 }

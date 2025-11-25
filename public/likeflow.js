@@ -43,17 +43,17 @@ export function updateWalletUI() {
 // -------------------------------
 // UPLOAD POST
 // -------------------------------
-window.uploadPost = async function() {
+async function uploadPost() {
     const fileInput = document.getElementById("mediaFile");
     if (!fileInput) return;
     const file = fileInput.files[0];
     if (!file) return alert("Carica un file!");
 
     const authorNameInput = document.getElementById("authorName");
-    const authorName = authorNameInput ? authorNameInput.value || "" : "";
-
+    const authorName = authorNameInput ? authorNameInput.value : "";
+    
     const postDescInput = document.getElementById("postDesc");
-    const postDesc = postDescInput ? postDescInput.value || "" : "";
+    const postDesc = postDescInput ? postDescInput.value : "";
     
     const authorPhotoInput = document.getElementById("authorPhoto");
     const authorPhotoFile = authorPhotoInput ? authorPhotoInput.files[0] : null;
@@ -81,8 +81,10 @@ window.uploadPost = async function() {
     });
 
     alert("Post pubblicato!");
-    location.href = "feed";
+    location.href = "/likeflow/feed";
 }
+
+window.uploadPost = uploadPost;
 
 // -------------------------------
 // LOAD FEED
@@ -111,23 +113,20 @@ async function loadFeed() {
             ${mediaHTML}
 
             <div class="post-info">
-                <img src="${d.authorPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80'}" class="author-photo">
+                <img src="${d.authorPhoto || '/default-avatar.png'}" class="author-photo">
                 <div class="author-name">${d.authorName || "Anonimo"}</div>
                 <div class="post-desc">${d.postDesc || ""}</div>
             </div>
 
             <button class="like-btn" onclick="likePost('${p.id}', this)">
-                ❤️ <span>${d.likes}</span>
+                ❤️ <span>${d.likes || 0}</span>
             </button>
         </div>`;
     });
 }
 
-if (document.getElementById("feedContainer")) {
+if (window.location.pathname.endsWith('/feed')) {
     loadFeed();
-}
-
-if (document.getElementById("walletValue")) {
     updateWalletUI();
 }
 
@@ -143,11 +142,8 @@ window.likePost = async function (postId, btn) {
     span.innerText = newLikes;
 
     const postRef = doc(db, "posts", postId);
-    
-    // To keep this simple, we'll update both likes and likesWeek to the same value.
-    // In a real app, likesWeek might involve more complex logic.
     await updateDoc(postRef, {
         likes: newLikes,
-        likesWeek: newLikes 
+        likesWeek: newLikes
     });
 };
