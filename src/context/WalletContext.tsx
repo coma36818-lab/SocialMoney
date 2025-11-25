@@ -20,33 +20,38 @@ const INITIAL_LIKES = 5;
 const INITIAL_UPLOADS = 3;
 
 export function WalletProvider({ children }: { children: ReactNode }) {
-  const [wallet, setWallet] = useState<Wallet>(() => {
-    if (typeof window === 'undefined') {
-      return { likes: INITIAL_LIKES, uploads: INITIAL_UPLOADS };
-    }
+  const [wallet, setWallet] = useState<Wallet>({
+    likes: INITIAL_LIKES,
+    uploads: INITIAL_UPLOADS
+  });
+  
+  // This state ensures that we only read from localStorage on the client
+  // after the component has mounted.
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
     try {
       const saved = localStorage.getItem('likeflow_wallet');
       if (saved) {
         const parsed = JSON.parse(saved);
-        return {
-          likes: parsed.likes || INITIAL_LIKES,
-          uploads: parsed.uploads || INITIAL_UPLOADS,
-        };
+        setWallet({
+          likes: parsed.likes ?? INITIAL_LIKES,
+          uploads: parsed.uploads ?? INITIAL_UPLOADS,
+        });
       }
     } catch (e) {
-      // ignore
+      console.error("Failed to load wallet from localStorage", e);
     }
-    return {
-      likes: INITIAL_LIKES,
-      uploads: INITIAL_UPLOADS
-    };
-  });
+    setIsHydrated(true);
+  }, []);
+
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    // Only save to localStorage on the client after initial hydration
+    if (isHydrated) {
       localStorage.setItem('likeflow_wallet', JSON.stringify(wallet));
     }
-  }, [wallet]);
+  }, [wallet, isHydrated]);
 
   const addLikes = useCallback((amount: number) => {
     setWallet(prev => ({ ...prev, likes: prev.likes + amount }));
