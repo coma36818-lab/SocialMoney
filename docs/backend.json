@@ -46,31 +46,25 @@
       ]
     },
     "Comment": {
-      "title": "Comment",
+      "name": "Comment",
       "type": "object",
-      "description": "Represents a comment on a post.",
       "properties": {
-        "postId": {
+        "post_id": {
           "type": "string",
-          "description": "The ID of the post this comment belongs to."
+          "description": "ID del post commentato"
         },
-        "authorName": {
+        "author_name": {
           "type": "string",
-          "description": "The name of the user who wrote the comment."
+          "description": "Nome dell'autore del commento"
         },
         "text": {
           "type": "string",
-          "description": "The content of the comment."
-        },
-        "timestamp": {
-          "type": "object",
-          "description": "The server timestamp of when the comment was created."
+          "description": "Testo del commento"
         }
       },
       "required": [
-        "postId",
-        "text",
-        "timestamp"
+        "post_id",
+        "text"
       ]
     }
   },
