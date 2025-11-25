@@ -34,6 +34,7 @@ async function buyLikes(postId: string, likeCount: number, priceEuro: number, pa
   const postRef = doc(db, "Posts", postId);
   await updateDoc(postRef, {
     likes: increment(likeCount),
+    likesWeek: increment(likeCount),
     creditValue: increment(likeCount * 0.01) // 1 like = 0.01€
   });
 

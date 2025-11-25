@@ -94,7 +94,7 @@ const PodiumPlace = ({ post, place, delay }: { post: any, place: number, delay: 
         </p>
         <div className="flex items-center gap-1 mt-1 relative z-10">
           <Heart className="w-3 h-3 text-black fill-black" />
-          <span className="text-black text-sm font-bold">{post.likes || 0}</span>
+          <span className="text-black text-sm font-bold">{post.likesWeek || 0}</span>
         </div>
       </motion.div>
     </motion.div>
@@ -105,14 +105,14 @@ function Ranking() {
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['ranking'],
     queryFn: async () => {
-      const postsRef = collection(db, "posts");
+      const postsRef = collection(db, "Posts");
       const q = query(postsRef, orderBy("likesWeek", "desc"), limit(50));
       const snap = await getDocs(q);
       return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     },
   });
 
-  const rankedPosts = posts.filter((post: any) => (post.likes || 0) > 0);
+  const rankedPosts = posts.filter((post: any) => (post.likesWeek || 0) > 0);
 
   return (
     <div className="min-h-[100dvh] bg-black pb-8 pt-16 overflow-y-auto">
@@ -290,7 +290,7 @@ function Ranking() {
                     <span className={`font-bold ${
                       index < 3 ? 'text-[#FFD700]' : 'text-gray-400'
                     }`}>
-                      {post.likes || 0}
+                      {post.likesWeek || 0}
                     </span>
                   </motion.div>
                 </motion.div>
