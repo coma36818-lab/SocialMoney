@@ -1,0 +1,103 @@
+
+body {
+    background: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    padding: 15px;
+    margin: 0;
+}
+
+#walletBox {
+    background: #111;
+    border-bottom: 1px solid #333;
+    padding: 12px;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+#walletValue {
+    color: gold;
+    font-weight: bold;
+}
+
+#buyBtn {
+    background: gold;
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+#feedContainer {
+    padding-top: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.post {
+    width: 100%;
+    max-width: 400px;
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.post-media {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.post-info {
+    padding: 12px;
+}
+
+.post-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.author-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.author-name {
+    font-weight: bold;
+}
+
+.post-desc {
+    font-size: 14px;
+    color: #aaa;
+    margin-top: 8px;
+}
+
+.like-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 24px;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    

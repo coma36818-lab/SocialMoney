@@ -22,7 +22,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/likeflow`,
+      url: `${baseUrl}/likeflow/upload`,
+      lastModified: '2025-11-11',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/likeflow/feed`,
+      lastModified: '2025-11-11',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/likeflow/top`,
+      lastModified: '2025-11-11',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/likeflow/purchase`,
       lastModified: '2025-11-11',
       priority: 0.8,
     },
@@ -79,3 +94,4 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [...staticUrls, ...categoryUrls, ...curiositaUrl];
 }
 
+    
