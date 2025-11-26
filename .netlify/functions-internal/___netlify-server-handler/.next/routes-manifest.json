@@ -52,12 +52,6 @@
       "namedRegex": "^/favicon\\.ico(?:/)?$"
     },
     {
-      "page": "/gamehub",
-      "regex": "^/gamehub(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/gamehub(?:/)?$"
-    },
-    {
       "page": "/gossip/le-coppie-vip",
       "regex": "^/gossip/le\\-coppie\\-vip(?:/)?$",
       "routeKeys": {},
@@ -68,6 +62,42 @@
       "regex": "^/library(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/library(?:/)?$"
+    },
+    {
+      "page": "/likeflow",
+      "regex": "^/likeflow(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/likeflow(?:/)?$"
+    },
+    {
+      "page": "/likeflow/feed",
+      "regex": "^/likeflow/feed(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/likeflow/feed(?:/)?$"
+    },
+    {
+      "page": "/likeflow/purchase",
+      "regex": "^/likeflow/purchase(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/likeflow/purchase(?:/)?$"
+    },
+    {
+      "page": "/likeflow/top",
+      "regex": "^/likeflow/top(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/likeflow/top(?:/)?$"
+    },
+    {
+      "page": "/likeflow/upload",
+      "regex": "^/likeflow/upload(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/likeflow/upload(?:/)?$"
+    },
+    {
+      "page": "/likeflow/wallet",
+      "regex": "^/likeflow/wallet(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/likeflow/wallet(?:/)?$"
     },
     {
       "page": "/privacy",

@@ -9,12 +9,15 @@ import { addDoc, collection, serverTimestamp, doc, getDoc, setDoc, increment } f
 const { firestore: db } = initializeFirebase();
 
 const getOrCreateUserId = (): string => {
-  let userId = localStorage.getItem('likeflow_userId');
-  if (!userId) {
-    userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    localStorage.setItem('likeflow_userId', userId);
+  if (typeof window !== 'undefined') {
+    let userId = localStorage.getItem('likeflow_userId');
+    if (!userId) {
+      userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      localStorage.setItem('likeflow_userId', userId);
+    }
+    return userId;
   }
-  return userId;
+  return ''
 };
 
 // Mock PayPal payment creation
@@ -61,25 +64,32 @@ async function withdrawCredits(localUserId: string) {
 export default function WalletPage() {
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const { wallet, addCredits, resetCredits } = useWallet();
-
-  const userId = getOrCreateUserId();
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchWallet = async () => {
-      const walletRef = doc(db, "Wallets", userId);
-      const walletSnap = await getDoc(walletRef);
-      if (walletSnap.exists()) {
-        addCredits(walletSnap.data().credit);
-      }
-    };
-    fetchWallet();
+    setUserId(getOrCreateUserId());
+  }, []);
+
+  useEffect(() => {
+    if(userId){
+        const fetchWallet = async () => {
+        const walletRef = doc(db, "Wallets", userId);
+        const walletSnap = await getDoc(walletRef);
+        if (walletSnap.exists()) {
+            addCredits(walletSnap.data().credit);
+        }
+        };
+        fetchWallet();
+    }
   }, [userId, addCredits]);
   
   const handleWithdraw = async () => {
-    setIsWithdrawing(true);
-    await withdrawCredits(userId);
-    resetCredits();
-    setIsWithdrawing(false);
+    if(userId){
+        setIsWithdrawing(true);
+        await withdrawCredits(userId);
+        resetCredits();
+        setIsWithdrawing(false);
+    }
   };
 
   return (

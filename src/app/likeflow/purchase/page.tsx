@@ -66,10 +66,14 @@ export default function Packages() {
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const { addLikes, addUploads } = useWallet();
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const userId = getOrCreateUserId();
+  useEffect(() => {
+    setUserId(getOrCreateUserId());
+  }, []);
 
   const handlePurchase = (type: 'likes' | 'uploads', amount: number, price: number, pkg: {id: number, name: string}) => {
+    if (!userId) return;
     setSelectedPackage(`${type}-${pkg.id}`);
     
     window.open(
